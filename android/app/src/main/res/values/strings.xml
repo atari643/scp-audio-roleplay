@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SCP Audio</string>
+    <string name="title_activity_main">SCP Audio</string>
+    <string name="package_name">fr.fondation.scpaudio</string>
+    <string name="custom_url_scheme">fr.fondation.scpaudio</string>
+</resources>

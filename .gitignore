@@ -1,0 +1,31 @@
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
+scripts/.build/
+scripts/.audit-cache/
+scripts/.probe-cache/
+scripts/audit-*.json
+dist-server/
+.env
+
+# Dépendances et produits de build
+node_modules/
+dist/
+tsconfig.tsbuildinfo
+
+# Sorties audio de travail (régénérables : probe-speech.mjs, echantillons)
+tmp/
+tmp-ecoute/
+echantillons-voix/
+test_tts.mp3
+
+# Capacitor / Android : tout ce que `npx cap sync` et Gradle régénèrent
+android/app/build/
+android/build/
+android/.gradle/
+android/.idea/
+android/local.properties
+android/app/src/main/assets/public/
+android/capacitor-cordova-android-plugins/build/
+
+# Réglages locaux de l'agent (permissions propres à la machine)
+.claude/settings.local.json

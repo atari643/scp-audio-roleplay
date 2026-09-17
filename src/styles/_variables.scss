@@ -1,0 +1,29 @@
+// SCSS Variables for SCP Foundation Classified Terminal Theme
+$color-bg: #0b0e14;
+$color-surface: #121722;
+$color-card: #181f2e;
+$color-card-hover: #202a3e;
+$color-border: #2a364f;
+
+// Brand & Alert Accents
+$color-scp-red: #dc2626;
+$color-scp-red-dark: #7f1d1d;
+$color-scp-red-glow: rgba(220, 38, 38, 0.4);
+$color-amber: #f59e0b;
+$color-emerald: #10b981;
+$color-cyan: #06b6d4;
+$color-purple: #a855f7;
+
+// Text Colors
+$text-primary: #f8fafc;
+$text-secondary: #cbd5e1;
+$text-muted: #94a3b8;
+$text-dim: #64748b;
+
+// Fonts
+$font-mono: 'JetBrains Mono', 'Consolas', monospace;
+$font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+// Transitions
+$transition-fast: 150ms ease;
+$transition-normal: 250ms ease;

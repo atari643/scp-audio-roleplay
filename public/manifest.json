@@ -1,0 +1,17 @@
+{
+  "name": "SCP Foundation - Audio Roleplay",
+  "short_name": "SCP Audio",
+  "description": "Lecteur Audio Roleplay Multi-voix de dossiers de la Fondation SCP",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0e14",
+  "theme_color": "#0b0e14",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

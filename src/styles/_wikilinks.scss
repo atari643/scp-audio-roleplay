@@ -1,0 +1,169 @@
+// Liens inter-dossiers : un passage du texte qui renvoie ailleurs dans le wiki.
+//
+// Contrainte de fond : ces liens vivent AU MILIEU du texte narré, et le lecteur écoute
+// autant qu'il lit. Le repos doit donc rester très discret — un soulignement pointillé
+// suffit à signaler sans hacher la lecture — et l'affordance ne se révèle qu'au survol.
+
+@use 'sass:color';
+@use 'variables' as *;
+
+.wiki-link {
+  display: inline;
+  padding: 0 0.15em;
+  margin: 0 -0.05em;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  border-radius: 3px;
+  transition: background-color $transition-fast, color $transition-fast,
+    box-shadow $transition-fast;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration-style: solid;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  // Un accent par nature de cible, pour qu'on sache où l'on va avant de cliquer.
+  &--scp {
+    color: color.adjust($color-scp-red, $lightness: 18%);
+    text-decoration-color: color.change($color-scp-red, $alpha: 0.55);
+    &:hover { background: color.change($color-scp-red, $alpha: 0.14); box-shadow: 0 0 12px color.change($color-scp-red, $alpha: 0.25); }
+  }
+
+  &--tale {
+    color: color.adjust($color-amber, $lightness: 12%);
+    text-decoration-color: color.change($color-amber, $alpha: 0.55);
+    &:hover { background: color.change($color-amber, $alpha: 0.14); box-shadow: 0 0 12px color.change($color-amber, $alpha: 0.22); }
+  }
+
+  &--hub {
+    color: color.adjust($color-cyan, $lightness: 12%);
+    text-decoration-color: color.change($color-cyan, $alpha: 0.55);
+    &:hover { background: color.change($color-cyan, $alpha: 0.14); box-shadow: 0 0 12px color.change($color-cyan, $alpha: 0.22); }
+  }
+
+  &--goi {
+    color: color.adjust($color-purple, $lightness: 10%);
+    text-decoration-color: color.change($color-purple, $alpha: 0.55);
+    &:hover { background: color.change($color-purple, $alpha: 0.14); box-shadow: 0 0 12px color.change($color-purple, $alpha: 0.22); }
+  }
+
+  &--external {
+    color: $text-muted;
+    text-decoration-color: color.change($text-muted, $alpha: 0.5);
+    &:hover { background: color.change($text-muted, $alpha: 0.12); color: $text-secondary; }
+
+    // Marque de sortie : on quitte l'application.
+    &::after {
+      content: '↗';
+      font-size: 0.72em;
+      margin-left: 0.18em;
+      vertical-align: super;
+      opacity: 0.75;
+    }
+  }
+}
+
+// Petite étiquette de type, affichée dans la file et au survol prolongé.
+.wiki-link-badge {
+  display: inline-block;
+  font-family: $font-mono;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 5px;
+  border-radius: 3px;
+  border: 1px solid currentColor;
+  opacity: 0.85;
+}
+
+// Segment porteur d'au moins un lien : liseré latéral, sans toucher au flux du texte.
+.segment-has-link {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 0.28em;
+    bottom: 0.28em;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(
+      to bottom,
+      color.change($color-cyan, $alpha: 0),
+      color.change($color-cyan, $alpha: 0.55),
+      color.change($color-cyan, $alpha: 0)
+    );
+  }
+}
+
+// File « À SUIVRE » : ce qu'on a mis de côté sans couper l'écoute.
+.reading-queue {
+  border: 1px solid $color-border;
+  border-radius: 12px;
+  background: color.change($color-surface, $alpha: 0.9);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: 0;
+    color: $text-secondary;
+    font-family: $font-mono;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    &:hover { color: $text-primary; }
+  }
+
+  &__count {
+    margin-left: auto;
+    font-family: $font-mono;
+    font-size: 10px;
+    color: $color-cyan;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    // Cible tactile confortable : la file est aussi utilisée sur mobile.
+    min-height: 44px;
+    padding: 8px 12px;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid color.change($color-border, $alpha: 0.6);
+    color: $text-secondary;
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover { background: color.change($color-card-hover, $alpha: 0.7); color: $text-primary; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wiki-link {
+    transition: none;
+    &:hover { box-shadow: none; }
+  }
+}
