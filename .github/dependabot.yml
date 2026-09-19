@@ -10,20 +10,42 @@
 # le paquet web, ni dans l'APK. L'ignorer est un choix, pas un oubli — à revoir
 # quand `@capacitor/cli` embarquera un `xcode` à jour.
 
+# Deux réglages viennent du premier essai, qui a ouvert neuf demandes de tirage
+# d'un coup : les mises à jour sont **groupées** en une seule demande, et les
+# montées de version **majeures** sont écartées. Un projet sans tests — ici
+# `tsc -b` est le seul filet — ne peut pas absorber une rupture d'API à l'aveugle
+# depuis une demande automatique ; ces montées-là se font à la main, en regardant
+# le journal des modifications.
+
 version: 2
 updates:
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
+    groups:
+      mineures:
+        patterns: ['*']
+        update-types: [minor, patch]
     ignore:
       - dependency-name: uuid
         versions: ['<9']
+      - dependency-name: '*'
+        update-types: [version-update:semver-major]
 
   # Les actions des trois workflows (CI, miroir Pages, APK Android) : une action
   # épinglée qui vieillit finit par tourner sur un runner qui ne la supporte plus.
+  # Groupées aussi, et sans les majeures, pour la même raison.
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    open-pull-requests-limit: 2
+    groups:
+      actions:
+        patterns: ['*']
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: '*'
+        update-types: [version-update:semver-major]
