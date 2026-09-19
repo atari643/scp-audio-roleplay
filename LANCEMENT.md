@@ -97,24 +97,53 @@ modérateur coûte plus qu'il ne rapporte.
 > Live: https://scp-audio-roleplay.vercel.app
 > Code: https://github.com/atari643/scp-audio-roleplay
 
-### Reddit — r/SCP
+### Reddit — r/SCP (anglais)
 
-> **J'ai fait un lecteur audio des dossiers SCP, avec une voix par personnage**
+> **I made a site that reads SCP files out loud, with a different voice for each
+> character**
+
+> Not one flat robot voice for the whole thing. The narrator reads the file, the
+> researcher gives the containment procedure, the anomaly answers in the
+> interview, the D-class panics, the Site-19 intercom cuts everyone off.
 >
-> Pas une synthèse vocale qui lit tout d'une traite : le narrateur pose le
-> dossier, le chercheur donne la procédure, l'anomalie répond dans l'entretien,
-> le Classe-D crie, l'intercom du Site-19 coupe la parole à tout le monde.
+> Redacted blocks aren't read — they become a censor beep, on the exact
+> millisecond the text goes black. Footnotes are spoken where they're marked, not
+> dumped at the end.
 >
-> Le caviardage devient un bip placé à l'instant exact où le texte est noirci.
-> Les notes de bas de page sont dites à leur place, pas entassées à la fin. Les
-> dossiers sont lus en direct depuis le wiki, dans dix branches linguistiques.
+> Nothing to install, no account, free. Files are pulled live from the wiki.
 >
-> Rien à installer, rien à créer : https://scp-audio-roleplay.vercel.app
+> Start here: https://scp-audio-roleplay.vercel.app/?lang=en
+> Or jump straight into 173: https://scp-audio-roleplay.vercel.app/?scp=scp-173&lang=en
 >
-> C'est un projet de fan, non officiel, sans revenu. Le contenu reste CC BY-SA
-> 3.0 et chaque dossier affiche son auteur, son traducteur et sa source.
-> Retours bienvenus, surtout sur les dossiers qui se lisent mal — c'est
-> reproductible avec le numéro, la langue et la voix.
+> Fan project, not official, no money in it. Content stays CC BY-SA 3.0 and every
+> file credits its author.
+>
+> If a file reads badly, tell me which number — that's usually enough to fix it.
+
+### Reddit / Discord — communauté francophone
+
+> **J'ai fait un site qui lit les dossiers SCP à voix haute, une voix par
+> personnage**
+
+> Pas une voix de robot qui débite tout d'un bloc. Le narrateur pose le dossier,
+> le chercheur donne la procédure de confinement, l'anomalie répond dans
+> l'entretien, le Classe-D panique, l'intercom du Site-19 coupe la parole à tout
+> le monde.
+>
+> Les blocs caviardés ne sont pas lus : ils deviennent un bip, placé exactement
+> là où le texte est noirci. Les notes de bas de page sont dites à leur place, pas
+> entassées à la fin.
+>
+> Rien à installer, pas de compte, gratuit. Les dossiers sont lus en direct depuis
+> le wiki.
+>
+> C'est ici : https://scp-audio-roleplay.vercel.app
+> Ou directement SCP-173 : https://scp-audio-roleplay.vercel.app/?scp=scp-173
+>
+> Projet de fan, non officiel, sans revenu. Le contenu reste CC BY-SA 3.0 et
+> chaque dossier affiche son auteur et son traducteur.
+>
+> Si un dossier se lit mal, dites-moi lequel — le numéro suffit en général.
 
 ### Dev.to — angle technique (titre suggéré)
 
@@ -137,13 +166,29 @@ Un article qui apprend quelque chose est lu ; une annonce ne l'est pas.
 - Une annonce sans suite retombe. Un rythme de publication, même lent, retient
   les gens qui ont mis une étoile.
 
-## 6. Ce qui manque encore au produit, et qui compte pour la diffusion
+## 6. Les liens à partager
 
-- **Les liens profonds.** L'application n'a pas de routeur : impossible de
-  partager « écoute SCP-173 ici ». Chaque partage est aujourd'hui un lien vers
-  l'accueil. C'est la fonctionnalité qui rendrait le projet réellement
-  partageable, et sans doute le meilleur investissement avant une annonce.
+Depuis les liens profonds, **un lien ouvre la bonne branche**. C'est la
+différence entre un anglophone qui tombe sur un catalogue français et un
+anglophone qui tombe sur ce qu'il cherchait.
+
+| À partager | Lien |
+|---|---|
+| Accueil, français | `https://scp-audio-roleplay.vercel.app` |
+| Accueil, **anglais** | `https://scp-audio-roleplay.vercel.app/?lang=en` |
+| Un dossier précis, anglais | `…/?scp=scp-173&lang=en` |
+| Un dossier précis, français | `…/?scp=scp-173` |
+
+Un lien qui **vise un dossier** saute la séquence de démarrage et ouvre
+directement le dossier : c'est celui qu'il faut poster, parce que le visiteur
+entend l'application dans les deux secondes au lieu d'attendre dix.
+
+Vérifiez toujours la langue du lien avant de poster. C'est l'erreur la plus
+facile à commettre et la plus coûteuse.
+
+## 7. Ce qui manque encore au produit
+
 - **Une démonstration visuelle.** Les dépôts qui montrent le produit en
   mouvement — un GIF de trente secondes, pas davantage — obtiennent nettement
   plus d'engagement qu'une description, si bonne soit-elle. Il en faut un dans le
-  README, au-dessus du pli.
+  README, au-dessus du pli. C'est l'issue #12.
