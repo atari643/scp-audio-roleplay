@@ -29,12 +29,13 @@ export const App: React.FC = () => {
 
   return (
     <>
-      {/* Bascule tactique flottante (Bureau ⇄ Mobile) */}
+      {/* Bascule tactique flottante (Bureau ⇄ Mobile), en bas à droite */}
       <DeviceSwitcherBadge
         mode={mode}
         isMobile={isMobile}
         onToggle={toggleMode}
         onSetMode={setDeviceMode}
+        lecteurVisible={app.playerStatus.totalSegments > 0}
       />
 
       {/* Vue dédiée, chargée à la demande */}

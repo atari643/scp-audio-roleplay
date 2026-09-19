@@ -206,6 +206,77 @@ class SpeechEngine {
   private loadSystemVoices(): void {
     if (!this.synth) return;
     this.availableSystemVoices = this.synth.getVoices();
+    this.repartirVoixSysteme();
+  }
+
+  /**
+   * Donne une voix différente à chaque rôle quand on tombe sur le moteur du navigateur.
+   *
+   * Sans ça, `fallbackSystemSpeech()` n'assignait AUCUNE voix : `voiceURI` vaut `''` dans
+   * les profils par défaut, le navigateur prenait donc sa voix unique, et les sept rôles
+   * sortaient de la même bouche à la hauteur près. C'est ce qu'entendent les visiteurs du
+   * miroir statique, où le relais de synthèse n'existe pas.
+   *
+   * Deux précautions : on ne touche qu'aux profils encore vides — un choix explicite fait
+   * dans le studio vocal doit primer — et on ne persiste rien, le catalogue de voix
+   * dépendant de la machine et du navigateur.
+   */
+  private repartirVoixSysteme(): void {
+    const candidates = this.classerVoixSysteme();
+    if (candidates.length === 0) return;
+
+    // Ordre fixe : le narrateur, le plus entendu, prend la meilleure voix. Les rôles
+    // suivants se partagent le reste, et on reboucle s'il y en a moins que de rôles.
+    const ordre: CharacterRole[] = [
+      'narrator',
+      'researcher',
+      'anomaly',
+      'classD',
+      'agent',
+      'commander',
+      'intercom'
+    ];
+
+    ordre.forEach((role, rang) => {
+      const profil = this.voiceProfiles[role];
+      if (!profil || profil.voiceURI) return;
+      this.voiceProfiles[role] = {
+        ...profil,
+        voiceURI: candidates[rang % candidates.length].voiceURI
+      };
+    });
+  }
+
+  /**
+   * Classe les voix installées de la langue courante, de la plus convaincante à la moins.
+   *
+   * Le critère est le nom, faute de mieux : l'API du navigateur ne dit rien de la qualité
+   * d'une voix. « Natural » et « Neural » désignent les voix modernes de Windows et
+   * d'Android ; une voix distante (`localService === false`) est en général une voix de
+   * serveur, meilleure que la synthèse locale ; eSpeak, à l'inverse, est le timbre
+   * métallique qu'on veut éviter tant qu'il existe autre chose.
+   */
+  private classerVoixSysteme(): SpeechSynthesisVoice[] {
+    const prefixe = this.languageCode.toLowerCase().split('-')[0];
+    const note = (voix: SpeechSynthesisVoice): number => {
+      const nom = voix.name.toLowerCase();
+      if (nom.includes('espeak')) return -10;
+      let points = 0;
+      if (nom.includes('natural') || nom.includes('neural')) points += 6;
+      if (!voix.localService) points += 3;
+      if (nom.includes('google')) points += 2;
+      if (nom.includes('microsoft')) points += 1;
+      // Une voix de la locale exacte passe devant une simple correspondance de langue.
+      if (voix.lang.toLowerCase() === this.languageCode.toLowerCase()) points += 1;
+      return points;
+    };
+
+    return this.availableSystemVoices
+      .filter(v => v.lang.toLowerCase().startsWith(prefixe))
+      .map(v => ({ v, n: note(v) }))
+      .filter(x => x.n > -10)
+      .sort((a, b) => b.n - a.n || a.v.name.localeCompare(b.v.name))
+      .map(x => x.v);
   }
 
   public getEngineMode(): TtsEngineMode {
@@ -246,6 +317,19 @@ class SpeechEngine {
         this.aiVoiceAssignments = assigned as Record<CharacterRole, string>;
       }
     }
+
+    // Le classement des voix du navigateur dépend de la langue : changer de branche doit
+    // rebattre les cartes, sinon on lirait du russe avec des voix françaises en repli.
+    this.repartirVoixSysteme();
+  }
+
+  /**
+   * Vrai quand les voix neurales sont hors d'atteinte et qu'on parle avec le moteur du
+   * navigateur : soit l'utilisateur l'a choisi, soit le point d'accès a échoué assez de
+   * fois pour qu'on cesse d'essayer. L'interface s'en sert pour le dire, discrètement.
+   */
+  public isDegradedVoiceMode(): boolean {
+    return this.engineMode === 'system' || this.neuralUnavailable;
   }
 
   public getAiVoiceAssignments(): Record<CharacterRole, string> {
@@ -1268,6 +1352,7 @@ class SpeechEngine {
       globalSpeed: this.globalSpeed,
       currentTime: this.currentTime,
       duration: this.duration,
+      voixDegradee: this.isDegradedVoiceMode(),
       volume: this.volume,
       isMuted: this.isMuted
     });

@@ -81,9 +81,15 @@ User-Agent dans un WebSocket — d'où trois chemins, tous dans
 
 | Contexte | Chemin | Pourquoi |
 |---|---|---|
-| Chrome, Firefox | `/api/tts` | le navigateur serait refusé en direct |
+| Chrome, Firefox, en local | `/api/tts` | le navigateur serait refusé en direct |
+| Chrome, Firefox, sur le miroir Pages | relais Vercel, via `VITE_TTS_ENDPOINT` | Pages est statique : il n'exécute aucune fonction |
 | Edge, WebView Android | WebSocket direct | l'agent passe déjà |
 | Node (dev, serveur, fonction serverless) | WebSocket direct | Node peut poser ses en-têtes |
+
+Quand aucun de ces chemins n'aboutit, l'application retombe sur les voix du
+navigateur, le signale dans le lecteur (« VOIX DE SECOURS ») et répartit malgré tout
+des voix **différentes** entre les rôles — au lieu de lire les sept personnages avec
+la même.
 
 Sur Android, c'est `overrideUserAgent` dans
 [`capacitor.config.ts`](capacitor.config.ts) qui rend les voix neurales

@@ -55,10 +55,26 @@ const ROLE_BADGES: Record<CharacterRole, { label: string; couleur: string; code:
 
 const SPEEDS = [0.85, 1.0, 1.2, 1.4];
 
+/**
+ * Anneau de focus commun.
+ *
+ * Le lecteur est la barre la plus utilisée de l'application et elle se pilote au
+ * clavier (espace, flèches). Sans anneau visible, la navigation au clavier se fait
+ * à l'aveugle sur une douzaine de boutons alignés.
+ */
+const FOCUS =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-texte focus-visible:ring-offset-1 focus-visible:ring-offset-surface-1';
+
 const BOUTON_TRANSPORT =
   'w-9 h-9 flex items-center justify-center rounded-sm text-texte-attenue ' +
   'hover:text-texte hover:bg-surface-3 disabled:opacity-25 disabled:hover:bg-transparent ' +
-  'disabled:hover:text-texte-attenue transition-colors';
+  'disabled:hover:text-texte-attenue transition-colors ' +
+  FOCUS;
+
+/** Groupe de réglages : même boîte pour le volume, la vitesse et l'ambiance. */
+const GROUPE_REGLAGE =
+  'flex items-center h-8 rounded-sm bg-surface-2 border border-bordure ' +
+  'hover:border-bordure-forte transition-colors';
 
 function formatTime(seconds: number): string {
   if (isNaN(seconds) || seconds < 0) return '00:00';
@@ -113,8 +129,12 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-surface-1/97 backdrop-blur-xl border-t border-bordure select-none shadow-relief">
       {/* Barre de progression : deux niveaux, un seul accent.
           Le fond sourd indique où l'on en est du dossier, l'aplat plein où l'on
-          en est du segment. */}
-      <div className="relative w-full h-1.5 bg-fond group cursor-pointer">
+          en est du segment.
+
+          La piste s'épaissit au survol et sort une tête de lecture : à 1,5 px et
+          sans repère, on visait un point de la bande sans savoir où l'on était,
+          et le rail restait invisible tant qu'on ne cherchait pas le curseur. */}
+      <div className="group/piste relative w-full h-1.5 hover:h-2.5 bg-fond transition-[height] duration-150 cursor-pointer">
         <div
           className="absolute inset-y-0 left-0 bg-accent/30 pointer-events-none transition-[width] duration-300"
           style={{ width: `${segmentProgressPercent}%` }}
@@ -123,6 +143,11 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
           className="absolute inset-y-0 left-0 bg-accent-texte pointer-events-none"
           style={{ width: `${audioProgressPercent}%` }}
         />
+        <span
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-0.5 h-3.5 bg-texte opacity-0 group-hover/piste:opacity-100 transition-opacity pointer-events-none"
+          style={{ left: `${audioProgressPercent}%` }}
+          aria-hidden="true"
+        />
         <input
           type="range"
           min={0}
@@ -130,7 +155,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
           step={0.1}
           value={status.duration > 0 ? status.currentTime : audioProgressPercent}
           onChange={handleScrubberChange}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+          className={`absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 ${FOCUS}`}
           aria-label="Progression de la lecture"
           title={`Progression : ${formatTime(status.currentTime)} / ${formatTime(status.duration)}`}
         />
@@ -156,6 +181,21 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
               >
                 {roleBadge.label}
               </span>
+              {/* Le code de canal existait dans la table des rôles sans jamais être
+                  affiché. Il donne l'identité du poste sans ajouter de couleur. */}
+              <span className="font-mono text-xs text-texte-attenue tracking-technique shrink-0 hidden xl:inline">
+                {roleBadge.code}
+              </span>
+              {status.voixDegradee && (
+                // Signalement volontairement sobre : l'auditeur doit savoir qu'il
+                // n'entend pas les voix neurales, sans que ça devienne une alarme.
+                <span
+                  className="font-mono text-xs text-texte-attenue border border-bordure rounded-sm px-1 shrink-0 hidden lg:inline"
+                  title="Voix du navigateur : le moteur neural n'est pas joignable depuis cet hébergement. Ouvrez le studio des voix pour réessayer."
+                >
+                  VOIX DE SECOURS
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-2 mt-0.5 min-w-0">
@@ -177,7 +217,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
         </div>
 
         {/* Transport */}
-        <div className="flex flex-col items-center gap-1">
+        <div className="flex flex-col items-center gap-1 shrink-0">
           <div className="flex items-center gap-1">
             <button
               onClick={() => {
@@ -208,7 +248,11 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
               onClick={() => (status.isPlaying ? onPause() : onPlay())}
               title={status.isPlaying ? 'Mettre en pause [Espace]' : 'Démarrer la lecture [Espace]'}
               aria-label={status.isPlaying ? 'Mettre en pause' : 'Démarrer la lecture'}
-              className="w-11 h-11 mx-1 rounded-sm flex items-center justify-center bg-accent hover:bg-accent-texte active:bg-accent-fort text-texte transition-colors"
+              className={`w-11 h-11 mx-1 rounded-sm flex items-center justify-center bg-accent hover:bg-accent-texte active:bg-accent-fort text-texte transition-colors ${FOCUS} ${
+                // Un liseré pendant la lecture : le seul bouton dont l'état doit
+                // se lire d'un coup d'œil depuis l'autre bout de l'écran.
+                status.isPlaying ? 'ring-1 ring-inset ring-texte/25' : ''
+              }`}
             >
               {status.isPlaying ? (
                 <Pause className="w-5 h-5 fill-current" />
@@ -276,7 +320,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
         {/* Réglages */}
         <div className="w-full sm:w-1/3 flex items-center justify-between sm:justify-end gap-2 font-mono text-xs">
           {/* Volume */}
-          <div className="flex items-center gap-1.5 h-8 px-2 rounded-sm bg-surface-2 border border-bordure">
+          <div className={`${GROUPE_REGLAGE} gap-1.5 px-2`}>
             <button
               onClick={() => {
                 sfx.playTerminalBeep();
@@ -285,7 +329,9 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
               title={status.isMuted ? 'Rétablir le son [M]' : 'Couper le son [M]'}
               aria-label={status.isMuted ? 'Rétablir le son' : 'Couper le son'}
               aria-pressed={status.isMuted}
-              className={status.isMuted ? 'text-accent-texte' : 'text-texte-attenue hover:text-texte transition-colors'}
+              className={`rounded-sm ${FOCUS} ${
+                status.isMuted ? 'text-accent-texte' : 'text-texte-attenue hover:text-texte transition-colors'
+              }`}
             >
               {status.isMuted || status.volume === 0 ? (
                 <VolumeX className="w-4 h-4" />
@@ -312,12 +358,12 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
             </span>
           </div>
 
-          <div className="hidden xl:flex items-center h-8 px-2 rounded-sm bg-surface-2 border border-bordure shrink-0">
+          <div className={`${GROUPE_REGLAGE} px-2 shrink-0 hidden xl:flex`}>
             <HeartRateMonitor isPlaying={status.isPlaying} currentRole={status.currentRole} />
           </div>
 
           {/* Vitesse de lecture */}
-          <div className="flex items-center gap-0.5 h-8 px-1.5 rounded-sm bg-surface-2 border border-bordure">
+          <div className={`${GROUPE_REGLAGE} gap-0.5 px-1.5`}>
             <Gauge className="w-3.5 h-3.5 text-texte-attenue mr-0.5 hidden md:block" aria-hidden="true" />
             {SPEEDS.map((sp) => (
               <button
@@ -327,7 +373,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                   onSpeedChange(sp);
                 }}
                 aria-pressed={status.globalSpeed === sp}
-                className={`px-1.5 py-0.5 rounded-sm transition-colors ${
+                className={`px-1.5 py-0.5 rounded-sm transition-colors tabular-nums ${FOCUS} ${
                   status.globalSpeed === sp
                     ? 'bg-accent text-texte font-semibold'
                     : 'text-texte-attenue hover:text-texte'
@@ -343,7 +389,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
             onClick={onToggleAmbience}
             title={ambienceActive ? 'Couper le fond sonore du Site-19' : 'Activer le fond sonore du Site-19'}
             aria-pressed={ambienceActive}
-            className={`inline-flex items-center gap-1.5 h-8 px-2 rounded-sm border transition-colors ${
+            className={`inline-flex items-center gap-1.5 h-8 px-2 rounded-sm border transition-colors ${FOCUS} ${
               ambienceActive
                 ? 'bg-surface-3 border-accent-texte text-accent-texte'
                 : 'bg-surface-2 border-bordure text-texte-attenue hover:text-texte hover:border-bordure-forte'
@@ -363,7 +409,11 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
             }}
             title="Studio des voix et attribution des rôles"
             aria-label="Ouvrir le studio des voix"
-            className="w-8 h-8 flex items-center justify-center rounded-sm bg-surface-2 border border-bordure text-texte-attenue hover:text-texte hover:border-bordure-forte transition-colors"
+            className={`w-8 h-8 flex items-center justify-center rounded-sm bg-surface-2 border text-texte-attenue hover:text-texte hover:border-bordure-forte transition-colors ${FOCUS} ${
+              // En mode dégradé, le studio des voix est l'endroit où l'on peut
+              // réessayer le moteur neural : le bouton se signale, sans crier.
+              status.voixDegradee ? 'border-classe-euclid text-classe-euclid' : 'border-bordure'
+            }`}
           >
             <Sliders className="w-3.5 h-3.5" />
           </button>

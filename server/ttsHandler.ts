@@ -33,7 +33,37 @@ function normalizeSign(raw: string): string {
   return clean;
 }
 
-export async function handleTtsRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
+/**
+ * Durcissements qui ne concernent QUE le relais public (`api/tts.ts`).
+ *
+ * Servi depuis la machine de l'utilisateur, ce point d'accès est déjà protégé par le fait
+ * qu'il n'est joignable que par lui. Exposé sur Internet, il devient un service de synthèse
+ * gratuit pour qui le découvre, payé sur le quota du propriétaire. D'où ces deux réglages —
+ * et d'où le fait qu'ils soient **optionnels** : sans eux, le comportement local ne bouge
+ * pas d'un octet.
+ */
+export interface OptionsTts {
+  /**
+   * Valeur à poser en `Access-Control-Allow-Origin`, ou `null` pour n'en poser aucune
+   * (l'origine appelante n'est pas autorisée : le navigateur refusera la réponse).
+   * Absent ⇒ `*`, le comportement historique.
+   */
+  origineCors?: string | null;
+  /** Longueur maximale du texte accepté. Absent ⇒ aucune limite. */
+  longueurMax?: number;
+  /**
+   * Durée de conservation par un réseau de diffusion, en secondes. Un même passage relu
+   * ressort du cache sans réveiller la fonction : c'est ce qui rend le quota gratuit
+   * difficile à atteindre.
+   */
+  cacheReseau?: number;
+}
+
+export async function handleTtsRequest(
+  req: IncomingMessage,
+  res: ServerResponse,
+  options: OptionsTts = {}
+): Promise<void> {
   const query = new URL(req.url || '', 'http://localhost').searchParams;
 
   const text = query.get('text') || '';
@@ -48,6 +78,14 @@ export async function handleTtsRequest(req: IncomingMessage, res: ServerResponse
 
   if (!text) {
     refuser(400, 'Text parameter is required');
+    return;
+  }
+
+  // Mesuré sur dix dossiers et 1 413 segments : le plus long fait 903 caractères, aucun ne
+  // dépasse 1 200. Un plafond très au-dessus ne gêne donc jamais la lecture d'un dossier,
+  // mais empêche qu'on fasse lire un roman au relais.
+  if (options.longueurMax !== undefined && text.length > options.longueurMax) {
+    refuser(413, `Text too long (max ${options.longueurMax} characters)`);
     return;
   }
 
@@ -72,8 +110,22 @@ export async function handleTtsRequest(req: IncomingMessage, res: ServerResponse
       wordBoundaries: wantBoundaries
     });
 
-    res.setHeader('Cache-Control', 'public, max-age=86400');
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // `max-age` pour le navigateur, `s-maxage` pour le réseau de diffusion devant la
+    // fonction : la même phrase, dans la même voix, ne se resynthétise pas.
+    res.setHeader(
+      'Cache-Control',
+      options.cacheReseau
+        ? `public, max-age=86400, s-maxage=${options.cacheReseau}, stale-while-revalidate=86400`
+        : 'public, max-age=86400'
+    );
+
+    const origine = options.origineCors === undefined ? '*' : options.origineCors;
+    if (origine !== null) {
+      res.setHeader('Access-Control-Allow-Origin', origine);
+      // L'en-tête varie selon l'origine appelante : sans ce `Vary`, un cache partagé
+      // resservirait à un site la réponse autorisée pour un autre.
+      if (origine !== '*') res.setHeader('Vary', 'Origin');
+    }
 
     if (wantBoundaries) {
       res.setHeader('Content-Type', 'application/json');

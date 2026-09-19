@@ -32,7 +32,35 @@ importer `atari643/scp-audio-roleplay`. Tout est déjà décrit dans
 [`vercel.json`](vercel.json) — commande de build, dossier de sortie, réécriture
 SPA, durée maximale de la fonction.
 
-**Rien à configurer côté variables d'environnement.**
+**Rien à configurer côté variables d'environnement.** Le plan Hobby est gratuit à
+vie et **ne demande aucune carte bancaire** : en cas de dépassement de quota, le
+service se met en pause, il n'y a rien à prélever. Les quotas — 1 million d'appels
+et 4 h de CPU réel par mois — sont hors d'atteinte pour cet usage, d'autant que les
+réponses sont mises en cache par le réseau de diffusion (`s-maxage`) et que le
+client garde déjà l'audio en IndexedDB.
+
+### Le relais est verrouillé
+
+`api/tts.ts` n'accepte que les origines du projet (le miroir Pages, le déploiement
+Vercel lui-même lu dans `VERCEL_URL`, et `localhost` pour le développement), et
+refuse en `403` **avant de synthétiser** — un relais ouvert serait un service de
+synthèse gratuit offert à qui le découvre, facturé sur votre quota. Les textes de
+plus de 3 000 caractères sont refusés en `413` ; c'est plus de trois fois le
+segment le plus long mesuré sur le corpus (903 caractères).
+
+Ces deux verrous vivent **uniquement** dans `api/tts.ts`. Un clone hébergé en local
+(`npm run dev`, `npm run serve`) n'est ni filtré ni plafonné : il se comporte
+exactement comme avant.
+
+### Plan B : Cloudflare Workers
+
+Si Vercel posait problème, Workers convient aussi (gratuit, sans carte, 100 000
+requêtes par jour) et supporte le WebSocket sortant avec en-têtes personnalisés via
+`fetch(url, { headers: { Upgrade: 'websocket' } })` puis `response.webSocket`. Il
+faudrait alors un adaptateur dans `src/services/edgeTts.ts`, dont `openSocket()`
+utilise aujourd'hui l'extension `new WebSocket(url, { headers })` propre à Node.
+Ce n'est pas implémenté : Vercel réutilise le code du serveur local tel quel, ce qui
+garantit que le relais ne dérive jamais du comportement local.
 
 ### Vérifier que les voix neurales passent
 

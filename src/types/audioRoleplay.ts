@@ -65,4 +65,11 @@ export interface PlayerStatus {
   duration: number;
   volume: number;
   isMuted: boolean;
+  /**
+   * Vrai quand on parle avec le moteur du navigateur au lieu des voix neurales —
+   * soit par choix, soit parce que le point d'accès de synthèse est hors d'atteinte
+   * (cas du miroir statique). L'interface le signale discrètement plutôt que de
+   * laisser l'auditeur croire que c'est le rendu normal.
+   */
+  voixDegradee?: boolean;
 }
