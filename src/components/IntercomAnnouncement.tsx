@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Volume2, X } from 'lucide-react';
 import { sfx } from '../services/sfxService';
-import { useT } from '../i18n';
+import { CleTraduction, useT } from '../i18n';
 
-const ANNOUNCEMENTS = [
-  "Rappel a tout le personnel : le port du dosimetre est obligatoire en Zone de Confinement B.",
-  "Attention - transfert de sujet Classe-D en cours dans le couloir 7. Veuillez degager le passage.",
-  "Le Dr Bright est formellement interdit d'utiliser SCP-999 sans accord O5.",
-  "Test d'alarme de confinement programme. Ne pas evacuer sauf sur ordre direct du Directeur de Site.",
-  "Rappel : les interactions non autorisees avec des anomalies de classe Keter sont passibles de termination.",
-  "Personnel de confinement, veuillez verifier les protocoles de securite du secteur 19-C.",
+/**
+ * Les annonces de l'intercom, par clé.
+ *
+ * On stocke la clé et non le texte : le module est évalué une fois au
+ * chargement, avant que la langue ne soit connue, et une annonce tirée au sort
+ * doit sortir dans la langue affichée au moment où elle passe.
+ */
+const ANNONCES: CleTraduction[] = [
+  'intercom.dosimetre',
+  'intercom.transfert',
+  'intercom.bright',
+  'intercom.alarme',
+  'intercom.keter',
+  'intercom.protocoles'
 ];
 
 interface IntercomAnnouncementProps {
@@ -25,8 +32,8 @@ export const IntercomAnnouncement: React.FC<IntercomAnnouncementProps> = ({ trig
   useEffect(() => {
     if (!trigger) return;
 
-    const msg = ANNOUNCEMENTS[Math.floor(Math.random() * ANNOUNCEMENTS.length)];
-    setMessage(msg);
+    const cle = ANNONCES[Math.floor(Math.random() * ANNONCES.length)];
+    setMessage(t(cle));
     setVisible(true);
     setFlash(true);
     sfx.playIntercom();
@@ -55,10 +62,10 @@ export const IntercomAnnouncement: React.FC<IntercomAnnouncementProps> = ({ trig
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs tracking-widest text-classe-euclid font-bold font-mono uppercase">
-            DIFFUSION P.A. // SITE-19
+            {t('intercom.diffusion')}
           </span>
           <span className="text-[8px] font-mono text-classe-euclid border border-classe-euclid/50 px-1 py-0.5 rounded">
-            CANAL GÉNÉRAL
+            {t('intercom.canal')}
           </span>
         </div>
         <p className="text-xs font-mono text-classe-euclid leading-relaxed">

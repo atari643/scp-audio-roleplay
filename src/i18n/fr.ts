@@ -274,6 +274,38 @@ export const FR = {
   'bascule.auto': 'Revenir à la détection automatique',
   'explorateur.ouvrirCourt': 'OUVRIR',
 
+  // --- Séquence de démarrage ------------------------------------------------
+  'boot.bios': 'SCiPNET MAINFRAME BIOS v4.19-R — INITIALISATION DU TERMINAL…',
+  'boot.memoire': 'TEST DE LA MÉMOIRE VIVE CONVENTIONNELLE : 640 Ko… [OK]',
+  'boot.handshake': 'VÉRIFICATION DE LA POIGNÉE DE MAIN CHIFFRÉE (SITE-19)… [OK]',
+  'boot.noyau': 'CHARGEMENT DU NOYAU DE SÉCURITÉ : PROTOCOLE BERRYMAN-LANGFORD v9.3…',
+  'boot.archive': 'MONTAGE DE L\'ARCHIVE SONORE MULTI-VOIX ET SYNTHÈSE NEURALE… [OK]',
+  'boot.satellite': 'LIAISON CHIFFRÉE VERS L\'API CROM… [CONNECTÉ]',
+  'boot.accreditation': 'VÉRIFICATION DE L\'ACCRÉDITATION : NIVEAU 4 / RESTREINT… [VALIDÉ]',
+  'boot.pareFeu': 'ACTIVATION DU PARE-FEU COGNITIF ET ISOLATION MÉMÉTIQUE… [ACTIF]',
+  'boot.signatures': 'CHARGEMENT DES SIGNATURES VOCALES DES CHERCHEURS… [OK]',
+  'boot.operationnel': 'TERMINAL SITE-19 OPÉRATIONNEL — CANAL SÉCURISÉ ACTIF',
+  'boot.acces': '>_ ACCÈS AUTORISÉ. PRÉPARATION DU TEST D\'INOCULATION…',
+
+  // --- Scanner biométrique --------------------------------------------------
+  'bio.validee': 'AUTHENTIFICATION VALIDÉE // ACCÈS AUTORISÉ',
+  'bio.erreur': 'ERREUR D\'EMPREINTE — SIGNAL INTERROMPU',
+  'bio.maintenez': 'Maintenez le doigt ou le clic sur le capteur',
+  'bio.acquisition': 'ACQUISITION DU SILLON DERMOPAPILLAIRE…',
+  'bio.minuties': 'ANALYSE DES MINUTIES ET SILLONS…',
+  'bio.comparaison': 'COMPARAISON AVEC LE REGISTRE DU SITE-19…',
+  'bio.niveau4': 'VÉRIFICATION DE L\'ACCRÉDITATION NIVEAU 4…',
+
+  // --- Annonces de l'intercom -----------------------------------------------
+  'intercom.diffusion': 'DIFFUSION P.A. // SITE-19',
+  'intercom.canal': 'CANAL GÉNÉRAL',
+  'intercom.dosimetre': 'Rappel à tout le personnel : le port du dosimètre est obligatoire en Zone 3.',
+  'intercom.transfert': 'Attention — transfert de sujet Classe-D en cours dans le couloir 7. Veuillez dégager le passage.',
+  'intercom.bright': 'Le Dr Bright est formellement interdit d\'utiliser SCP-999 sans accord O5.',
+  'intercom.alarme': 'Test d\'alarme de confinement programmé. Ne pas évacuer sauf ordre direct.',
+  'intercom.keter': 'Rappel : les interactions non autorisées avec des anomalies de classe Keter sont passibles de sanction.',
+  'intercom.protocoles': 'Personnel de confinement, veuillez vérifier les protocoles de sécurité du secteur.',
+
   // --- Écran de confinement d'erreur ---------------------------------------
   'erreur.banniere': "Confinement de l'erreur",
   'erreur.titre': "L'interface a cessé de répondre.",

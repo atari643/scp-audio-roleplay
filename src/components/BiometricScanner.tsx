@@ -68,13 +68,13 @@ export const BiometricScanner: React.FC<BiometricScannerProps> = ({ scpTitle, on
   }, [phase]);
 
   const getTelemetryText = () => {
-    if (phase === 'granted') return 'AUTHENTIFICATION VALIDÉE // ACCÈS AUTORISÉ';
-    if (phase === 'denied') return 'ERREUR D\'EMPREINTE — SIGNAL INTERROMPU';
-    if (phase === 'idle') return 'Maintenez le doigt ou le clic sur le capteur';
-    if (holdProgress < 25) return 'ACQUISITION DU SILLON DERMOPAPILLAIRE...';
-    if (holdProgress < 55) return 'ANALYSE DES MINUTIES ET SILLONS...';
-    if (holdProgress < 85) return 'COMPARAISON REGISTRE DU SITE-19...';
-    return 'VÉRIFICATION ACCRÉDITATION NIVEAU 4...';
+    if (phase === 'granted') return t('bio.validee');
+    if (phase === 'denied') return t('bio.erreur');
+    if (phase === 'idle') return t('bio.maintenez');
+    if (holdProgress < 25) return t('bio.acquisition');
+    if (holdProgress < 55) return t('bio.minuties');
+    if (holdProgress < 85) return t('bio.comparaison');
+    return t('bio.niveau4');
   };
 
   return (

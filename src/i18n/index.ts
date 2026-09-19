@@ -34,15 +34,27 @@ const charges = new Map<string, Dictionnaire>([['fr', FR]]);
 /**
  * L'instantané que lit `useSyncExternalStore`.
  *
- * C'est une chaîne et non le dictionnaire : React compare par identité, et
- * renvoyer l'objet obligerait à le recréer à chaque appel — boucle de rendu
- * garantie. La langue suffit à dire que quelque chose a changé.
+ * Un **compteur**, et surtout pas la langue.
+ *
+ * `definirLangue()` notifie deux fois : une fois en posant la langue, une
+ * seconde fois quand le dictionnaire est arrivé — et c'est la seconde qui
+ * compte, puisque c'est elle qui apporte les traductions. Avec la langue pour
+ * instantané, la seconde notification lisait la même valeur que la première,
+ * React en concluait que rien n'avait changé, et ne re-rendait pas : le
+ * dictionnaire anglais était bien téléchargé, mais jamais affiché.
+ *
+ * Le compteur change à chaque notification, donc aucune ne peut être avalée. Il
+ * doit rester stable entre deux appels sans notification, sinon React boucle —
+ * d'où l'incrément dans `prevenir()` et nulle part ailleurs.
  */
-function instantane(): string {
-  return langueCourante;
+let version = 0;
+
+function instantane(): number {
+  return version;
 }
 
 function prevenir(): void {
+  version++;
   for (const abonne of abonnes) abonne();
 }
 
@@ -143,3 +155,4 @@ export function useT(): typeof t {
 }
 
 export type { CleTraduction };
+

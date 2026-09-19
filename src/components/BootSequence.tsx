@@ -1,19 +1,28 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { sfx } from '../services/sfxService';
-import { useT } from '../i18n';
+import { CleTraduction, useT } from '../i18n';
 
-const BOOT_LINES = [
-  { text: 'SCiPNET MAINFRAME BIOS v4.19-R — INITIALISATION DU TERMINAL...', delay: 0, type: 'system' },
-  { text: 'TEST DE LA MÉMOIRE VIVE CONVENTIONNELLE : 640 Ko... [OK]', delay: 450, type: 'ok' },
-  { text: 'VÉRIFICATION QUANTUM-ENCRYPTED HANDSHAKE (SITE-19)... [OK]', delay: 950, type: 'ok' },
-  { text: 'CHARGEMENT NOYAU SÉCURITÉ : PROTOCOLE BERRYMAN-LANGFORD v9.3...', delay: 1550, type: 'warn' },
-  { text: 'MONTAGE ARCHIVE SONORE MULTI-VOIX ET SYNTHÈSE NEURALE... [OK]', delay: 2150, type: 'ok' },
-  { text: 'LIAISON SATELLITE CRYPTÉE VERS CROM GRAPHQL API... [CONNECTÉ]', delay: 2750, type: 'ok' },
-  { text: 'VÉRIFICATION ACCRÉDITATION OPÉRATEUR : NIVEAU 4 / RESTREINT... [VALIDÉ]', delay: 3350, type: 'ok' },
-  { text: 'ACTIVATION DU PARE-FEU COGNITIF ET ISOLATION MÉMÉTIQUE... [ACTIF]', delay: 3950, type: 'warn' },
-  { text: 'CHARGEMENT DES SIGNATURES VOCALES DES CHERCHEURS (♂/♀)... [OK]', delay: 4550, type: 'ok' },
-  { text: 'TERMINAL SITE-19 OPÉRATIONNEL — CANAL SÉCURISÉ ACTIF', delay: 5150, type: 'ok' },
-  { text: '>_ ACCÈS AUTORISÉ. PRÉPARATION DU TEST D\'INOCULATION...', delay: 5750, type: 'access' },
+/**
+ * Les lignes du BIOS, par clé.
+ *
+ * Elles restaient en français quelle que soit la branche — et comme elles
+ * occupent l'écran entier pendant dix secondes, c'était la première chose, et
+ * parfois la seule, qu'un visiteur anglophone voyait. Le texte est résolu au
+ * rendu, pas ici : le module est évalué une fois, avant que la langue ne soit
+ * connue.
+ */
+const BOOT_LINES: Array<{ cle: CleTraduction; delay: number; type: string }> = [
+  { cle: 'boot.bios', delay: 0, type: 'system' },
+  { cle: 'boot.memoire', delay: 450, type: 'ok' },
+  { cle: 'boot.handshake', delay: 950, type: 'ok' },
+  { cle: 'boot.noyau', delay: 1550, type: 'warn' },
+  { cle: 'boot.archive', delay: 2150, type: 'ok' },
+  { cle: 'boot.satellite', delay: 2750, type: 'ok' },
+  { cle: 'boot.accreditation', delay: 3350, type: 'ok' },
+  { cle: 'boot.pareFeu', delay: 3950, type: 'warn' },
+  { cle: 'boot.signatures', delay: 4550, type: 'ok' },
+  { cle: 'boot.operationnel', delay: 5150, type: 'ok' },
+  { cle: 'boot.acces', delay: 5750, type: 'access' },
 ];
 
 interface BootSequenceProps {
@@ -159,7 +168,7 @@ export const BootSequence: React.FC<BootSequenceProps> = ({ onComplete }) => {
                   [{String(i).padStart(2, '0')}]
                 </span>
               )}
-              {line.text}
+              {t(line.cle)}
               {line.type === 'ok' && visibleLines.includes(i) && (
                 <span className="text-classe-safe ml-2 font-bold select-none">✓</span>
               )}
