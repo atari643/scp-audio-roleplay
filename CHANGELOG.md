@@ -5,6 +5,36 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Ajouté
+
+- **L'interface suit la langue choisie, dans les dix branches.** Choisir
+  l'anglais changeait le catalogue mais pas un mot autour : on lisait un dossier
+  anglais entouré de boutons français, et le badge du locuteur annonçait
+  « Archiviste » à chaque réplique. 223 clés, traduites en anglais, espagnol,
+  allemand, italien, polonais, russe, japonais, coréen et chinois. Le socle est
+  écrit à la main — pas de bibliothèque ajoutée — et chaque branche charge son
+  seul dictionnaire, une dizaine de kilo-octets.
+- **Les résumés d'entités arrivent dans la bonne langue.** Le wiki les publie
+  dans chaque branche depuis toujours ; le script n'en gardait qu'un, l'anglais,
+  parce qu'il est construit en premier. 1 508 résumés au lieu de 418, dont 223
+  en français là où il n'y en avait aucun. Au passage, le morceau de données
+  passe de 82 à 33 Ko compressés : les résumés sont désormais découpés par
+  branche, donc on ne télécharge plus les dix langues pour n'en lire qu'une.
+- **Des liens partageables** : `?scp=scp-173&lang=en` ouvre le dossier sur la
+  bonne branche, `?lang=en` ouvre l'archive en anglais, et l'adresse se met à
+  jour toute seule. Un lien qui vise un dossier saute la séquence de démarrage —
+  dix secondes d'attente avant le dossier promis faisaient fuir le visiteur.
+
+### Sécurité
+
+- **Injection SSML par le nom de voix.** `buildSsml()` posait la voix dans un
+  attribut XML sans l'échapper, là où le texte, lui, passe par `escapeXml`. Une
+  apostrophe suffisait à en sortir. Ce n'est pas un XSS — la sortie est du MP3 —
+  mais un contournement du plafond du relais public : seul `text` est limité à
+  3 000 caractères, donc un texte de longueur arbitraire logé dans `voice` était
+  synthétisé aux frais du quota. Corrigé sur deux couches, `rate`, `pitch` et
+  `volume` compris.
+
 ## [1.1.0] — 2026-09-19
 
 Première version publiée sur le web : l'application tourne sur Vercel, le miroir
