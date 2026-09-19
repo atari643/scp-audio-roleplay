@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../../i18n';
 
 /**
  * Le filet sous l'arbre React.
@@ -58,27 +59,25 @@ export class LimiteErreur extends React.Component<LimiteErreurProps, LimiteErreu
         role="alert"
       >
         <p className="font-mono text-xs uppercase tracking-[0.25em] text-classe-keter">
-          Confinement de l'erreur
+          {t('erreur.banniere')}
         </p>
 
         <h1 className="font-mono text-base font-bold text-texte">
-          L'interface a cessé de répondre.
+          {t('erreur.titre')}
         </h1>
 
         <p className="max-w-md text-sm leading-relaxed text-texte-second">
           {this.props.contexte
-            ? `Le chargement de ${this.props.contexte} a échoué. `
+            ? `${t('erreur.chargementEchoue', { contexte: this.props.contexte })} `
             : ''}
-          C'est presque toujours une mise à jour de l'application déployée pendant
-          que cet onglet était ouvert. Recharger suffit ; vos favoris, votre
-          historique et vos profils de voix sont intacts.
+          {t('erreur.explication')}
         </p>
 
         <button
           onClick={this.recharger}
           className="min-h-[44px] rounded border border-bordure bg-surface-1 px-5 font-mono text-xs uppercase tracking-technique text-texte transition-colors hover:bg-surface-2"
         >
-          Relancer l'archive
+          {t('erreur.relancer')}
         </button>
 
         <p className="max-w-md break-words font-mono text-xs text-texte-attenue">

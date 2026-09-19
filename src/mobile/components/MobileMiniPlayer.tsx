@@ -2,6 +2,7 @@ import React from 'react';
 import { Play, Pause, SkipForward, ChevronUp, User } from 'lucide-react';
 import { PlayerStatus } from '../../types/audioRoleplay';
 import { sfx } from '../../services/sfxService';
+import { useT } from '../../i18n';
 
 interface MobileMiniPlayerProps {
   status: PlayerStatus;
@@ -20,6 +21,7 @@ export const MobileMiniPlayer: React.FC<MobileMiniPlayerProps> = ({
   onNext,
   onExpand
 }) => {
+  const t = useT();
   if (status.totalSegments === 0) return null;
 
   const progressPercent = status.duration > 0
@@ -63,14 +65,14 @@ export const MobileMiniPlayer: React.FC<MobileMiniPlayerProps> = ({
                 {status.voixDegradee && (
                   <span
                     className="shrink-0 rounded-sm border border-bordure px-1 font-normal text-texte-attenue"
-                    title="Voix du navigateur : le moteur neural n'est pas joignable. Ouvrez le lecteur pour réessayer."
+                    title={t('lecteur.voixSecoursCourtInfo')}
                   >
-                    SECOURS
+                    {t('lecteur.voixSecoursCourt')}
                   </span>
                 )}
               </div>
               <p className="text-xs font-sans text-texte-second truncate leading-tight">
-                {currentTextPreview || 'Diffusion audio SCiPNET...'}
+                {currentTextPreview || t('lecteur.diffusion')}
               </p>
             </div>
           </div>
@@ -88,7 +90,7 @@ export const MobileMiniPlayer: React.FC<MobileMiniPlayerProps> = ({
                 }
               }}
               className="p-2 rounded-lg bg-accent hover:bg-accent-texte active:scale-95 text-texte transition-all shadow-md"
-              title={status.isPlaying ? "Pause" : "Lecture"}
+              title={status.isPlaying ? t('lecteur.pause') : t('lecteur.lire')}
             >
               {status.isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
             </button>
@@ -101,7 +103,7 @@ export const MobileMiniPlayer: React.FC<MobileMiniPlayerProps> = ({
               }}
               disabled={status.currentSegmentIndex >= status.totalSegments - 1}
               className="p-2 rounded-lg bg-surface-2 text-texte-second hover:text-texte disabled:opacity-30 active:scale-95 transition-all"
-              title="Segment suivant"
+              title={t('lecteur.segmentSuivant')}
             >
               <SkipForward className="w-4 h-4" />
             </button>
@@ -110,7 +112,7 @@ export const MobileMiniPlayer: React.FC<MobileMiniPlayerProps> = ({
             <button
               onClick={onExpand}
               className="p-1.5 text-texte-attenue hover:text-texte"
-              title="Agrandir le lecteur"
+              title={t('lecteur.agrandir')}
             >
               <ChevronUp className="w-4 h-4" />
             </button>

@@ -16,6 +16,7 @@ import {
 import { CharacterRole, PlayerStatus } from '../types/audioRoleplay';
 import { sfx } from '../services/sfxService';
 import { HeartRateMonitor } from './HeartRateMonitor';
+import { CleTraduction, useT } from '../i18n';
 
 interface AudioPlayerProps {
   status: PlayerStatus;
@@ -43,14 +44,14 @@ interface AudioPlayerProps {
  * et la bordure du badge, ce qui faisait changer de couleur tout le coin gauche
  * du lecteur à chaque réplique.
  */
-const ROLE_BADGES: Record<CharacterRole, { label: string; couleur: string; code: string }> = {
-  narrator: { label: 'Archiviste', couleur: 'var(--role-narrateur)', code: 'ARCH-01' },
-  researcher: { label: 'Chercheur', couleur: 'var(--role-chercheur)', code: 'SCI-MED' },
-  anomaly: { label: 'Entité SCP', couleur: 'var(--role-anomalie)', code: 'ANOM-BIO' },
-  classD: { label: 'Classe-D', couleur: 'var(--role-classed)', code: 'D-CORPS' },
-  agent: { label: 'Agent FIM', couleur: 'var(--role-agent)', code: 'MTF-OPS' },
-  commander: { label: 'Commandement', couleur: 'var(--role-commandant)', code: 'O5-COMM' },
-  intercom: { label: 'Intercom', couleur: 'var(--role-intercom)', code: 'PA-SITE19' }
+const ROLE_BADGES: Record<CharacterRole, { cle: CleTraduction; couleur: string; code: string }> = {
+  narrator: { cle: 'roles.narrateur', couleur: 'var(--role-narrateur)', code: 'ARCH-01' },
+  researcher: { cle: 'roles.chercheur', couleur: 'var(--role-chercheur)', code: 'SCI-MED' },
+  anomaly: { cle: 'roles.anomalie', couleur: 'var(--role-anomalie)', code: 'ANOM-BIO' },
+  classD: { cle: 'roles.classeD', couleur: 'var(--role-classed)', code: 'D-CORPS' },
+  agent: { cle: 'roles.agent', couleur: 'var(--role-agent)', code: 'MTF-OPS' },
+  commander: { cle: 'roles.commandement', couleur: 'var(--role-commandant)', code: 'O5-COMM' },
+  intercom: { cle: 'roles.intercom', couleur: 'var(--role-intercom)', code: 'PA-SITE19' }
 };
 
 const SPEEDS = [0.85, 1.0, 1.2, 1.4];
@@ -100,6 +101,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   onSpeedChange,
   onOpenVoiceStudio
 }) => {
+  const t = useT();
   const roleBadge = ROLE_BADGES[status.currentRole] || ROLE_BADGES.narrator;
 
   // Avancement dans le dossier, segment par segment.
@@ -156,7 +158,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
           value={status.duration > 0 ? status.currentTime : audioProgressPercent}
           onChange={handleScrubberChange}
           className={`absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 ${FOCUS}`}
-          aria-label="Progression de la lecture"
+          aria-label={t('lecteur.progression')}
           title={`Progression : ${formatTime(status.currentTime)} / ${formatTime(status.duration)}`}
         />
       </div>
@@ -179,7 +181,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 className="font-mono text-xs tracking-technique uppercase shrink-0 hidden md:inline"
                 style={{ color: roleBadge.couleur }}
               >
-                {roleBadge.label}
+                {t(roleBadge.cle)}
               </span>
               {/* Le code de canal existait dans la table des rôles sans jamais être
                   affiché. Il donne l'identité du poste sans ajouter de couleur. */}
@@ -191,9 +193,9 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 // n'entend pas les voix neurales, sans que ça devienne une alarme.
                 <span
                   className="font-mono text-xs text-texte-attenue border border-bordure rounded-sm px-1 shrink-0 hidden lg:inline"
-                  title="Voix du navigateur : le moteur neural n'est pas joignable depuis cet hébergement. Ouvrez le studio des voix pour réessayer."
+                  title={t('lecteur.voixSecoursInfo')}
                 >
-                  VOIX DE SECOURS
+                  {t('lecteur.voixSecours')}
                 </span>
               )}
             </div>
@@ -207,7 +209,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 </span>
               )}
               <p className="font-serif text-xs text-texte-attenue truncate italic flex-1">
-                {currentTextPreview || (status.isPlaying ? 'Transmission en cours…' : 'Lecture en pause')}
+                {currentTextPreview || (status.isPlaying ? t('lecteur.transmission') : t('lecteur.enPause'))}
               </p>
               <div className="lg:hidden shrink-0">
                 <HeartRateMonitor isPlaying={status.isPlaying} currentRole={status.currentRole} compact />
@@ -225,8 +227,8 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 onPrevious();
               }}
               disabled={status.currentSegmentIndex <= 0}
-              title="Réplique précédente [←]"
-              aria-label="Réplique précédente"
+              title={`${t('lecteur.repliquePrecedente')} [←]`}
+              aria-label={t('lecteur.repliquePrecedente')}
               className={BOUTON_TRANSPORT}
             >
               <SkipBack className="w-4 h-4" />
@@ -237,8 +239,8 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 sfx.playTerminalBeep();
                 onSeekTime?.(Math.max(0, status.currentTime - 5));
               }}
-              title="Reculer de 5 secondes"
-              aria-label="Reculer de 5 secondes"
+              title={t('lecteur.reculer')}
+              aria-label={t('lecteur.reculer')}
               className={`${BOUTON_TRANSPORT} hidden sm:flex`}
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -247,7 +249,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
             <button
               onClick={() => (status.isPlaying ? onPause() : onPlay())}
               title={status.isPlaying ? 'Mettre en pause [Espace]' : 'Démarrer la lecture [Espace]'}
-              aria-label={status.isPlaying ? 'Mettre en pause' : 'Démarrer la lecture'}
+              aria-label={status.isPlaying ? t('lecteur.pause') : t('lecteur.lire')}
               className={`w-11 h-11 mx-1 rounded-sm flex items-center justify-center bg-accent hover:bg-accent-texte active:bg-accent-fort text-texte transition-colors ${FOCUS} ${
                 // Un liseré pendant la lecture : le seul bouton dont l'état doit
                 // se lire d'un coup d'œil depuis l'autre bout de l'écran.
@@ -266,8 +268,8 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 sfx.playTerminalBeep();
                 onSeekTime?.(Math.min(status.duration || 600, status.currentTime + 5));
               }}
-              title="Avancer de 5 secondes"
-              aria-label="Avancer de 5 secondes"
+              title={t('lecteur.avancer')}
+              aria-label={t('lecteur.avancer')}
               className={`${BOUTON_TRANSPORT} hidden sm:flex`}
             >
               <RotateCw className="w-3.5 h-3.5" />
@@ -279,8 +281,8 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 onNext();
               }}
               disabled={status.currentSegmentIndex >= status.totalSegments - 1}
-              title="Réplique suivante [→]"
-              aria-label="Réplique suivante"
+              title={`${t('lecteur.repliqueSuivante')} [→]`}
+              aria-label={t('lecteur.repliqueSuivante')}
               className={BOUTON_TRANSPORT}
             >
               <SkipForward className="w-4 h-4" />
@@ -291,8 +293,8 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 sfx.playTerminalBeep();
                 onStop();
               }}
-              title="Arrêter et réinitialiser"
-              aria-label="Arrêter la lecture"
+              title={t('lecteur.arreterInfo')}
+              aria-label={t('lecteur.arreter')}
               className={`${BOUTON_TRANSPORT} hidden sm:flex`}
             >
               <Square className="w-3.5 h-3.5" />
@@ -327,7 +329,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 onToggleMute?.();
               }}
               title={status.isMuted ? 'Rétablir le son [M]' : 'Couper le son [M]'}
-              aria-label={status.isMuted ? 'Rétablir le son' : 'Couper le son'}
+              aria-label={status.isMuted ? t('lecteur.retablirSon') : t('lecteur.couperSon')}
               aria-pressed={status.isMuted}
               className={`rounded-sm ${FOCUS} ${
                 status.isMuted ? 'text-accent-texte' : 'text-texte-attenue hover:text-texte transition-colors'
@@ -350,7 +352,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
               onChange={(e) => onVolumeChange?.(parseFloat(e.target.value))}
               className="w-14 h-1 cursor-pointer"
               style={{ accentColor: 'var(--accent)' }}
-              aria-label="Volume"
+              aria-label={t('lecteur.volume')}
               title={`Volume : ${status.isMuted ? 'muet' : `${Math.round(status.volume * 100)} %`}`}
             />
             <span className="text-texte-attenue w-8 text-right tabular-nums">
@@ -407,8 +409,8 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
               sfx.playTerminalBeep();
               onOpenVoiceStudio();
             }}
-            title="Studio des voix et attribution des rôles"
-            aria-label="Ouvrir le studio des voix"
+            title={t('lecteur.studioVoix')}
+            aria-label={t('lecteur.ouvrirStudio')}
             className={`w-8 h-8 flex items-center justify-center rounded-sm bg-surface-2 border text-texte-attenue hover:text-texte hover:border-bordure-forte transition-colors ${FOCUS} ${
               // En mode dégradé, le studio des voix est l'endroit où l'on peut
               // réessayer le moteur neural : le bouton se signale, sans crier.

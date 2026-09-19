@@ -4,6 +4,7 @@ import { useDeviceMode } from './shared/hooks/useDeviceMode';
 import { DeviceSwitcherBadge } from './shared/components/DeviceSwitcherBadge';
 import { EcranAttente } from './shared/components/EcranAttente';
 import { LimiteErreur } from './shared/components/LimiteErreur';
+import { useT } from './i18n';
 
 /**
  * Aiguilleur racine : route vers `DesktopApp` ou `MobileApp` selon la détection
@@ -25,6 +26,7 @@ const MobileApp = lazy(() =>
 );
 
 export const App: React.FC = () => {
+  const t = useT();
   const app = useScpApp();
   const { mode, isMobile, toggleMode, setDeviceMode } = useDeviceMode();
 
@@ -47,7 +49,7 @@ export const App: React.FC = () => {
         placer ici garde la bascule desktop ⇄ mobile utilisable même quand la vue,
         elle, n'a pas pu se charger.
       */}
-      <LimiteErreur contexte={isMobile ? "l'interface mobile" : "l'interface bureau"}>
+      <LimiteErreur contexte={t(isMobile ? 'erreur.contexteMobile' : 'erreur.contexteBureau')}>
         <Suspense fallback={<EcranAttente />}>
           {isMobile ? (
             <MobileApp app={app} toggleMode={toggleMode} setDeviceMode={setDeviceMode} />

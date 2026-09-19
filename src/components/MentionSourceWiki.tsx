@@ -1,5 +1,6 @@
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
+import { useT } from '../i18n';
 
 /**
  * La ligne « titre — page d'origine, sous licence CC BY-SA 3.0 ».
@@ -33,19 +34,22 @@ export const MentionSourceWiki: React.FC<MentionSourceWikiProps> = ({
   titre,
   intro,
   className = ''
-}) => (
+}) => {
+  const t = useT();
+
+  return (
   <p className={`text-xs text-texte-attenue leading-relaxed ${className}`}>
-    {intro ? `${intro} ` : ''}« {titre} » —{' '}
+    {intro ? `${intro} ` : ''}{t('credits.citation', { titre })} —{' '}
     <a
       href={url}
       target="_blank"
       rel="noopener noreferrer"
       className="underline underline-offset-2 hover:text-texte"
     >
-      page d'origine sur le wiki
+      {t('credits.pageOrigine')}
       <ExternalLink className="inline w-3 h-3 ml-0.5 align-[-1px]" aria-hidden="true" />
     </a>
-    , publiée sous licence{' '}
+    , {t('credits.publieeSous')}{' '}
     <a
       href="https://creativecommons.org/licenses/by-sa/3.0/deed.fr"
       target="_blank"
@@ -56,4 +60,5 @@ export const MentionSourceWiki: React.FC<MentionSourceWikiProps> = ({
     </a>
     .
   </p>
-);
+  );
+};

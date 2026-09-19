@@ -1,6 +1,7 @@
 import React from 'react';
 import { AttributionScp } from '../types/scp';
 import { MentionSourceWiki } from './MentionSourceWiki';
+import { CleTraduction, useT } from '../i18n';
 
 /**
  * Le pavé de crédits d'un dossier.
@@ -15,13 +16,13 @@ import { MentionSourceWiki } from './MentionSourceWiki';
  */
 
 /** Les rôles que renvoie Crom, dits en français. */
-const ROLES: Record<string, string> = {
-  AUTHOR: 'Auteur',
-  SUBMITTER: 'Publié par',
-  TRANSLATOR: 'Traduction',
-  REWRITE: 'Réécriture',
-  CONTRIBUTOR: 'Contribution',
-  MAINTAINER: 'Maintenance'
+const ROLES: Record<string, CleTraduction> = {
+  AUTHOR: 'credits.auteur',
+  SUBMITTER: 'credits.publiePar',
+  TRANSLATOR: 'credits.traduction',
+  REWRITE: 'credits.reecriture',
+  CONTRIBUTOR: 'credits.contribution',
+  MAINTAINER: 'credits.maintenance'
 };
 
 interface CreditsDossierProps {
@@ -38,15 +39,16 @@ export const CreditsDossier: React.FC<CreditsDossierProps> = ({
   titre,
   className = ''
 }) => {
+  const t = useT();
   const credits = attributions ?? [];
 
   return (
     <section
       className={`rounded border border-bordure-faible bg-surface-1/60 px-3 py-2.5 ${className}`}
-      aria-label="Crédits et licence du dossier"
+      aria-label={t('credits.aria')}
     >
       <p className="font-mono text-xs uppercase tracking-technique text-texte-attenue mb-1.5">
-        Crédits
+        {t('credits.titre')}
       </p>
 
       {credits.length > 0 ? (
@@ -54,8 +56,8 @@ export const CreditsDossier: React.FC<CreditsDossierProps> = ({
           {credits.map((credit) => (
             <li key={`${credit.nom}-${credit.type}-${credit.surOriginal ? 'o' : 'p'}`}>
               <span className="text-texte-attenue">
-                {ROLES[credit.type] || credit.type}
-                {credit.surOriginal ? " de l'original" : ''} :{' '}
+                {ROLES[credit.type] ? t(ROLES[credit.type]) : credit.type}
+                {credit.surOriginal ? ` ${t('credits.deLOriginal')}` : ''} :{' '}
               </span>
               <span className="font-medium text-texte">{credit.nom}</span>
             </li>
@@ -66,7 +68,7 @@ export const CreditsDossier: React.FC<CreditsDossierProps> = ({
         // laisser croire qu'il n'y a pas d'auteur, on renvoie à la page, qui
         // fait foi.
         <p className="text-xs text-texte-second">
-          Crédits non renseignés dans l'index : ils figurent sur la page d'origine.
+          {t('credits.nonRenseignes')}
         </p>
       )}
 

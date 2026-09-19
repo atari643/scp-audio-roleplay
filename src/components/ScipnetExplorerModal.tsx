@@ -30,6 +30,7 @@ import {
 import { versScpEntity } from '../data/entityPresentation';
 import { EntityIllustration } from './illustrations/ScpIllustrations';
 import { sfx } from '../services/sfxService';
+import { libelleCategorie } from '../i18n';
 import { FenetreScipnet } from './FenetreScipnet';
 
 interface ScipnetExplorerModalProps {
@@ -64,7 +65,9 @@ const LIMITE_DOSSIERS = 60;
 /** Le nom de dossier fictif d'une catégorie, dans la barre d'adresse SCiPNET. */
 function dossierDe(categorie: CategorieEntite): string {
   const rang = CATEGORIES.findIndex(c => c.id === categorie);
-  const nom = CATEGORIES[rang]?.pluriel.toUpperCase().replace(/\s+/g, '_') ?? 'DIVERS';
+  const nom = CATEGORIES[rang]
+    ? libelleCategorie(CATEGORIES[rang].id, true).toUpperCase().replace(/\s+/g, '_')
+    : 'DIVERS';
   return `${String(rang + 1).padStart(2, '0')}_${nom}`;
 }
 
@@ -360,7 +363,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                       </span>
                       <Icone className={`w-3.5 h-3.5 ${style.icôneCouleur}`} />
                       <span className="text-xs font-bold">
-                        {String(rang + 1).padStart(2, '0')}_{cat.pluriel.toUpperCase().replace(/\s+/g, '_')}
+                        {String(rang + 1).padStart(2, '0')}_{libelleCategorie(cat.id, true).toUpperCase().replace(/\s+/g, '_')}
                       </span>
                     </div>
                     <span className={`text-xs ${style.icôneCouleur}/80`}>({entites.length})</span>

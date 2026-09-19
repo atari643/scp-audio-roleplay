@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { PlayerStatus, SpeechSegment } from '../../types/audioRoleplay';
 import { sfx } from '../../services/sfxService';
+import { useT } from '../../i18n';
 
 interface MobileAudioSheetProps {
   status: PlayerStatus;
@@ -43,6 +44,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
   onOpenVoiceStudio,
   onClose
 }) => {
+  const t = useT();
   const [showSegmentList, setShowSegmentList] = useState(false);
 
   const formatTime = (seconds: number) => {
@@ -65,9 +67,9 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
         <div className="w-16 h-16 rounded-2xl bg-surface-3/40 border border-accent-texte/40 flex items-center justify-center text-texte-attenue mb-4">
           <Radio className="w-8 h-8" />
         </div>
-        <h3 className="text-base font-bold font-mono text-texte mb-1">AUCUN FLUX AUDIO ACTIF</h3>
+        <h3 className="text-base font-bold font-mono text-texte mb-1">{t('lecteur.aucunFlux')}</h3>
         <p className="text-xs font-mono text-texte-attenue max-w-xs mb-6">
-          Sélectionnez un dossier SCP dans les archives pour charger la transcription vocale multi-personnages.
+          {t('lecteur.aucunFluxInfo')}
         </p>
         <button
           onClick={() => {
@@ -77,7 +79,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-1 border border-bordure text-xs font-mono text-role-agent hover:text-texte"
         >
           <Sparkles className="w-4 h-4 text-role-agent" />
-          <span>Configurer le Voice Studio Neural</span>
+          <span>{t('lecteur.configurerStudio')}</span>
         </button>
       </div>
     );
@@ -92,7 +94,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
             <button
               onClick={onClose}
               className="p-1.5 rounded-lg bg-surface-1 border border-bordure text-texte-attenue hover:text-texte"
-              title="Réduire"
+              title={t('lecteur.reduire')}
             >
               <ChevronDown className="w-5 h-5" />
             </button>
@@ -102,7 +104,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
               SCiPNET TACTICAL AUDIO
             </div>
             <div className="text-xs font-mono text-texte-second">
-              SEGMENT <span className="text-systeme tabular-nums">{status.currentSegmentIndex + 1}</span> / <span className="tabular-nums">{status.totalSegments}</span>
+              {t('lecteur.segment')} <span className="text-systeme tabular-nums">{status.currentSegmentIndex + 1}</span> / <span className="tabular-nums">{status.totalSegments}</span>
             </div>
           </div>
         </div>
@@ -116,7 +118,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
             className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-3/80 border border-accent-texte text-xs font-mono text-accent-texte hover:text-texte active:scale-95 transition-all"
           >
             <Sparkles className="w-3.5 h-3.5 text-role-agent" />
-            <span>Voix IA</span>
+            <span>{t('lecteur.voixIA')}</span>
           </button>
           <button
             onClick={() => setShowSegmentList(!showSegmentList)}
@@ -125,7 +127,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                 ? 'bg-surface-3/60 border-accent-texte text-texte'
                 : 'bg-surface-1 border-bordure text-texte-attenue'
             }`}
-            title="Liste des segments"
+            title={t('lecteur.listeSegments')}
           >
             <ListMusic className="w-4 h-4" />
           </button>
@@ -136,7 +138,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
       {showSegmentList ? (
         <div className="flex-1 py-3 overflow-y-auto space-y-1.5">
           <div className="text-xs font-mono text-texte-attenue mb-2 font-semibold">
-            INDEX DES DIALOGUES ({segments.length})
+            {t('lecteur.indexDialogues')} ({segments.length})
           </div>
           {segments.map((seg, idx) => (
             <button
@@ -193,7 +195,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                   }}
                   className="mt-2 min-h-[44px] px-3 rounded-lg border border-bordure bg-surface-1/80 font-mono text-xs text-texte-attenue active:bg-surface-2"
                 >
-                  VOIX DE SECOURS — appuyez pour réessayer
+                  {t('lecteur.voixSecoursMobile')}
                 </button>
               )}
             </div>

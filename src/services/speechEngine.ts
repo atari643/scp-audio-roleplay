@@ -1,5 +1,6 @@
 import { CharacterRole, PlayerStatus, SpeechSegment, VoiceProfile } from '../types/audioRoleplay';
 import { DEFAULT_AI_ROLES_EN, DEFAULT_AI_ROLES_FR, NEURAL_VOICES_BY_LANG } from '../types/neuralVoices';
+import { t } from '../i18n';
 import { sfx } from './sfxService';
 import {
   acronymPattern,
@@ -1355,7 +1356,7 @@ class SpeechEngine {
       isPaused: this.isPaused,
       currentSegmentIndex: this.currentIndex,
       totalSegments: this.segments.length,
-      currentSpeaker: currentSegment ? currentSegment.speaker : 'Narrateur',
+      currentSpeaker: currentSegment ? currentSegment.speaker : t('roles.narrateur'),
       currentRole: currentSegment ? currentSegment.role : 'narrator',
       globalSpeed: this.globalSpeed,
       currentTime: this.currentTime,

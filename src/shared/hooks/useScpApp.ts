@@ -12,6 +12,7 @@ import { chargerEntites, dossiersDeLEntite, entiteParId } from '../../services/e
 import { scpDataApi } from '../../services/scpDataApi';
 import { parseScpDossier } from '../../services/scriptParser';
 import { WikiLink } from '../../services/linkExtractor';
+import { definirLangue } from '../../i18n';
 import { ecrireEtatPartage, lireEtatPartage } from '../../services/lienPartage';
 import { speechEngine } from '../../services/speechEngine';
 import { storageService } from '../../services/storageService';
@@ -244,6 +245,9 @@ export function useScpApp() {
 
   useEffect(() => {
     speechEngine.setLanguage(currentLanguage.code);
+    // L'interface suit la même langue que le catalogue : c'était le défaut le
+    // plus visible, on lisait un dossier anglais entouré de boutons français.
+    void definirLangue(currentLanguage.code);
   }, [currentLanguage]);
 
   // L'adresse suit l'état, pour qu'elle soit copiable à tout instant sans bouton

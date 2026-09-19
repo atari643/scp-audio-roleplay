@@ -13,6 +13,7 @@ import {
 } from '../../services/entityService';
 import { sfx } from '../../services/sfxService';
 import { MentionSourceWiki } from '../../components/MentionSourceWiki';
+import { libelleCategorie, useT } from '../../i18n';
 
 /**
  * Le répertoire de la Fondation, pensé pour le pouce.
@@ -54,6 +55,7 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
   languageCode,
   onSelectScpSlug
 }) => {
+  const t = useT();
   const [categorie, setCategorie] = useState<CategorieEntite | null>(null);
   const [entiteOuverte, setEntiteOuverte] = useState<Entite | null>(null);
   const [recherche, setRecherche] = useState('');
@@ -98,7 +100,7 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
           className="flex items-center gap-2 text-texte-second font-mono text-sm min-h-[44px] px-1"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Retour</span>
+          <span>{t('entites.retour')}</span>
         </button>
 
         <div className={`mt-1 p-3 rounded-lg bg-surface-1/80 border ${COULEURS[entiteOuverte.categorie]}`}>
@@ -128,7 +130,7 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
                 <MentionSourceWiki
                   url={pageSource}
                   titre={nomEntite(entiteOuverte, languageCode)}
-                  intro="Résumé repris de"
+                  intro={t('entites.resumeRepris')}
                   className="mt-2 break-words"
                 />
               )}
@@ -136,8 +138,8 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
           )}
 
           <p className="mt-2.5 text-xs font-mono text-texte-attenue">
-            {confirmes} dossier{confirmes > 1 ? 's' : ''} confirmé{confirmes > 1 ? 's' : ''}
-            {mentions > 0 && ` · ${mentions} mention${mentions > 1 ? 's' : ''}`}
+            {confirmes} {t(confirmes > 1 ? 'entites.dossiersConfirmes' : 'entites.dossierConfirme')}
+            {mentions > 0 && ` · ${mentions} ${t(mentions > 1 ? 'entites.mentions' : 'entites.mention')}`}
           </p>
         </div>
 
@@ -157,12 +159,12 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
           ))}
           {dossiers.length === 0 && (
             <p className="text-xs font-mono text-texte-attenue px-1 py-4">
-              Aucun dossier rattaché sur cette branche.
+              {t('entites.aucunDossierBranche')}
             </p>
           )}
           {dossiers.length > 80 && (
             <p className="text-xs font-mono text-texte-attenue px-1 pt-1">
-              {dossiers.length - 80} autres — les mieux notés d'abord.
+              {t('entites.autresDossiers', { n: String(dossiers.length - 80) })}
             </p>
           )}
         </div>
@@ -184,7 +186,7 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
           className="flex items-center gap-2 text-texte-second font-mono text-sm min-h-[44px] px-1"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>{cat?.pluriel}</span>
+          <span>{cat ? libelleCategorie(cat.id, true) : ''}</span>
           <span className="text-texte-attenue">({liste.length})</span>
         </button>
 
@@ -213,7 +215,7 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
         <input
           value={recherche}
           onChange={e => setRecherche(e.target.value)}
-          placeholder="Chercher une entité…"
+          placeholder={t('entites.chercher')}
           className="w-full min-h-[44px] pl-9 pr-3 rounded-lg bg-surface-1/80 border border-bordure text-sm font-mono text-texte placeholder:text-texte-attenue focus:outline-none focus:border-accent-texte"
         />
       </div>
@@ -232,7 +234,7 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
             />
           ))}
           {resultats.length === 0 && (
-            <p className="text-xs font-mono text-texte-attenue px-1 py-4">Aucune entité ne correspond.</p>
+            <p className="text-xs font-mono text-texte-attenue px-1 py-4">{t('entites.aucuneEntite')}</p>
           )}
         </div>
       ) : (
@@ -251,7 +253,7 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Icone className={`w-5 h-5 shrink-0 ${COULEURS[cat.id].split(' ')[0]}`} />
-                  <span className="font-mono text-sm text-texte truncate">{cat.pluriel}</span>
+                  <span className="font-mono text-sm text-texte truncate">{libelleCategorie(cat.id, true)}</span>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <span className="font-mono text-xs text-texte-attenue">{n}</span>
