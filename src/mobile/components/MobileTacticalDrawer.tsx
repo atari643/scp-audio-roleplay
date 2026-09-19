@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { LanguageBranch, SUPPORTED_LANGUAGES } from '../../types/scp';
 import { sfx } from '../../services/sfxService';
+import { useT } from '../../i18n';
 
 interface MobileTacticalDrawerProps {
   isOpen: boolean;
@@ -41,6 +42,7 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
   onLanguageChange,
   onSwitchToDesktop
 }) => {
+  const t = useT();
   if (!isOpen) return null;
 
   return (
@@ -96,8 +98,8 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
               <div className="flex items-center gap-2.5">
                 <Sparkles className="w-4 h-4 text-role-agent" />
                 <div>
-                  <div className="text-xs font-mono font-bold text-texte">Voice Studio Neural</div>
-                  <div className="text-xs font-mono text-texte-attenue">Profilage vocal des acteurs</div>
+                  <div className="text-xs font-mono font-bold text-texte">{t('menu.studioVocal')}</div>
+                  <div className="text-xs font-mono text-texte-attenue">{t('menu.studioVocalInfo')}</div>
                 </div>
               </div>
               <ChevronRight className="w-3.5 h-3.5 text-texte-attenue" />
@@ -115,7 +117,7 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
               <div className="flex items-center gap-2.5">
                 <Star className="w-4 h-4 text-classe-euclid fill-current" />
                 <div>
-                  <div className="text-xs font-mono font-bold text-texte">Dossiers Favoris</div>
+                  <div className="text-xs font-mono font-bold text-texte">{t('menu.favoris')}</div>
                   <div className="text-xs font-mono text-texte-attenue">{favoritesCount} dossiers sauvegardés</div>
                 </div>
               </div>
@@ -136,8 +138,8 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
               <div className="flex items-center gap-2.5">
                 <Terminal className="w-4 h-4 text-accent-texte" />
                 <div>
-                  <div className="text-xs font-mono font-bold text-texte">Console RAISA</div>
-                  <div className="text-xs font-mono text-texte-attenue">Ligne de commande & télémétrie</div>
+                  <div className="text-xs font-mono font-bold text-texte">{t('menu.raisa')}</div>
+                  <div className="text-xs font-mono text-texte-attenue">{t('menu.raisaInfo')}</div>
                 </div>
               </div>
               <span className="text-xs text-accent-texte">CLI</span>
@@ -164,7 +166,7 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
                 }`}
               >
                 {sfxEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                <span className="text-xs font-mono font-bold">SONS SFX</span>
+                <span className="text-xs font-mono font-bold">{t('menu.sons')}</span>
               </button>
 
               {/* CRT Filter */}
@@ -180,7 +182,7 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
                 }`}
               >
                 <Tv className="w-4 h-4" />
-                <span className="text-xs font-mono font-bold">ÉCRAN CRT</span>
+                <span className="text-xs font-mono font-bold">{t('menu.crt')}</span>
               </button>
             </div>
 
@@ -198,7 +200,7 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
             >
               <div className="flex items-center gap-2">
                 <Radio className={`w-4 h-4 ${ambienceActive ? 'text-classe-safe' : ''}`} />
-                <span>Bruit Blanc Confinement</span>
+                <span>{t('menu.bruitBlanc')}</span>
               </div>
               <span className="text-xs font-bold">
                 {ambienceActive ? 'ACTIF' : 'INACTIF'}
@@ -210,7 +212,7 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
           <div className="mt-6 pt-4 border-t border-bordure">
             <div className="text-xs font-mono text-texte-attenue font-bold uppercase mb-2 flex items-center gap-1">
               <Globe className="w-3 h-3 text-accent-texte" />
-              <span>BRANCHE LINGUISTIQUE</span>
+              <span>{t('menu.branche')}</span>
             </div>
             <div className="grid grid-cols-2 gap-1.5">
               {SUPPORTED_LANGUAGES.map((lang) => (
@@ -245,7 +247,7 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
             className="w-full py-2.5 px-3 rounded-xl bg-surface-1 border border-classe-euclid/70 text-classe-euclid hover:text-texte text-xs font-mono font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg"
           >
             <Monitor className="w-4 h-4 text-classe-euclid" />
-            <span>Passer en mode bureau</span>
+            <span>{t('menu.modeBureau')}</span>
           </button>
         </div>
       </div>

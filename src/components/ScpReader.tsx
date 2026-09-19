@@ -20,6 +20,7 @@ import { SpokenLine } from './SpokenLine';
 import { ReadingQueue } from './ReadingQueue';
 import { BandeauEntites } from './BandeauEntites';
 import { habillageClasse, styleBadgeClasse, styleFondClasse } from './classification';
+import { useT } from '../i18n';
 
 interface ScpReaderProps {
   scp: ScpItemDetail;
@@ -90,6 +91,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
   languageCode = 'fr',
   onOuvrirEntite
 }) => {
+  const t = useT();
   const [autoScroll, setAutoScroll] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'roleplay' | 'raw'>('roleplay');
   const segmentRefs = useRef<Record<number, HTMLDivElement | null>>({});
@@ -137,7 +139,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
           className={`${BOUTON_OUTIL} group`}
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-          <span>Catalogue</span>
+          <span>{t('dossier.catalogue')}</span>
         </button>
 
         <div className="flex items-center gap-2">
@@ -162,11 +164,11 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
             href={scp.url}
             target="_blank"
             rel="noopener noreferrer"
-            title="Consulter l'archive originale sur le wiki"
+            title={t('dossier.sourceInfo')}
             className={BOUTON_OUTIL}
           >
             <ExternalLink className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Source</span>
+            <span className="hidden sm:inline">{t('dossier.source')}</span>
           </a>
         </div>
       </div>
@@ -187,8 +189,8 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
         />
 
         <div className="px-3 sm:px-5 py-2 border-b border-bordure-faible flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-mono text-xs text-texte-attenue tracking-technique uppercase">
-          <span>Dossier classifié RAISA · Accréditation 4</span>
-          <span className="text-systeme">Confinement maintenu · Site-19</span>
+          <span>{t('dossier.classifie')}</span>
+          <span className="text-systeme">{t('dossier.confinement')}</span>
         </div>
 
         <div className="p-4 sm:p-6">
@@ -219,12 +221,12 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
               {isPlaying ? (
                 <>
                   <Pause className="w-4 h-4 fill-current" />
-                  <span>Pause</span>
+                  <span>{t('lecteur.pause')}</span>
                 </>
               ) : (
                 <>
                   <Play className="w-4 h-4 fill-current" />
-                  <span>Écouter</span>
+                  <span>{t('dossier.ecouter')}</span>
                 </>
               )}
             </button>
@@ -275,7 +277,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>Archive brute</span>
+            <span>{t('dossier.archiveBrute')}</span>
           </button>
         </div>
 
@@ -286,11 +288,11 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
                 sfx.playTerminalBeep();
                 scrollToActiveSegment(currentSegmentIndex, true);
               }}
-              title="Recentrer l'affichage sur la réplique en cours"
+              title={t('dossier.recentrerInfo')}
               className={BOUTON_OUTIL}
             >
               <Crosshair className="w-3.5 h-3.5" />
-              <span>Recentrer</span>
+              <span>{t('dossier.recentrer')}</span>
             </button>
 
             <label className="inline-flex items-center gap-2 h-8 px-3 rounded text-xs font-mono text-texte-second bg-surface-2 border border-bordure cursor-pointer select-none hover:border-bordure-forte transition-colors">
@@ -301,7 +303,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
                 className="w-3.5 h-3.5 cursor-pointer"
                 style={{ accentColor: 'var(--accent)' }}
               />
-              <span>Suivi</span>
+              <span>{t('dossier.suivi')}</span>
             </label>
           </div>
         )}
@@ -385,10 +387,10 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
                     >
                       {segment.speaker}
                       {segment.gender === 'female' && (
-                        <span className="ml-1 opacity-70" title="Personnage féminin">♀</span>
+                        <span className="ml-1 opacity-70" title={t('dossier.personnageFeminin')}>♀</span>
                       )}
                       {segment.gender === 'male' && (
-                        <span className="ml-1 opacity-70" title="Personnage masculin">♂</span>
+                        <span className="ml-1 opacity-70" title={t('dossier.personnageMasculin')}>♂</span>
                       )}
                     </span>
 
@@ -399,7 +401,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
                     )}
 
                     {isActivelyPlaying && (
-                      <span className="flex items-end gap-0.5 h-4 shrink-0" aria-label="Lecture en cours">
+                      <span className="flex items-end gap-0.5 h-4 shrink-0" aria-label={t('dossier.lectureEnCours')}>
                         <span className="visualizer-bar" />
                         <span className="visualizer-bar" />
                         <span className="visualizer-bar" />

@@ -15,6 +15,7 @@ import { EntityIllustration } from './illustrations/ScpIllustrations';
 import { sfx } from '../services/sfxService';
 import { FenetreScipnet } from './FenetreScipnet';
 import { MentionSourceWiki } from './MentionSourceWiki';
+import { useT } from '../i18n';
 
 interface EntityDetailModalProps {
   entity: ScpEntity | null;
@@ -36,6 +37,9 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
   onSelectScpSlug,
   onOpenExplorer
 }) => {
+  // Avant le retour conditionnel : un hook ne peut pas être appelé de façon
+  // conditionnelle, et `useT` s'abonne au changement de langue.
+  const t = useT();
   if (!isOpen || !entity) return null;
 
   const handleFilterClick = () => {
@@ -88,8 +92,8 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
       largeur="max-w-4xl"
       barreEtat={
         <div className="flex flex-wrap items-center justify-between gap-2 uppercase">
-          <span>Terminal Site-19 · nœud B</span>
-          <span>Connexion sécurisée</span>
+          <span>{t('fiche.terminal')}</span>
+          <span>{t('fiche.connexion')}</span>
         </div>
       }
     >
@@ -105,7 +109,7 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
               className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-sm font-mono text-xs text-texte-second hover:bg-surface-3 hover:text-texte transition-colors"
             >
               <FolderOpen className="w-3.5 h-3.5" />
-              <span>Explorateur</span>
+              <span>{t('entete.explorateur')}</span>
             </button>
           </div>
         )}
@@ -166,24 +170,24 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
               {/* Technical Specifications Matrix */}
               <div className="win2k-inset p-3 bg-fond/90 font-mono text-xs space-y-2">
                 <div className="text-xs font-bold text-accent-texte border-b border-bordure pb-1 flex items-center justify-between">
-                  <span>MATRICE TECHNIQUE</span>
+                  <span>{t('fiche.matrice')}</span>
                   <span>SEC-02</span>
                 </div>
 
                 {entity.director && (
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-texte-attenue">RESPONSABLE :</span>
+                    <span className="text-texte-attenue">{t('fiche.responsable')}</span>
                     <span className="text-texte font-semibold text-right">{entity.director}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-texte-attenue">ACCRÉDITATION :</span>
+                  <span className="text-texte-attenue">{t('fiche.accreditation')}</span>
                   <span className="text-classe-euclid font-bold">Niveau {entity.clearanceLevel}</span>
                 </div>
 
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-texte-attenue">STATUT SYSTÈME :</span>
+                  <span className="text-texte-attenue">{t('fiche.statut')}</span>
                   <span className="text-classe-safe font-bold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-classe-safe inline-block" />
                     ACTIF // CRYPTÉ
@@ -192,7 +196,7 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
 
                 {entity.motto && (
                   <div className="pt-2 border-t border-bordure/80">
-                    <span className="text-xs text-texte-attenue block mb-0.5">DEVISE OPÉRATIONNELLE :</span>
+                    <span className="text-xs text-texte-attenue block mb-0.5">{t('fiche.devise')}</span>
                     <p className="text-xs italic text-texte-second">"{entity.motto}"</p>
                   </div>
                 )}
@@ -206,7 +210,7 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
               <div className="win2k-inset p-4 bg-surface-1/60">
                 <h3 className="text-xs font-bold text-texte tracking-wider flex items-center gap-1.5 mb-2 text-accent-texte">
                   <Terminal className="w-3.5 h-3.5" />
-                  <span>SYNTHÈSE DE MISSION & ATTRIBUTIONS</span>
+                  <span>{t('fiche.synthese')}</span>
                 </h3>
                 <p className="text-xs sm:text-sm text-texte leading-relaxed">
                   {entity.description}
@@ -217,7 +221,7 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
               <div className="win2k-inset p-4 bg-surface-1/40 space-y-2">
                 <h3 className="text-xs font-bold text-classe-euclid tracking-wider flex items-center gap-1.5">
                   <ShieldAlert className="w-3.5 h-3.5" />
-                  <span>DOSSIER DE SÉCURITÉ // ARCHIVES SITE-19</span>
+                  <span>{t('fiche.securite')}</span>
                 </h3>
                 <p className="text-xs text-texte-second leading-relaxed whitespace-pre-line font-sans">
                   {entity.lore}
@@ -230,9 +234,9 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
                   <div className="flex items-center justify-between text-xs font-bold text-texte-second">
                     <span className="flex items-center gap-1.5">
                       <Radio className="w-3.5 h-3.5 text-accent-texte" />
-                      <span>DOSSIERS ANORMAUX DIRECTEMENT ASSOCIÉS :</span>
+                      <span>{t('fiche.dossiersAssocies')}</span>
                     </span>
-                    <span className="text-xs text-texte-attenue">CLIQUEZ POUR OUVRIR</span>
+                    <span className="text-xs text-texte-attenue">{t('fiche.cliquezOuvrir')}</span>
                   </div>
 
                   <div className="flex flex-wrap gap-2 pt-1">
@@ -252,7 +256,7 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
 
               {/* Research Keywords */}
               <div className="text-xs text-texte-attenue pt-1">
-                <span>MOTS-CLÉS DE RECHERCHE : </span>
+                <span>{t('fiche.motsCles')}</span>
                 <span className="text-texte-attenue italic">{entity.queryKeywords.join(', ')}</span>
               </div>
 

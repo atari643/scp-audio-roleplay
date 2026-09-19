@@ -2,6 +2,7 @@ import React from 'react';
 import { Volume2, VolumeX, Shuffle, Menu, Globe } from 'lucide-react';
 import { LanguageBranch, SUPPORTED_LANGUAGES } from '../../types/scp';
 import { sfx } from '../../services/sfxService';
+import { useT } from '../../i18n';
 
 interface MobileHeaderProps {
   currentLanguage: LanguageBranch;
@@ -20,6 +21,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   sfxEnabled,
   onToggleSfx
 }) => {
+  const t = useT();
   return (
     <header
       className="sticky top-0 z-40 bg-fond/95 border-b border-scp-border backdrop-blur-md px-3 py-2 flex items-center justify-between"
@@ -63,8 +65,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             onRandomScp();
           }}
           className="w-11 h-11 flex items-center justify-center rounded-sm bg-surface-2 border border-bordure text-texte-attenue active:bg-surface-3 transition-colors"
-          title="Dossier Aléatoire"
-          aria-label="Dossier Aléatoire"
+          title={t('menu.aleatoire')}
+          aria-label={t('menu.aleatoire')}
         >
           <Shuffle className="w-4 h-4" />
         </button>
@@ -80,14 +82,14 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               : 'bg-surface-1/60 border-bordure text-texte-attenue'
           }`}
           title={sfxEnabled ? "Désactiver effets sonores" : "Activer effets sonores"}
-          aria-label="Effets sonores"
+          aria-label={t('menu.effetsSonores')}
         >
           {sfxEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
         </button>
 
         {/* Language selector pill */}
         <div className="relative flex items-center">
-          <label htmlFor="mobile-lang-select" className="sr-only">Changer de langue</label>
+          <label htmlFor="mobile-lang-select" className="sr-only">{t('menu.changerLangue')}</label>
           <div className="flex items-center gap-1 bg-surface-1 border border-bordure rounded-lg px-2 py-1.5 text-xs font-mono text-texte">
             <Globe className="w-3.5 h-3.5 text-accent-texte shrink-0" />
             <span className="text-xs font-bold">{currentLanguage.flag}</span>
@@ -117,8 +119,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             onOpenDrawer();
           }}
           className="w-11 h-11 flex items-center justify-center rounded-lg bg-surface-3/60 border border-accent-texte/80 text-accent-texte hover:bg-surface-3/80 active:scale-95 transition-all"
-          title="Menu Tactique"
-          aria-label="Ouvrir le menu tactique"
+          title={t('menu.tactique')}
+          aria-label={t('menu.ouvrirTactique')}
         >
           <Menu className="w-4 h-4" />
         </button>
