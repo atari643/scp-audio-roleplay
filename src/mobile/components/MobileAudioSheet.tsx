@@ -220,8 +220,8 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
           {/* Spoken Text Dialogue Card */}
           <div className="bg-surface-1/90 border border-bordure rounded-xl p-3 shadow-md">
             <div className="text-xs font-mono text-texte-attenue mb-1 flex items-center justify-between">
-              <span>TRANSCRIPTION EN DIRECT</span>
-              <span className="text-role-agent">DIFFUSION ACTIVE</span>
+              <span>{t('feuille.transcription')}</span>
+              <span className="text-role-agent">{t('feuille.diffusionActive')}</span>
             </div>
             <p className="text-xs font-sans text-texte leading-relaxed italic line-clamp-4">
               « {currentTextPreview || 'En attente de transmission...'} »
@@ -262,7 +262,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                 onSeekTime(Math.max(0, status.currentTime - 10));
               }}
               className="p-3 rounded-full bg-surface-1 border border-bordure text-texte-attenue hover:text-texte active:scale-95"
-              title="-10 secondes"
+              title={t('feuille.moins10')}
             >
               <RotateCcw className="w-5 h-5" />
             </button>
@@ -275,7 +275,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
               }}
               disabled={status.currentSegmentIndex <= 0}
               className="p-3 rounded-full bg-surface-1 border border-bordure text-texte-second hover:text-texte disabled:opacity-30 active:scale-95"
-              title="Segment précédent"
+              title={t('feuille.segmentPrecedent')}
             >
               <SkipBack className="w-6 h-6" />
             </button>
@@ -308,7 +308,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
               }}
               disabled={status.currentSegmentIndex >= status.totalSegments - 1}
               className="p-3 rounded-full bg-surface-1 border border-bordure text-texte-second hover:text-texte disabled:opacity-30 active:scale-95"
-              title="Segment suivant"
+              title={t('lecteur.segmentSuivant')}
             >
               <SkipForward className="w-6 h-6" />
             </button>
@@ -320,7 +320,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                 onSeekTime(Math.min(status.duration, status.currentTime + 10));
               }}
               className="p-3 rounded-full bg-surface-1 border border-bordure text-texte-attenue hover:text-texte active:scale-95"
-              title="+10 secondes"
+              title={t('feuille.plus10')}
             >
               <RotateCw className="w-5 h-5" />
             </button>
@@ -330,7 +330,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
           <div className="grid grid-cols-2 gap-2 pt-1">
             {/* Speed Pills */}
             <div className="flex items-center justify-between bg-surface-1 border border-bordure rounded-xl p-1.5">
-              <span className="text-xs font-mono text-texte-attenue pl-1 font-bold">VITESSE</span>
+              <span className="text-xs font-mono text-texte-attenue pl-1 font-bold">{t('feuille.vitesse')}</span>
               <div className="flex gap-1">
                 {speeds.map((spd) => (
                   <button
@@ -364,10 +364,10 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                     ? 'bg-surface-3 border border-classe-safe text-classe-safe font-bold'
                     : 'text-texte-attenue hover:text-texte'
                 }`}
-                title="Bruit blanc de confinement"
+                title={t('menu.bruitBlanc')}
               >
                 <Radio className={`w-3 h-3 ${ambienceActive ? 'text-classe-safe' : ''}`} />
-                <span>AMBIANCE</span>
+                <span>{t('feuille.ambiance')}</span>
               </button>
 
               {/* Mute button */}
@@ -379,7 +379,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                 className={`p-1.5 rounded text-xs transition-all ${
                   status.isMuted ? 'text-accent-texte bg-surface-3/60' : 'text-texte-attenue hover:text-texte'
                 }`}
-                title="Sourdine"
+                title={t('feuille.sourdine')}
               >
                 {status.isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
               </button>

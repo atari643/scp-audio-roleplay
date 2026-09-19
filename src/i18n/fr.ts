@@ -187,6 +187,47 @@ export const FR = {
   'menu.tactique': 'Menu tactique',
   'menu.ouvrirTactique': 'Ouvrir le menu tactique',
 
+  // --- Explorateur SCiPNET --------------------------------------------------
+  'explorateur.reseau': 'Réseau intranet SCiPNET',
+  'explorateur.numeroScp': 'N° SCP (ex : 173)',
+  'explorateur.arborescence': 'ARBORESCENCE DU SYSTÈME SCiPNET',
+  'explorateur.filtrer': 'Filtrer dans ce dossier…',
+  'explorateur.ouvrirComplet': 'Ouvrir le dossier déclassifié complet',
+  'explorateur.rechercherLiees': 'Rechercher les archives liées',
+  'explorateur.rattaches': 'DOSSIERS RATTACHÉS À CETTE ENTITÉ :',
+  'explorateur.classifie': 'Dossier classifié SCiPNET',
+  'explorateur.parcourirSerie': 'Parcourir les 1 000 dossiers de la série',
+  'explorateur.phares': 'DOSSIERS PHARES DE CETTE SÉRIE :',
+  'explorateur.fichier': 'FICHIER',
+  'explorateur.entrer': 'ENTRER DANS LE DOSSIER',
+  'explorateur.colonneCode': 'Code',
+  'explorateur.colonneNom': "Nom de l'entité",
+  'explorateur.colonneCategorie': 'Catégorie',
+  'explorateur.colonneAccreditation': 'Accréditation',
+  'explorateur.colonneTitre': 'Titre / Rôle',
+  'explorateur.colonneAction': 'Action',
+  'explorateur.ouvrir': 'Ouvrir',
+
+  // --- Feuille audio mobile -------------------------------------------------
+  'feuille.transcription': 'TRANSCRIPTION EN DIRECT',
+  'feuille.diffusionActive': 'DIFFUSION ACTIVE',
+  'feuille.moins10': '-10 secondes',
+  'feuille.plus10': '+10 secondes',
+  'feuille.segmentPrecedent': 'Segment précédent',
+  'feuille.vitesse': 'VITESSE',
+  'feuille.ambiance': 'AMBIANCE',
+  'feuille.sourdine': 'Sourdine',
+
+  // --- Studio des voix ------------------------------------------------------
+  'studio.packNeural': 'Pack IA neural',
+  'studio.navigateur': 'Navigateur',
+  'studio.prereglages': 'Préréglages SCP :',
+  'studio.packsIntegres': 'Packs Hugging Face et GitHub intégrés',
+  'studio.tonalite': 'Modulation de tonalité :',
+  'studio.rythme': 'Rythme de diction :',
+  'studio.retablir': 'Rétablir',
+  'studio.retablirInfo': "Rétablir les paramètres d'origine",
+
   // --- Écran de confinement d'erreur ---------------------------------------
   'erreur.banniere': "Confinement de l'erreur",
   'erreur.titre': "L'interface a cessé de répondre.",

@@ -30,7 +30,7 @@ import {
 import { versScpEntity } from '../data/entityPresentation';
 import { EntityIllustration } from './illustrations/ScpIllustrations';
 import { sfx } from '../services/sfxService';
-import { libelleCategorie } from '../i18n';
+import { libelleCategorie, useT } from '../i18n';
 import { FenetreScipnet } from './FenetreScipnet';
 
 interface ScipnetExplorerModalProps {
@@ -132,6 +132,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
   onSelectScpSlug,
   languageCode = 'fr'
 }) => {
+  const t = useT();
   const [currentSelection, setCurrentSelection] = useState<NodeSelection>({ type: 'root' });
   const [searchFilter, setSearchFilter] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -249,7 +250,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
       barreEtat={
         <div className="flex flex-wrap items-center justify-between gap-2 uppercase">
           <span className="tabular-nums">{totalEntites} entités répertoriées</span>
-          <span>Réseau intranet SCiPNET</span>
+          <span>{t('explorateur.reseau')}</span>
         </div>
       }
     >
@@ -273,7 +274,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                 type="text"
                 value={jumperVal}
                 onChange={(e) => setJumperVal(e.target.value)}
-                placeholder="N° SCP (ex: 173)"
+                placeholder={t('explorateur.numeroScp')}
                 className="win2k-inset px-2 py-0.5 bg-black text-classe-euclid border border-bordure text-xs w-28 font-mono outline-none"
               />
               <button
@@ -314,7 +315,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
           <div className="w-64 sm:w-80 bg-surface-1/90 border-r border-bordure flex flex-col select-none overflow-y-auto font-mono text-xs p-2">
             <div className="text-xs uppercase font-bold text-texte-attenue mb-2 px-1 flex items-center gap-1.5 border-b border-bordure pb-1">
               <Folder className="w-3.5 h-3.5 text-classe-euclid" />
-              <span>ARBORESCENCE DU SYSTÈME SCiPNET</span>
+              <span>{t('explorateur.arborescence')}</span>
             </div>
 
             {/* Root: C:\SCIPNET\ARCHIVES */}
@@ -470,7 +471,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                   type="text"
                   value={searchFilter}
                   onChange={(e) => setSearchFilter(e.target.value)}
-                  placeholder="Filtrer dans ce dossier..."
+                  placeholder={t('explorateur.filtrer')}
                   className="win2k-inset px-2 py-0.5 bg-fond text-texte text-xs w-full outline-none font-mono border border-bordure"
                 />
               </div>
@@ -535,7 +536,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                         className="win2k-btn px-3 py-1 text-xs text-texte font-bold flex items-center gap-1.5 hover:bg-surface-3"
                       >
                         <FileText className="w-3.5 h-3.5 text-accent-texte" />
-                        <span>Ouvrir le dossier déclassifié complet</span>
+                        <span>{t('explorateur.ouvrirComplet')}</span>
                       </button>
 
                       {onSelectSeriesFilter && (
@@ -548,7 +549,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                           className="win2k-btn px-3 py-1 text-xs text-classe-euclid hover:text-texte flex items-center gap-1.5"
                         >
                           <Sparkles className="w-3.5 h-3.5 text-classe-euclid" />
-                          <span>Rechercher les archives liées</span>
+                          <span>{t('explorateur.rechercherLiees')}</span>
                         </button>
                       )}
                     </div>
@@ -558,7 +559,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                   <div>
                     <div className="text-xs font-bold text-texte-attenue uppercase mb-2 flex items-center gap-2 flex-wrap">
                       <FolderOpen className="w-3.5 h-3.5 text-accent-texte" />
-                      <span>DOSSIERS RATTACHÉS À CETTE ENTITÉ :</span>
+                      <span>{t('explorateur.rattaches')}</span>
                       {/* Le décompte sépare ce que le wiki DÉCLARE de ce que le texte
                           se contente de mentionner. C'est ce qui remplace l'ancienne
                           liste saisie à la main, dont rien ne disait d'où elle venait. */}
@@ -590,7 +591,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                             <FileText className="w-4 h-4 text-accent-texte shrink-0" />
                             <div>
                               <div className="font-bold text-texte text-xs">{scpSlug}</div>
-                              <div className="text-xs text-texte-attenue">Dossier classifié SCiPNET</div>
+                              <div className="text-xs text-texte-attenue">{t('explorateur.classifie')}</div>
                             </div>
                           </div>
                           <span className="text-xs text-accent-texte font-bold group-hover:translate-x-0.5 transition-transform">
@@ -645,7 +646,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                           className="win2k-btn px-3 py-1 text-xs font-bold text-classe-euclid hover:text-texte flex items-center gap-1.5"
                         >
                           <Sparkles className="w-3.5 h-3.5 text-classe-euclid" />
-                          <span>Parcourir les 1 000 dossiers de la série</span>
+                          <span>{t('explorateur.parcourirSerie')}</span>
                         </button>
                       )}
                     </div>
@@ -655,7 +656,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                   <div>
                     <div className="text-xs font-bold text-texte-attenue uppercase mb-2 flex items-center gap-2">
                       <FileText className="w-3.5 h-3.5 text-classe-euclid" />
-                      <span>DOSSIERS PHARES DE CETTE SÉRIE :</span>
+                      <span>{t('explorateur.phares')}</span>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
@@ -672,7 +673,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                           className="win2k-btn p-2.5 text-left flex flex-col justify-between hover:border-classe-euclid/80 group"
                         >
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs font-mono text-texte-attenue">FICHIER</span>
+                            <span className="text-xs font-mono text-texte-attenue">{t('explorateur.fichier')}</span>
                             <span className="text-xs font-bold text-classe-euclid group-hover:underline">OUVRIR &gt;</span>
                           </div>
                           <span className="font-mono font-bold text-texte text-xs tracking-wider">
@@ -723,7 +724,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                         <div className="pt-2 border-t border-bordure flex items-center justify-between text-xs">
                           <span className="text-texte-attenue">{entity.iconicScps.length} SCP(s) associés</span>
                           <span className="text-accent-texte font-bold group-hover:underline flex items-center gap-1">
-                            <span>ENTRER DANS LE DOSSIER</span>
+                            <span>{t('explorateur.entrer')}</span>
                             <ChevronRight className="w-3 h-3" />
                           </span>
                         </div>
@@ -736,12 +737,12 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-surface-1 border-b border-bordure text-xs text-texte-attenue uppercase">
-                          <th className="p-2">Code</th>
-                          <th className="p-2">Nom de l'Entité</th>
-                          <th className="p-2">Catégorie</th>
-                          <th className="p-2">Accréditation</th>
-                          <th className="p-2">Titre / Rôle</th>
-                          <th className="p-2 text-right">Action</th>
+                          <th className="p-2">{t('explorateur.colonneCode')}</th>
+                          <th className="p-2">{t('explorateur.colonneNom')}</th>
+                          <th className="p-2">{t('explorateur.colonneCategorie')}</th>
+                          <th className="p-2">{t('explorateur.colonneAccreditation')}</th>
+                          <th className="p-2">{t('explorateur.colonneTitre')}</th>
+                          <th className="p-2 text-right">{t('explorateur.colonneAction')}</th>
                         </tr>
                       </thead>
                       <tbody>

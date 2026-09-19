@@ -6,6 +6,7 @@ import { DEFAULT_ROLE_PROFILES } from '../services/storageService';
 import { DEFAULT_AI_ROLES_FR, NEURAL_VOICES_BY_LANG, VOICE_LANGUAGE_STATS } from '../types/neuralVoices';
 import { sfx } from '../services/sfxService';
 import { FenetreScipnet } from './FenetreScipnet';
+import { useT } from '../i18n';
 
 interface VoiceStudioModalProps {
   isOpen: boolean;
@@ -81,6 +82,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
   onClose,
   languageCode
 }) => {
+  const t = useT();
   const [engineMode, setEngineMode] = useState<TtsEngineMode>(speechEngine.getEngineMode());
   const [profiles, setProfiles] = useState<Record<CharacterRole, VoiceProfile>>(speechEngine.getVoiceProfiles());
   const [aiAssignments, setAiAssignments] = useState<Record<CharacterRole, string>>(speechEngine.getAiVoiceAssignments());
@@ -216,7 +218,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
                 }`}
               >
                 <Cpu className="w-3.5 h-3.5" />
-                <span>Pack IA Neural</span>
+                <span>{t('studio.packNeural')}</span>
               </button>
               <button
                 onClick={() => handleToggleEngine('system')}
@@ -226,7 +228,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
                     : 'text-texte-attenue hover:text-texte'
                 }`}
               >
-                <span>Navigateur</span>
+                <span>{t('studio.navigateur')}</span>
               </button>
             </div>
 
@@ -236,7 +238,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
         {/* Presets & HuggingFace Info Bar */}
         <div className="px-5 py-2 bg-surface-1/70 border-b border-scp-border flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-            <span className="text-xs font-mono text-texte-attenue shrink-0">Préréglages SCP :</span>
+            <span className="text-xs font-mono text-texte-attenue shrink-0">{t('studio.prereglages')}</span>
             {SCP_PRESETS.map(preset => (
               <button
                 key={preset.id}
@@ -250,7 +252,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
 
           <div className="flex items-center gap-1.5 text-xs font-mono text-classe-safe bg-surface-3/40 px-2 py-0.5 rounded border border-classe-safe/40">
             <Globe className="w-3 h-3" />
-            <span>Packs Hugging Face & GitHub intégrés</span>
+            <span>{t('studio.packsIntegres')}</span>
           </div>
         </div>
 
@@ -386,7 +388,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
             {/* Pitch Modulation Slider */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-mono text-texte-second">
-                <span>Modulation de Tonalité (Pitch) :</span>
+                <span>{t('studio.tonalite')}</span>
                 <span className="text-accent-texte font-bold">
                   {currentProfile.pitch < 0.9 ? 'Grave / Sombre' : currentProfile.pitch > 1.1 ? 'Aigu / Dynamique' : 'Neutre'}
                 </span>
@@ -405,7 +407,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
             {/* Speed Slider */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-mono text-texte-second">
-                <span>Rythme de diction :</span>
+                <span>{t('studio.rythme')}</span>
                 <span className="text-accent-texte font-bold">{currentProfile.rate.toFixed(2)}x</span>
               </div>
               <input
@@ -432,11 +434,11 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
 
               <button
                 onClick={handleReset}
-                title="Rétablir les paramètres d'origine"
+                title={t('studio.retablirInfo')}
                 className="flex items-center gap-1.5 bg-scp-card hover:bg-scp-cardHover border border-scp-border text-texte-second text-xs font-mono py-2.5 px-3 rounded-xl transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>Rétablir</span>
+                <span>{t('studio.retablir')}</span>
               </button>
             </div>
           </div>
