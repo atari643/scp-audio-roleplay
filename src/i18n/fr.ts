@@ -108,6 +108,39 @@ export const FR = {
   'general.erreurArchive': "Une erreur est survenue lors de la communication avec l'archive SCP.",
   'general.fermer': 'Fermer',
 
+  // --- En-tête et barre d'outils -------------------------------------------
+  'entete.archive': 'Archive Site-19',
+  'entete.noeud': 'Nœud SCiPNET 19-B',
+  'entete.brancheAria': 'Sélection de la branche SCP',
+  'entete.aleatoire': 'Aléatoire',
+  'entete.aleatoireInfo': 'Ouvrir un dossier au hasard',
+  'entete.explorateur': 'Explorateur',
+  'entete.explorateurInfo': "Explorateur d'entités SCiPNET : départements, personnel, factions, sites",
+  'entete.voix': 'Voix',
+  'entete.voixInfo': 'Studio des voix et des rôles',
+  'entete.favoris': 'Dossiers classés',
+
+  // --- Bandeau d'état de l'accueil -----------------------------------------
+  'etat.diffusion': 'Diffusion multi-voix',
+  'etat.protocole': 'Protocole CROM',
+  'etat.connecte': 'connecté',
+  'etat.synthese': 'Synthèse',
+  'etat.isolation': 'Isolation mémétique',
+  'etat.niveau4': 'niveau 4',
+
+  // --- Recherche et filtres -------------------------------------------------
+  'recherche.placeholder': 'Rechercher : 049, 173, « Pataphysique », « Dr Clef », « CMO »…',
+  'recherche.aria': "Recherche dans l'archive",
+  'recherche.indexation': 'Indexation…',
+  'recherche.bouton': 'Rechercher',
+  'recherche.effacer': 'Effacer la recherche',
+  'recherche.effacerFiltre': 'Effacer le filtre',
+  'recherche.explorateurInfo': "Ouvrir l'explorateur d'entités SCiPNET",
+  'recherche.series': 'Séries',
+  'recherche.classe': 'Classe',
+  'recherche.aucunDossier': 'Aucun dossier trouvé.',
+  'recherche.erreurCommunication': 'Erreur de communication SCiPNET.',
+
   // --- Écran de confinement d'erreur ---------------------------------------
   'erreur.banniere': "Confinement de l'erreur",
   'erreur.titre': "L'interface a cessé de répondre.",

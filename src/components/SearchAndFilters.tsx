@@ -24,6 +24,7 @@ import {
 import { SCP_SERIES, ScpSeriesInfo } from '../data/seriesData';
 import { prefetchScpSeries } from '../services/queryClient';
 import { styleBadgeClasse } from './classification';
+import { useT } from '../i18n';
 
 interface SearchAndFiltersProps {
   onSearch: (query: string) => void;
@@ -126,6 +127,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
   entiteFiltreNom,
   languageCode = 'fr'
 }) => {
+  const t = useT();
   const [inputVal, setInputVal] = useState(activeQuery);
   const [activeQuickTab, setActiveQuickTab] = useState<OngletRapide>('none');
 
@@ -207,8 +209,8 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
           type="text"
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value)}
-          placeholder="Rechercher : 049, 173, « Pataphysique », « Dr Clef », « CMO »…"
-          aria-label="Recherche dans l'archive"
+          placeholder={t('recherche.placeholder')}
+          aria-label={t('recherche.aria')}
           className="w-full bg-transparent border-none pl-10 sm:pl-24 pr-32 py-3 font-mono text-sm text-texte placeholder:text-texte-attenue focus:outline-none"
         />
 
@@ -216,7 +218,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
           {isLoading ? (
             <span className="inline-flex items-center gap-1.5 px-2 font-mono text-xs text-texte-attenue">
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="hidden sm:inline">Indexation…</span>
+              <span className="hidden sm:inline">{t('recherche.indexation')}</span>
             </span>
           ) : (
             <>
@@ -224,7 +226,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 <button
                   type="button"
                   onClick={handleClear}
-                  aria-label="Effacer la recherche"
+                  aria-label={t('recherche.effacer')}
                   className="w-8 h-8 flex items-center justify-center rounded-sm text-texte-attenue hover:text-texte hover:bg-surface-3 transition-colors"
                 >
                   <X className="w-4 h-4" />
@@ -235,7 +237,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 className="inline-flex items-center gap-1.5 h-8 px-3 rounded-sm bg-accent hover:bg-accent-texte text-texte font-mono text-xs font-semibold transition-colors"
               >
                 <Search className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Rechercher</span>
+                <span className="hidden sm:inline">{t('recherche.bouton')}</span>
               </button>
             </>
           )}
@@ -249,11 +251,11 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
             sfx.playTerminalBeep();
             onOpenExplorer();
           }}
-          title="Ouvrir l'explorateur d'entités SCiPNET"
+          title={t('recherche.explorateurInfo')}
           className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-sm bg-surface-2 border border-bordure font-mono text-xs text-texte-second hover:bg-surface-3 hover:text-texte hover:border-bordure-forte transition-colors"
         >
           <FolderOpen className="w-3.5 h-3.5" />
-          <span>Explorateur</span>
+          <span>{t('entete.explorateur')}</span>
         </button>
 
         <span className="w-px h-5 bg-bordure hidden sm:block" aria-hidden="true" />
@@ -284,7 +286,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
         {activeQuery && (
           <span className="ml-auto inline-flex items-center gap-1.5 h-7 px-2 rounded-sm border border-accent-texte/50 font-mono text-xs text-accent-texte">
             <span className="truncate max-w-[16ch]">« {activeQuery} »</span>
-            <button onClick={handleClear} aria-label="Effacer le filtre" className="hover:text-texte transition-colors">
+            <button onClick={handleClear} aria-label={t('recherche.effacerFiltre')} className="hover:text-texte transition-colors">
               <X className="w-3.5 h-3.5" />
             </button>
           </span>
@@ -316,7 +318,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-bordure-faible pb-2">
         <span className="shrink-0 inline-flex items-center gap-1.5 mr-1 font-mono text-xs uppercase tracking-technique text-texte-attenue">
           <Database className="w-3.5 h-3.5" aria-hidden="true" />
-          <span className="hidden sm:inline">Séries</span>
+          <span className="hidden sm:inline">{t('recherche.series')}</span>
         </span>
 
         <button
@@ -390,7 +392,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         <span className="shrink-0 inline-flex items-center gap-1.5 mr-1 font-mono text-xs uppercase tracking-technique text-texte-attenue">
           <Shield className="w-3.5 h-3.5" aria-hidden="true" />
-          <span className="hidden sm:inline">Classe</span>
+          <span className="hidden sm:inline">{t('recherche.classe')}</span>
         </span>
 
         {CLASSES.map((cls) => {

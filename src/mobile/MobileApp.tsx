@@ -20,6 +20,7 @@ import { useScpApp } from '../shared/hooks/useScpApp';
 import { DeviceMode } from '../shared/hooks/useDeviceMode';
 import { sfx } from '../services/sfxService';
 import { Loader2, Radio, BookOpen, AlertTriangle, Languages } from 'lucide-react';
+import { useT } from '../i18n';
 
 /**
  * Écrans et fenêtres chargés à la demande.
@@ -75,6 +76,7 @@ interface MobileAppProps {
 }
 
 export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDeviceMode }) => {
+  const t = useT();
 
   const {
     currentLanguage,
@@ -278,7 +280,7 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
         {(searchError || detailError) && (
           <div className="mb-3 p-3 rounded-xl bg-surface-3/70 border border-accent-texte text-accent-texte text-xs font-mono flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-accent-texte shrink-0" />
-            <span>Erreur de communication SCiPNET.</span>
+            <span>{t('recherche.erreurCommunication')}</span>
           </div>
         )}
 
@@ -330,7 +332,7 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
             ) : filteredItems.length === 0 ? (
               <div className="text-center py-12 bg-surface-1/60 border border-bordure rounded-xl p-4">
                 <BookOpen className="w-8 h-8 text-texte-attenue mx-auto mb-2" />
-                <p className="text-xs font-mono text-texte-attenue">Aucun dossier trouvé.</p>
+                <p className="text-xs font-mono text-texte-attenue">{t('recherche.aucunDossier')}</p>
                 <button
                   onClick={() => {
                     setSelectedClass('ALL');

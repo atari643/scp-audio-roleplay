@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { LanguageBranch, SUPPORTED_LANGUAGES } from '../types/scp';
 import { sfx } from '../services/sfxService';
+import { useT } from '../i18n';
 
 interface HeaderProps {
   currentLanguage: LanguageBranch;
@@ -60,6 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
   crtEnabled,
   onToggleCrt
 }) => {
+  const t = useT();
   const [siteTime, setSiteTime] = useState<string>('');
 
   useEffect(() => {
@@ -87,13 +89,13 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="hidden sm:inline text-texte-attenue truncate tracking-technique">
             Tout accès non autorisé est enregistré et traité par la RAISA
           </span>
-          <span className="sm:hidden text-texte-attenue truncate">Archive Site-19</span>
+          <span className="sm:hidden text-texte-attenue truncate">{t('entete.archive')}</span>
         </div>
 
         {/* Horodatage et nœud réseau : de l'information machine, donc du cyan
             système. Le rouge reste à la classification, à gauche. */}
         <div className="flex items-center gap-3 shrink-0 tracking-technique">
-          <span className="hidden lg:inline text-texte-attenue">Nœud SCiPNET 19-B</span>
+          <span className="hidden lg:inline text-texte-attenue">{t('entete.noeud')}</span>
           <span className="text-bordure-forte hidden lg:inline" aria-hidden="true">|</span>
           <span className="tabular-nums text-texte-attenue">
             UTC <span className="text-systeme">{siteTime || '00:00:00'}</span>
@@ -138,7 +140,7 @@ export const Header: React.FC<HeaderProps> = ({
                 if (lang) onLanguageChange(lang);
               }}
               className="bg-transparent text-xs text-texte-second font-mono cursor-pointer focus:outline-none pr-1"
-              aria-label="Sélection de la branche SCP"
+              aria-label={t('entete.brancheAria')}
             >
               {SUPPORTED_LANGUAGES.map((lang) => (
                 <option key={lang.code} value={lang.code} className="bg-surface-1 text-texte font-mono">
@@ -153,11 +155,11 @@ export const Header: React.FC<HeaderProps> = ({
               sfx.playTerminalBeep();
               onRandomScp();
             }}
-            title="Ouvrir un dossier au hasard"
+            title={t('entete.aleatoireInfo')}
             className={BOUTON_BARRE}
           >
             <Dices className="w-4 h-4" aria-hidden="true" />
-            <span className="hidden md:inline">Aléatoire</span>
+            <span className="hidden md:inline">{t('entete.aleatoire')}</span>
           </button>
 
           {onOpenExplorer && (
@@ -166,11 +168,11 @@ export const Header: React.FC<HeaderProps> = ({
                 sfx.playTerminalBeep();
                 onOpenExplorer();
               }}
-              title="Explorateur d'entités SCiPNET : départements, personnel, factions, sites"
+              title={t('entete.explorateurInfo')}
               className={BOUTON_BARRE}
             >
               <FolderOpen className="w-4 h-4" aria-hidden="true" />
-              <span className="hidden md:inline">Explorateur</span>
+              <span className="hidden md:inline">{t('entete.explorateur')}</span>
             </button>
           )}
 
@@ -179,11 +181,11 @@ export const Header: React.FC<HeaderProps> = ({
               sfx.playTerminalBeep();
               onOpenVoiceStudio();
             }}
-            title="Studio des voix et des rôles"
+            title={t('entete.voixInfo')}
             className={BOUTON_BARRE}
           >
             <Sliders className="w-4 h-4" aria-hidden="true" />
-            <span className="hidden md:inline">Voix</span>
+            <span className="hidden md:inline">{t('entete.voix')}</span>
           </button>
 
           <button
@@ -213,7 +215,7 @@ export const Header: React.FC<HeaderProps> = ({
               sfx.playTerminalBeep();
               onOpenFavorites();
             }}
-            title="Dossiers classés"
+            title={t('entete.favoris')}
             className={`${BOUTON_BARRE} relative w-9 justify-center px-0`}
           >
             <Bookmark className="w-4 h-4" />

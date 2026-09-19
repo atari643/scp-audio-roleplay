@@ -5,6 +5,7 @@ import { ScpCard } from '../components/ScpCard';
 import { metaDossier } from '../services/corpusFilters';
 import { ScpReader } from '../components/ScpReader';
 import { AudioPlayer } from '../components/AudioPlayer';
+import { useT } from '../i18n';
 import { VoiceStudioModal } from '../components/VoiceStudioModal';
 import { FavoritesModal } from '../components/FavoritesModal';
 import { BootSequence } from '../components/BootSequence';
@@ -39,6 +40,7 @@ interface DesktopAppProps {
 }
 
 export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
+  const t = useT();
   const {
     currentLanguage,
     filtrerParEntite,
@@ -220,7 +222,7 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
         {(searchError || detailError) && (
           <div className="mb-6 p-4 rounded bg-surface-2 border border-bordure border-l-[3px] border-l-accent-texte text-texte-second text-sm font-mono flex items-center gap-3">
             <AlertTriangle className="w-5 h-5 text-accent-texte shrink-0" />
-            <div>Une erreur est survenue lors de la communication avec l'archive SCP.</div>
+            <div>{t('general.erreurArchive')}</div>
           </div>
         )}
 
@@ -336,7 +338,7 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
                   <Radio className="w-3.5 h-3.5" aria-hidden="true" />
                   Nœud audio SCiPNET · Site-19
                 </span>
-                <span>Diffusion multi-voix</span>
+                <span>{t('etat.diffusion')}</span>
               </div>
 
               <div className="px-4 sm:px-6 py-5">
@@ -352,16 +354,16 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
 
                 <dl className="mt-5 pt-4 border-t border-bordure-faible flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs">
                     <div className="flex items-center gap-2">
-                    <dt className="text-texte-attenue uppercase tracking-technique">Protocole CROM</dt>
-                    <dd className="text-systeme">connecté</dd>
+                    <dt className="text-texte-attenue uppercase tracking-technique">{t('etat.protocole')}</dt>
+                    <dd className="text-systeme">{t('etat.connecte')}</dd>
                   </div>
                   <div className="flex items-center gap-2">
-                    <dt className="text-texte-attenue uppercase tracking-technique">Synthèse</dt>
+                    <dt className="text-texte-attenue uppercase tracking-technique">{t('etat.synthese')}</dt>
                     <dd className="text-systeme">Edge Neural TTS</dd>
                   </div>
                   <div className="flex items-center gap-2">
-                    <dt className="text-texte-attenue uppercase tracking-technique">Isolation mémétique</dt>
-                    <dd className="text-systeme">niveau 4</dd>
+                    <dt className="text-texte-attenue uppercase tracking-technique">{t('etat.isolation')}</dt>
+                    <dd className="text-systeme">{t('etat.niveau4')}</dd>
                   </div>
                 </dl>
               </div>
@@ -399,7 +401,7 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
             ) : filteredItems.length === 0 ? (
               <div className="text-center py-16 bg-surface-1 border border-bordure rounded">
                 <BookOpen className="w-9 h-9 text-texte-attenue mx-auto mb-3" />
-                <p className="font-mono text-sm text-texte-second">Aucun dossier ne correspond à ces filtres.</p>
+                <p className="font-mono text-sm text-texte-second">{t('general.aucunResultat')}</p>
                 <button
                   onClick={() => {
                     setSelectedClass('ALL');
