@@ -1,5 +1,10 @@
 # Attribution du contenu — Fondation SCP
 
+> La [licence MIT](LICENSE) de ce dépôt couvre **le code, et lui seul**. Le
+> contenu des dossiers SCP que l'application lit à voix haute appartient au wiki
+> communautaire et reste publié sous **CC BY-SA 3.0** — c'est l'objet de cette
+> page.
+
 Cette application **ne contient aucun dossier SCP**. Elle les récupère à la
 demande sur le wiki communautaire de la Fondation SCP, via l'API publique
 [Crom](https://api.crom.avn.sh/graphql), et les met en voix.
