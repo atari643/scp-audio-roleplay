@@ -225,9 +225,11 @@ function fusionner(repertoire, entite) {
   for (const [langue, tags] of Object.entries(entite.tags)) {
     existante.tags[langue] = [...new Set([...(existante.tags[langue] ?? []), ...tags])];
   }
-  // On ne remplace jamais un résumé déjà écrit : l'anglais passe en premier, et c'est
-  // sa description qui fait référence.
-  if (!existante.resume && entite.resume) existante.resume = entite.resume;
+  // Fusion par branche, comme au-dessus. C'était auparavant « premier arrivé,
+  // premier servi » : l'anglais étant construit en premier, son résumé écrasait
+  // les neuf autres, qui étaient lues puis jetées.
+  existante.resume ??= {};
+  Object.assign(existante.resume, entite.resume);
   if (!existante.designation && entite.designation) existante.designation = entite.designation;
   return existante;
 }
@@ -272,7 +274,11 @@ function entitesDeLAnnuaire(categorie, source, langue, url, liens, titrePage) {
       tags: tag ? { [langue]: [tag] } : {},
       pages: { [langue]: url },
       designation,
-      resume
+      // Indexé par branche comme `noms` et `pages` : l'annuaire de chaque langue
+      // écrit sa propre présentation, et `resumeDuBloc()` sait déjà les lire
+      // toutes. Une chaîne unique faisait qu'un francophone lisait un nom
+      // français suivi d'un résumé anglais.
+      resume: resume ? { [langue]: resume } : {}
     });
   };
 
@@ -544,7 +550,14 @@ function fusionnerDoublons(entites, pairesSupplementaires = []) {
     const id = racine(e.id);
     const cible = fusionnees.get(id);
     if (!cible) {
-      fusionnees.set(id, { ...e, id, noms: { ...e.noms }, tags: { ...e.tags }, pages: { ...e.pages } });
+      fusionnees.set(id, {
+        ...e,
+        id,
+        noms: { ...e.noms },
+        tags: { ...e.tags },
+        pages: { ...e.pages },
+        resume: { ...(e.resume ?? {}) }
+      });
       continue;
     }
     for (const [langue, nom] of Object.entries(e.noms)) cible.noms[langue] ??= nom;
@@ -552,7 +565,10 @@ function fusionnerDoublons(entites, pairesSupplementaires = []) {
     for (const [langue, tags] of Object.entries(e.tags)) {
       cible.tags[langue] = [...new Set([...(cible.tags[langue] ?? []), ...tags])];
     }
-    cible.resume ??= e.resume;
+    // `??=` par branche, pas sur le champ entier : deux variantes d'une même
+    // entité peuvent chacune n'avoir que la moitié des langues.
+    cible.resume ??= {};
+    for (const [langue, resume] of Object.entries(e.resume ?? {})) cible.resume[langue] ??= resume;
     cible.designation ??= e.designation;
   }
   return { entites: [...fusionnees.values()], racine };
@@ -608,10 +624,32 @@ async function construireRepertoire(args) {
   for (const [id, slugs] of liensFusionnes) liens.set(id, slugs);
 
   for (const e of entites) {
-    if (!e.resume) delete e.resume;
+    // `resume` est maintenant un objet : un objet vide est toujours truthy, donc
+    // c'est le nombre de branches qui décide. Sans ça, 400 entités sans aucun
+    // résumé emporteraient chacune un `{}` dans le fichier livré.
+    if (!e.resume || Object.keys(e.resume).length === 0) delete e.resume;
     if (!e.designation) delete e.designation;
   }
   entites.sort((a, b) => a.categorie.localeCompare(b.categorie) || a.id.localeCompare(b.id));
+
+  // Les résumés sortent du répertoire, un fichier par branche.
+  //
+  // Ils sont dix fois plus volumineux que tout le reste réuni : les garder ici
+  // ferait télécharger les dix langues à qui n'en lit qu'une — mesuré, le
+  // morceau passait de 82 à 221 Ko gzip. Même découpage que
+  // `entityIndex.<lang>.json`, et `chargerEntites()` les charge avec l'index de
+  // la branche, donc sans requête supplémentaire à l'usage.
+  const resumesParLangue = {};
+  for (const e of entites) {
+    for (const [langue, texte] of Object.entries(e.resume ?? {})) {
+      (resumesParLangue[langue] ??= {})[e.id] = texte;
+    }
+    delete e.resume;
+  }
+  for (const [langue, resumes] of Object.entries(resumesParLangue)) {
+    const ko = ecrireJson(path.join(DATA, `entityResumes.${langue}.json`), resumes);
+    console.log(`  résumés ${langue.padEnd(6)} ${String(Object.keys(resumes).length).padStart(4)} entités · ${ko} Ko`);
+  }
 
   const repertoireFinal = { construitLe: new Date().toISOString(), branches, entites };
   const fichier = args.sortie ? path.resolve(args.sortie) : path.join(DATA, 'entities.json');

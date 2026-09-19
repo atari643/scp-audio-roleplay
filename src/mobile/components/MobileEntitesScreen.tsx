@@ -8,7 +8,8 @@ import {
   dossiersDeLEntite,
   entitesParCategorie,
   nomEntite,
-  pageSourceEntite
+  pageSourceEntite,
+  resumeEntite
 } from '../../services/entityService';
 import { sfx } from '../../services/sfxService';
 import { MentionSourceWiki } from '../../components/MentionSourceWiki';
@@ -82,7 +83,10 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
     const dossiers = dossiersDeLEntite(entiteOuverte.id, languageCode);
     const { confirmes, mentions } = compterDossiers(entiteOuverte.id, languageCode);
     const Icone = ICONES[entiteOuverte.categorie];
-    const pageSource = pageSourceEntite(entiteOuverte, languageCode);
+    // Le résumé vient toujours de la branche affichée — pas de repli de langue —
+    // donc c'est sa page qu'on cite.
+    const resume = resumeEntite(entiteOuverte, languageCode);
+    const pageSource = resume ? pageSourceEntite(entiteOuverte, languageCode) : undefined;
 
     return (
       <div className="px-3 pb-28">
@@ -110,9 +114,11 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
             </div>
           </div>
 
-          {entiteOuverte.resume && (
+          {resume && (
             <>
-              <p className="mt-2.5 text-xs text-texte-second leading-relaxed break-words">{entiteOuverte.resume}</p>
+              <p className="mt-2.5 text-xs text-texte-second leading-relaxed break-words">
+                {resume}
+              </p>
               {/*
                 Ce résumé est repris mot pour mot de l'annuaire du wiki, donc sous
                 CC BY-SA 3.0 : la source est obligatoire, et `pages` la porte déjà

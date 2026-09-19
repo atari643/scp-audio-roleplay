@@ -60,8 +60,16 @@ export interface Entite {
   pages: Record<string, string>;
   /** Désignation canonique quand il y en a une : `Site-19`, `FIM Epsilon-11`. */
   designation?: string;
-  /** Résumé tiré de l'annuaire du wiki. Jamais rédigé par nous. */
-  resume?: string;
+  /**
+   * Résumé tiré de l'annuaire du wiki, **par branche**. Jamais rédigé par nous.
+   *
+   * Indexé par langue comme `noms` et `pages`, et pour la même raison : chaque
+   * annuaire écrit sa propre présentation. Le champ était une chaîne unique, et
+   * comme l'anglais est construit en premier, c'est sa version qui écrasait les
+   * neuf autres — un francophone lisait un nom français suivi d'un résumé
+   * anglais. Lire avec `resumeEntite()`, jamais en direct.
+   */
+  resume?: Record<string, string>;
 }
 
 export interface RepertoireEntites {

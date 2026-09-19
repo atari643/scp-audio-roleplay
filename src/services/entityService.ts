@@ -29,6 +29,27 @@ const parId = new Map<string, Entite>();
 const indexCharges = new Map<string, IndexEntites | null>();
 const chargements = new Map<string, Promise<IndexEntites | null>>();
 
+/**
+ * Les résumés d'annuaire, par branche puis par entité.
+ *
+ * Ils vivent hors de `entities.json` parce qu'ils pèsent dix fois le reste : les
+ * y laisser faisait télécharger les dix langues à qui n'en lit qu'une. Chargés
+ * avec l'index de la branche, donc sans aller-retour supplémentaire.
+ */
+const resumesCharges = new Map<string, Record<string, string>>();
+
+async function chargerResumes(langue: string): Promise<void> {
+  if (resumesCharges.has(langue)) return;
+  try {
+    const module = await import(`../data/entityResumes.${langue}.json`);
+    resumesCharges.set(langue, (module.default ?? module) as Record<string, string>);
+  } catch {
+    // Toutes les branches n'ont pas d'annuaire rédigé : cas normal. On mémorise
+    // l'absence pour ne pas retenter à chaque rendu.
+    resumesCharges.set(langue, {});
+  }
+}
+
 /** Le répertoire, chargé une seule fois pour toute la session. */
 export async function chargerRepertoire(): Promise<RepertoireEntites | null> {
   if (repertoire) return repertoire;
@@ -66,7 +87,9 @@ export async function chargerEntites(langue: string): Promise<IndexEntites | nul
   if (enCours) return enCours;
 
   const promesse = (async () => {
-    await chargerRepertoire();
+    // Les résumés de la branche arrivent avec son index : même granularité, même
+    // moment d'usage, et `resumeEntite()` reste synchrone pour le rendu.
+    await Promise.all([chargerRepertoire(), chargerResumes(langue)]);
     try {
       const module = await import(`../data/entityIndex.${langue}.json`);
       const index = (module.default ?? module) as IndexEntites;
@@ -126,6 +149,22 @@ export function nomEntite(entite: Entite, langue: string): string {
  */
 export function pageSourceEntite(entite: Entite, langue: string): string | undefined {
   return entite.pages[langue] ?? entite.pages.en ?? Object.values(entite.pages)[0];
+}
+
+/**
+ * Le résumé d'une entité, dans la langue affichée **et dans aucune autre**.
+ *
+ * Contrairement à `nomEntite()`, pas de repli sur l'anglais : afficher un
+ * paragraphe anglais à un lecteur qui a choisi le français est précisément le
+ * mélange qu'on cherche à supprimer. Sans résumé dans la branche, la fiche s'en
+ * passe — elle garde son nom, sa désignation et ses dossiers.
+ *
+ * Synchrone : lit ce que `chargerEntites()` a déjà mis en mémoire. Une branche
+ * non chargée renvoie `undefined` plutôt que de déclencher un téléchargement
+ * pendant le rendu.
+ */
+export function resumeEntite(entite: Entite, langue: string): string | undefined {
+  return resumesCharges.get(langue)?.[entite.id];
 }
 
 export function entiteParId(id: string): Entite | undefined {
