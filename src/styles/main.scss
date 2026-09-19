@@ -1,0 +1,25 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+@use 'scp-theme' as *;
+@use 'animations' as *;
+@use 'wikilinks' as *;
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: $color-bg;
+  color: $text-primary;
+  font-family: $font-sans;
+  overflow-x: hidden;
+  @include custom-scrollbar;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

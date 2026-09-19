@@ -1,0 +1,268 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// =============================================================================
+// SCP FOUNDATION SCiPNET / BHL THEME SYSTEM
+// =============================================================================
+
+// 1. CRT Scanlines & Phosphor Monitor Overlay
+.crt-screen {
+  position: relative;
+  
+  &::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    z-index: 999;
+    background-size: 100% 3px, 6px 100%;
+    pointer-events: none;
+    opacity: 0.85;
+  }
+
+  &::after {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.65);
+    z-index: 998;
+    pointer-events: none;
+  }
+}
+
+// 2. Classified Rubber Stamps
+.classified-stamp {
+  font-family: $font-mono;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  user-select: none;
+  pointer-events: none;
+  border: 3px solid;
+  padding: 0.2rem 0.8rem;
+  display: inline-block;
+  transform: rotate(-7deg);
+  border-radius: 4px;
+  mask-image: radial-gradient(circle, #000 70%, rgba(0,0,0,0.7) 100%);
+
+  &.stamp-top-secret {
+    border-color: rgba(#dc2626, 0.65);
+    color: rgba(#dc2626, 0.65);
+    background-color: rgba(#dc2626, 0.05);
+  }
+
+  &.stamp-restricted {
+    border-color: rgba(#f59e0b, 0.55);
+    color: rgba(#f59e0b, 0.55);
+    background-color: rgba(#f59e0b, 0.05);
+  }
+
+  &.stamp-confidential {
+    border-color: rgba(#3b82f6, 0.5);
+    color: rgba(#3b82f6, 0.5);
+  }
+
+  &.stamp-keter {
+    border-color: rgba(#ef4444, 0.7);
+    color: rgba(#ef4444, 0.7);
+    background-color: rgba(#ef4444, 0.08);
+  }
+}
+
+// 3. Technical Blueprint Corner Borders (SCiPNET Terminal UI)
+.scipnet-box {
+  position: relative;
+  background-color: $color-surface;
+  border: 1px solid rgba($color-border, 0.8);
+  
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    pointer-events: none;
+  }
+
+  &::before {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid $color-scp-red;
+    border-left: 2px solid $color-scp-red;
+  }
+
+  &::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid $color-scp-red;
+    border-right: 2px solid $color-scp-red;
+  }
+}
+
+// 4. Hazard Warning Stripes (Keter / Containment Alert)
+.hazard-stripes {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(220, 38, 38, 0.15),
+    rgba(220, 38, 38, 0.15) 10px,
+    rgba(15, 23, 42, 0.3) 10px,
+    rgba(15, 23, 42, 0.3) 20px
+  );
+}
+
+.hazard-stripes-amber {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(245, 158, 11, 0.15),
+    rgba(245, 158, 11, 0.15) 10px,
+    rgba(15, 23, 42, 0.3) 10px,
+    rgba(15, 23, 42, 0.3) 20px
+  );
+}
+
+// 5. Redaction Block with Terminal Hover Interaction
+.redacted-block {
+  background-color: #f1f5f9;
+  color: #f1f5f9;
+  padding: 0 4px;
+  border-radius: 2px;
+  user-select: none;
+  cursor: help;
+  display: inline-block;
+  font-family: $font-mono;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #1e293b;
+    color: #ef4444;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  }
+}
+
+// 6. Audio Visualizer Pulse Animation
+@keyframes eq-bar {
+  0%, 100% { height: 4px; }
+  50% { height: 18px; }
+}
+
+.visualizer-bar {
+  display: inline-block;
+  width: 3px;
+  background-color: $color-scp-red;
+  border-radius: 1px;
+  animation: eq-bar 0.8s infinite ease-in-out;
+
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.3s; }
+  &:nth-child(3) { animation-delay: 0.2s; }
+  &:nth-child(4) { animation-delay: 0.4s; }
+  &:nth-child(5) { animation-delay: 0.15s; }
+}
+
+// 7. Active Playback Glow
+.audio-turn-active {
+  border-color: rgba($color-scp-red, 0.8) !important;
+  box-shadow: 0 0 20px rgba($color-scp-red, 0.25), inset 0 0 15px rgba($color-scp-red, 0.08) !important;
+}
+
+// 8. Terminal Text Glow
+.terminal-glow-red {
+  text-shadow: 0 0 8px rgba(220, 38, 38, 0.6);
+}
+
+.terminal-glow-green {
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+
+// 9. Retro 2000-2005 SCiPNET Windows OS Styling
+.win2k-window {
+  border: 2px solid;
+  border-top-color: #64748b;
+  border-left-color: #64748b;
+  border-right-color: #020617;
+  border-bottom-color: #020617;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.6), inset 1px 1px 0px #94a3b8, inset -1px -1px 0px #0f172a;
+}
+
+.win2k-btn {
+  border: 2px solid;
+  border-top-color: #94a3b8;
+  border-left-color: #94a3b8;
+  border-right-color: #0f172a;
+  border-bottom-color: #0f172a;
+  background-color: #1e293b;
+  color: #f1f5f9;
+  box-shadow: 1px 1px 0px #000;
+  transition: all 0.05s ease;
+
+  &:hover {
+    background-color: #334155;
+  }
+
+  &:active {
+    border-top-color: #0f172a;
+    border-left-color: #0f172a;
+    border-right-color: #94a3b8;
+    border-bottom-color: #94a3b8;
+    transform: translate(1px, 1px);
+    box-shadow: none;
+  }
+}
+
+.win2k-btn-red {
+  border: 2px solid;
+  border-top-color: #f87171;
+  border-left-color: #f87171;
+  border-right-color: #450a0a;
+  border-bottom-color: #450a0a;
+  background-color: #991b1b;
+  color: #ffffff;
+
+  &:hover {
+    background-color: #b91c1c;
+  }
+
+  &:active {
+    border-top-color: #450a0a;
+    border-left-color: #450a0a;
+    border-right-color: #f87171;
+    border-bottom-color: #f87171;
+  }
+}
+
+.win2k-inset {
+  border: 2px solid;
+  border-top-color: #020617;
+  border-left-color: #020617;
+  border-right-color: #475569;
+  border-bottom-color: #475569;
+  background-color: #0b0f19;
+}
+
+.win2k-statusbar {
+  border-top: 1px solid #334155;
+  background-color: #0f172a;
+  font-family: $font-mono;
+}
+
+
+// 9. Suivi de lecture — le mot prononcé à l'instant même.
+//
+// Les frontières de mots renvoyées par le service de synthèse sont alignées sur le texte
+// affiché (voir `wordAlignment.ts`), ce qui permet de suivre la voix à l'œil. Le surlignage
+// reste discret : il accompagne la lecture, il ne doit pas la disputer au texte.
+.mot-lu {
+  background: rgba(220, 38, 38, 0.18);
+  box-shadow: 0 1px 0 rgba(239, 68, 68, 0.85);
+  border-radius: 2px;
+  transition: background-color 0.12s linear;
+}
+
+// Respecte le réglage système « animations réduites » : le fond reste, la transition part.
+@media (prefers-reduced-motion: reduce) {
+  .mot-lu {
+    transition: none;
+  }
+}

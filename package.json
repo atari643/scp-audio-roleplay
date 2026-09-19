@@ -1,0 +1,43 @@
+{
+  "name": "scp-audio-roleplay-app",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "audit:build": "esbuild src/services/cromApi.ts src/services/scriptParser.ts src/services/speechText.ts src/services/corpusIndex.ts --bundle --format=esm --platform=node --outdir=scripts/.build --out-extension:.js=.mjs --log-level=error",
+    "audit": "npm run audit:build && node scripts/audit-coverage.mjs",
+    "index": "npm run audit:build && node scripts/build-index.mjs",
+    "entities:profil": "node scripts/build-entities.mjs --profil",
+    "entities:repertoire": "node scripts/build-entities.mjs --repertoire",
+    "entities": "node scripts/build-entities.mjs --lang en && node scripts/build-entities.mjs --lang fr",
+    "serve:build": "esbuild server/index.ts --bundle --platform=node --format=esm --target=node20 --outfile=dist-server/server.mjs --log-level=error",
+    "serve": "npm run serve:build && node dist-server/server.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
+    "@tanstack/react-query": "^5.102.8",
+    "@tanstack/react-virtual": "^3.14.10",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.475.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^3.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.1",
+    "@types/node": "^22.13.4",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.2",
+    "sass": "^1.103.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.7.2",
+    "vite": "^6.1.0"
+  }
+}
