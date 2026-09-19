@@ -1,6 +1,7 @@
 import React from 'react';
 import { BookOpen, FileText, Headphones, Database, Sliders } from 'lucide-react';
 import { sfx } from '../../services/sfxService';
+import { useT } from '../../i18n';
 
 export type MobileTab = 'catalog' | 'reader' | 'audio' | 'scipnet' | 'settings';
 
@@ -43,6 +44,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   hasActiveDossier,
   isPlaying
 }) => {
+  const t = useT();
   const handleTabClick = (tab: MobileTab) => {
     sfx.playTerminalBeep();
     onSelectTab(tab);
@@ -50,7 +52,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 
   return (
     <nav
-      aria-label="Navigation principale"
+      aria-label={t('general.navigation')}
       className="fixed bottom-0 left-0 right-0 z-40 bg-surface-1/97 border-t border-bordure backdrop-blur-xl"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >

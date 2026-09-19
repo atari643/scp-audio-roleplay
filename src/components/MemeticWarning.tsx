@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { sfx } from '../services/sfxService';
 import { ShieldAlert, Biohazard } from 'lucide-react';
+import { useT } from '../i18n';
 
 interface MemeticWarningProps {
   onComplete: () => void;
 }
 
 export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) => {
+  const t = useT();
   const [scanProgress, setScanProgress] = useState(0);
   const [phase, setPhase] = useState<'warning' | 'scanning' | 'confirmed' | 'done'>('warning');
   const [telemetryVal, setTelemetryVal] = useState('7.4 Hz');
@@ -93,7 +95,7 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
         {/* Top Warning Badge */}
         <div className="flex items-center gap-2 px-3 py-1 rounded bg-surface-3/80 border border-accent-texte text-accent-texte font-mono text-xs font-bold tracking-widest mb-6 animate-alarm-pulse">
           <Biohazard className="w-4 h-4 text-accent-texte animate-spin" style={{ animationDuration: '8s' }} />
-          <span>AVERTISSEMENT RAISA : AGENT MÉMÉTIQUE TUEUR ACTIF</span>
+          <span>{t('rp.avertissementMemetique')}</span>
           <ShieldAlert className="w-4 h-4 text-accent-texte" />
         </div>
 
@@ -151,7 +153,7 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
           {phase === 'warning' && (
             <div className="py-4 font-mono text-xs text-classe-euclid flex items-center justify-center gap-2">
               <span className="w-2 h-2 rounded-full bg-classe-euclid animate-ping" />
-              <span>CALIBRATION DU SCANNER SYNAPTIQUE... NE DÉTOURNEZ PAS LE REGARD</span>
+              <span>{t('rp.calibration')}</span>
             </div>
           )}
 
@@ -178,7 +180,7 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
               </div>
 
               <div className="flex items-center justify-between text-xs font-mono text-texte-attenue mt-2">
-                <span>RÉSISTANCE COGNITIVE : 99.8%</span>
+                <span>{t('rp.resistance')}</span>
                 <span className="text-classe-euclid font-bold">{Math.round(scanProgress)}% EFFECTUÉ</span>
               </div>
             </div>

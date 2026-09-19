@@ -13,6 +13,7 @@ import {
   styleFondClasse
 } from '../../components/classification';
 import { sfx } from '../../services/sfxService';
+import { useT } from '../../i18n';
 
 interface MobileScpReaderProps {
   scp: ScpItemDetail;
@@ -73,6 +74,7 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
   languageCode = 'fr',
   onOuvrirEntite
 }) => {
+  const t = useT();
   const [fontSize, setFontSize] = useState<keyof typeof TAILLES>('sm');
   const habillage = habillageClasse(scp.objectClass);
 
@@ -88,7 +90,7 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
           className="inline-flex items-center gap-1.5 h-10 px-3 rounded-sm font-mono text-xs text-texte-second bg-surface-2 border border-bordure active:bg-surface-3"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Retour</span>
+          <span>{t('entites.retour')}</span>
         </button>
 
         <div className="flex items-center gap-2">
@@ -96,7 +98,7 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
             <button
               onClick={() => setFontSize((p) => (p === 'lg' ? 'base' : 'sm'))}
               disabled={fontSize === 'sm'}
-              aria-label="Réduire le texte"
+              aria-label={t('lecteurMobile.reduireTexte')}
               className="w-10 h-10 flex items-center justify-center text-texte-attenue active:text-texte disabled:opacity-30"
             >
               <ZoomOut className="w-4 h-4" />
@@ -104,7 +106,7 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
             <button
               onClick={() => setFontSize((p) => (p === 'sm' ? 'base' : 'lg'))}
               disabled={fontSize === 'lg'}
-              aria-label="Agrandir le texte"
+              aria-label={t('lecteurMobile.agrandirTexte')}
               className="w-10 h-10 flex items-center justify-center text-texte-attenue active:text-texte disabled:opacity-30"
             >
               <ZoomIn className="w-4 h-4" />
@@ -137,8 +139,8 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
             href={scp.url}
             target="_blank"
             rel="noopener noreferrer license"
-            title="Consulter l'archive originale sur le wiki (CC BY-SA 3.0)"
-            aria-label="Consulter l'archive originale sur le wiki"
+            title={t('lecteurMobile.sourceInfo')}
+            aria-label={t('lecteurMobile.source')}
             className="w-10 h-10 flex items-center justify-center rounded-sm border bg-surface-2 border-bordure text-texte-attenue active:text-texte"
           >
             <ExternalLink className="w-4 h-4" />
@@ -236,7 +238,7 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
                 </span>
 
                 {isActivelyPlaying ? (
-                  <span className="flex items-end gap-0.5 h-3.5 shrink-0" aria-label="Lecture en cours">
+                  <span className="flex items-end gap-0.5 h-3.5 shrink-0" aria-label={t('dossier.lectureEnCours')}>
                     <span className="visualizer-bar" />
                     <span className="visualizer-bar" />
                     <span className="visualizer-bar" />

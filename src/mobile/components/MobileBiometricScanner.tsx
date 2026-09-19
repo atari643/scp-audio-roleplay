@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Fingerprint, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { sfx } from '../../services/sfxService';
+import { useT } from '../../i18n';
 
 interface MobileBiometricScannerProps {
   scpTitle: string;
@@ -11,6 +12,7 @@ export const MobileBiometricScanner: React.FC<MobileBiometricScannerProps> = ({
   scpTitle,
   onGranted
 }) => {
+  const t = useT();
   const [progress, setProgress] = useState(0);
   const [isScanning, setIsScanning] = useState(false);
   const [isGranted, setIsGranted] = useState(false);
@@ -66,7 +68,7 @@ export const MobileBiometricScanner: React.FC<MobileBiometricScannerProps> = ({
       <div className="text-center mt-6">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-3/80 border border-accent-texte/80 text-xs font-mono text-accent-texte mb-3">
           <AlertTriangle className="w-3.5 h-3.5 animate-pulse" />
-          <span>VÉRIFICATION BIOMÉTRIQUE REQUISE</span>
+          <span>{t('rp.verificationBio')}</span>
         </div>
         <h2 className="text-lg font-bold font-mono text-texte tracking-wider">
           ACCÈS AU DOSSIER

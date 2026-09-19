@@ -107,6 +107,8 @@ export const FR = {
   'general.aucunResultat': 'Aucun dossier ne correspond à ces filtres.',
   'general.erreurArchive': "Une erreur est survenue lors de la communication avec l'archive SCP.",
   'general.fermer': 'Fermer',
+  'general.fermerFenetre': 'Fermer la fenêtre',
+  'general.navigation': 'Navigation principale',
 
   // --- En-tête et barre d'outils -------------------------------------------
   'entete.archive': 'Archive Site-19',
@@ -227,6 +229,50 @@ export const FR = {
   'studio.rythme': 'Rythme de diction :',
   'studio.retablir': 'Rétablir',
   'studio.retablirInfo': "Rétablir les paramètres d'origine",
+
+  // --- Terminal RAISA -------------------------------------------------------
+  'raisa.ouvrir': 'Ouvrir la console RAISA Watchdog',
+  'raisa.reduire': 'Réduire le terminal',
+
+  // --- Lecteur mobile -------------------------------------------------------
+  'lecteurMobile.reduireTexte': 'Réduire le texte',
+  'lecteurMobile.agrandirTexte': 'Agrandir le texte',
+  'lecteurMobile.sourceInfo': "Consulter l'archive originale sur le wiki (CC BY-SA 3.0)",
+  'lecteurMobile.source': "Consulter l'archive originale sur le wiki",
+  'lecteurMobile.dossiersDe': 'Dossiers de ',
+  'lecteurMobile.rechercher': 'Rechercher un SCP (ex : 049, 173, statue, keter)…',
+
+  // --- Badges d'écoute ------------------------------------------------------
+  'badge.narre': 'Lecture narrée, presque sans dialogue',
+  'badge.populaire': 'Parmi les mieux notés et les plus lus de son année',
+  'badge.meconnu': 'Excellent pour sa génération, mais resté sous les radars',
+  'badge.note': 'Note de la communauté Wikidot',
+
+  // --- Habillage roleplay ---------------------------------------------------
+  'rp.devise': 'SÉCURISER. CONTENIR. PROTÉGER.',
+  'rp.systeme': 'SYSTÈME : SCiPNET v4.19 / RAISA',
+  'rp.agent': 'AGENT',
+  'rp.identifiant': 'IDENTIFIANT',
+  'rp.accesAccorde': 'ACCÈS ACCORDÉ',
+  'rp.refuse': 'REFUSÉ',
+  'rp.canalBiometrique': 'CANAL BIOMÉTRIQUE',
+  'rp.avertissementMemetique': 'AVERTISSEMENT RAISA : AGENT MÉMÉTIQUE TUEUR ACTIF',
+  'rp.calibration': 'CALIBRATION DU SCANNER SYNAPTIQUE… NE DÉTOURNEZ PAS LE REGARD',
+  'rp.resistance': 'RÉSISTANCE COGNITIVE : 99,8 %',
+  'rp.caviarde': '[ACCRÉDITATION NIVEAU 5 REQUISE — DONNÉE SOUS SÉQUESTRE RAISA]',
+  'rp.fermerAnnonce': "Fermer l'annonce",
+  'rp.ordreO5': 'PAR ORDRE DU CONSEIL O5',
+  'rp.verificationBio': 'VÉRIFICATION BIOMÉTRIQUE REQUISE',
+  'file.aSuivre': 'À suivre',
+  'rp.fermerAlerte': "Fermer l'alerte de confinement",
+
+  // --- Favoris et bascule d'affichage --------------------------------------
+  'favoris.aucun': "Aucun dossier classé pour l'instant.",
+  'favoris.indice': "L'étoile d'un dossier l'ajoute ici.",
+  'favoris.supprimer': 'Supprimer des favoris',
+  'bascule.aria': "Sélecteur d'affichage",
+  'bascule.auto': 'Revenir à la détection automatique',
+  'explorateur.ouvrirCourt': 'OUVRIR',
 
   // --- Écran de confinement d'erreur ---------------------------------------
   'erreur.banniere': "Confinement de l'erreur",

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { sfx } from '../services/sfxService';
+import { useT } from '../i18n';
 
 interface BiometricScannerProps {
   scpTitle: string;
@@ -7,6 +8,7 @@ interface BiometricScannerProps {
 }
 
 export const BiometricScanner: React.FC<BiometricScannerProps> = ({ scpTitle, onGranted }) => {
+  const t = useT();
   const [holdProgress, setHoldProgress] = useState(0);
   const [phase, setPhase] = useState<'idle' | 'holding' | 'granted' | 'denied'>('idle');
   const [scanY, setScanY] = useState(0);
@@ -150,7 +152,7 @@ export const BiometricScanner: React.FC<BiometricScannerProps> = ({ scpTitle, on
               <div className="absolute inset-0 bg-surface-3/80 flex items-center justify-center animate-fade-scale">
                 <div className="text-center">
                   <div className="text-3xl mb-1 text-classe-safe font-bold">✓</div>
-                  <div className="text-classe-safe font-mono font-bold text-xs">ACCÈS ACCORDÉ</div>
+                  <div className="text-classe-safe font-mono font-bold text-xs">{t('rp.accesAccorde')}</div>
                 </div>
               </div>
             )}
@@ -158,7 +160,7 @@ export const BiometricScanner: React.FC<BiometricScannerProps> = ({ scpTitle, on
               <div className="absolute inset-0 bg-surface-3/80 flex items-center justify-center">
                 <div className="text-center">
                   <div className="text-3xl mb-1 text-accent-texte font-bold">✗</div>
-                  <div className="text-accent-texte font-mono font-bold text-xs">REFUSÉ</div>
+                  <div className="text-accent-texte font-mono font-bold text-xs">{t('rp.refuse')}</div>
                 </div>
               </div>
             )}
@@ -178,7 +180,7 @@ export const BiometricScanner: React.FC<BiometricScannerProps> = ({ scpTitle, on
               />
             </div>
             <div className="text-xs font-mono text-texte-attenue mt-1 flex justify-between px-1">
-              <span>CANAL BIOMÉTRIQUE</span>
+              <span>{t('rp.canalBiometrique')}</span>
               <span className="text-texte-attenue font-bold">{Math.round(holdProgress)}%</span>
             </div>
           </div>

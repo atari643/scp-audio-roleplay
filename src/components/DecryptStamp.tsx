@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { sfx } from '../services/sfxService';
+import { useT } from '../i18n';
 
 interface DeclassifiedStampProps {
   show: boolean;
@@ -7,6 +8,7 @@ interface DeclassifiedStampProps {
 }
 
 export const DeclassifiedStamp: React.FC<DeclassifiedStampProps> = ({ show, objectClass }) => {
+  const t = useT();
   const [slammed, setSlammed] = useState(false);
 
   useEffect(() => {
@@ -39,7 +41,7 @@ export const DeclassifiedStamp: React.FC<DeclassifiedStampProps> = ({ show, obje
         }}
       >
         DECLASSIFIE
-        <div className="text-[8px] tracking-wider mt-0.5 text-center">PAR ORDRE DU CONSEIL O5</div>
+        <div className="text-[8px] tracking-wider mt-0.5 text-center">{t('rp.ordreO5')}</div>
       </div>
     </div>
   );

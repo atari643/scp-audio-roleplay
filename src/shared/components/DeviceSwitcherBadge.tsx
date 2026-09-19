@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Smartphone, Monitor, RefreshCw } from 'lucide-react';
 import { DeviceMode } from '../hooks/useDeviceMode';
 import { sfx } from '../../services/sfxService';
+import { useT } from '../../i18n';
 
 interface DeviceSwitcherBadgeProps {
   mode: DeviceMode;
@@ -33,6 +34,7 @@ export const DeviceSwitcherBadge: React.FC<DeviceSwitcherBadgeProps> = ({
   onSetMode,
   lecteurVisible = false
 }) => {
+  const t = useT();
   const [deploye, setDeploye] = useState(false);
 
   const handleClick = () => {
@@ -53,7 +55,7 @@ export const DeviceSwitcherBadge: React.FC<DeviceSwitcherBadgeProps> = ({
 
   return (
     <aside
-      aria-label="Sélecteur d'affichage"
+      aria-label={t('bascule.aria')}
       className="fixed right-3 z-[60] flex items-center gap-1.5"
       style={{ bottom: `calc(${bas}px + env(safe-area-inset-bottom, 0px))` }}
       onMouseEnter={() => setDeploye(true)}
@@ -65,8 +67,8 @@ export const DeviceSwitcherBadge: React.FC<DeviceSwitcherBadgeProps> = ({
             sfx.playTerminalBeep();
             onSetMode('auto');
           }}
-          title="Revenir à la détection automatique"
-          aria-label="Revenir à la détection automatique"
+          title={t('bascule.auto')}
+          aria-label={t('bascule.auto')}
           className="w-9 h-9 flex items-center justify-center rounded-full bg-fond/90 border border-bordure text-texte-attenue hover:text-texte hover:border-bordure-forte backdrop-blur-md shadow-2xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-texte"
         >
           <RefreshCw className="w-3.5 h-3.5" />

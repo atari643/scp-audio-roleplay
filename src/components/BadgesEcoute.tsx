@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, Drama, Gem, Landmark, Mic, Star } from 'lucide-react';
 import type { MetaDossier } from '../services/corpusFilters';
+import { useT } from '../i18n';
 
 /**
  * Les badges d'écoute d'un dossier : durée, type d'écoute, notoriété, note.
@@ -44,6 +45,7 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
   compact = false,
   className = ''
 }) => {
+  const t = useT();
   // Sans index, on n'affiche rien plutôt qu'une durée inventée.
   if (!meta && rating === undefined) return null;
 
@@ -76,7 +78,7 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
       {meta && meta.ecoute === 'solo' && (
         <span
           className={CLASSE_PASTILLE}
-          title="Lecture narrée, presque sans dialogue"
+          title={t('badge.narre')}
         >
           <Mic className="w-3 h-3" />
           {compact ? '1' : 'Solo'}
@@ -86,7 +88,7 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
       {meta?.notoriete === 'patrimoine' && (
         <span
           className={PASTILLE_PATRIMOINE}
-          title="Parmi les mieux notés et les plus lus de son année"
+          title={t('badge.populaire')}
         >
           <Landmark className="w-3 h-3" />
           {compact ? '' : 'Patrimoine'}
@@ -96,7 +98,7 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
       {meta?.notoriete === 'pepite' && (
         <span
           className={PASTILLE_SYSTEME}
-          title="Excellent pour sa génération, mais resté sous les radars"
+          title={t('badge.meconnu')}
         >
           <Gem className="w-3 h-3" />
           {compact ? '' : 'Pépite'}
@@ -106,7 +108,7 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
       {rating !== undefined && (
         <span
           className={`${CLASSE_PASTILLE} ${rating < 0 ? '!text-accent-texte' : ''}`}
-          title="Note de la communauté Wikidot"
+          title={t('badge.note')}
         >
           <Star className="w-3 h-3" />
           {rating >= 0 ? `+${rating}` : rating}

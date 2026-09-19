@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { useT } from '../i18n';
 
 interface FenetreScipnetProps {
   isOpen: boolean;
@@ -42,6 +43,7 @@ export const FenetreScipnet: React.FC<FenetreScipnetProps> = ({
   barreEtat,
   children
 }) => {
+  const t = useT();
   const fenetreRef = useRef<HTMLDivElement>(null);
   const declencheurRef = useRef<HTMLElement | null>(null);
 
@@ -132,7 +134,7 @@ export const FenetreScipnet: React.FC<FenetreScipnetProps> = ({
 
           <button
             onClick={onClose}
-            aria-label="Fermer la fenêtre"
+            aria-label={t('general.fermerFenetre')}
             className="ml-auto shrink-0 w-7 h-7 flex items-center justify-center rounded-sm border border-bordure-forte text-texte-second hover:bg-accent hover:border-accent hover:text-texte transition-colors"
           >
             <X className="w-4 h-4" />

@@ -3,6 +3,7 @@ import { Bookmark, Trash2, Headphones } from 'lucide-react';
 import { FenetreScipnet } from './FenetreScipnet';
 import { ScpItemSummary } from '../types/scp';
 import { sfx } from '../services/sfxService';
+import { useT } from '../i18n';
 
 interface FavoritesModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
   onSelectScp,
   onRemoveFavorite
 }) => {
+  const t = useT();
   return (
     <FenetreScipnet
       isOpen={isOpen}
@@ -32,8 +34,8 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
           {favorites.length === 0 ? (
           <div className="text-center py-12 text-texte-attenue font-mono text-xs">
             <Bookmark className="w-8 h-8 mx-auto mb-2 opacity-40" />
-            <p>Aucun dossier classé pour l'instant.</p>
-            <p className="mt-1">L'étoile d'un dossier l'ajoute ici.</p>
+            <p>{t('favoris.aucun')}</p>
+            <p className="mt-1">{t('favoris.indice')}</p>
           </div>
           ) : (
             favorites.map((item) => (
@@ -70,7 +72,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                       e.stopPropagation();
                       onRemoveFavorite(item);
                     }}
-                    title="Supprimer des favoris"
+                    title={t('favoris.supprimer')}
                     className="p-1.5 text-texte-attenue hover:text-accent-texte rounded-lg transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

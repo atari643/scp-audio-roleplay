@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { sfx } from '../services/sfxService';
+import { useT } from '../i18n';
 
 const BOOT_LINES = [
   { text: 'SCiPNET MAINFRAME BIOS v4.19-R — INITIALISATION DU TERMINAL...', delay: 0, type: 'system' },
@@ -20,6 +21,7 @@ interface BootSequenceProps {
 }
 
 export const BootSequence: React.FC<BootSequenceProps> = ({ onComplete }) => {
+  const t = useT();
   const [visibleLines, setVisibleLines] = useState<number[]>([]);
   const [phase, setPhase] = useState<'crt' | 'boot' | 'done'>('crt');
   const [cursorVisible, setCursorVisible] = useState(true);
@@ -184,14 +186,14 @@ export const BootSequence: React.FC<BootSequenceProps> = ({ onComplete }) => {
           />
         </div>
         <div className="mt-1.5 flex justify-between text-xs font-mono text-texte-attenue">
-          <span>SYSTÈME : SCiPNET v4.19 / RAISA</span>
+          <span>{t('rp.systeme')}</span>
           <span>INITIALISATION : {Math.min(100, Math.round((visibleLines.length / BOOT_LINES.length) * 100))}%</span>
         </div>
       </div>
 
       <div className="absolute bottom-6 flex flex-col items-center gap-1 opacity-40 select-none">
         <div className="text-xl font-mono font-bold text-accent-texte tracking-[0.25em]">☣ FONDATION SCP ☣</div>
-        <div className="text-xs font-mono text-texte-attenue tracking-[0.3em]">SÉCURISER. CONTENIR. PROTÉGER.</div>
+        <div className="text-xs font-mono text-texte-attenue tracking-[0.3em]">{t('rp.devise')}</div>
       </div>
     </div>
   );

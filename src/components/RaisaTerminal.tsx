@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Terminal, ChevronDown, ChevronUp } from 'lucide-react';
 import { PlayerStatus } from '../types/audioRoleplay';
 import { ObjectClass } from '../types/scp';
+import { useT } from '../i18n';
 
 type LogLevel = 'info' | 'warn' | 'alert' | 'success';
 
@@ -38,6 +39,7 @@ interface RaisaTerminalProps {
 export const RaisaTerminal: React.FC<RaisaTerminalProps> = ({
   playerStatus, activeScpNumber, activeObjectClass, hasActivePlayer = false
 }) => {
+  const t = useT();
   const [collapsed, setCollapsed] = useState(true);
   const [logs, setLogs] = useState<LogEntry[]>([
     makeLog('success', 'RAISA_NODE', 'Connexion établie — SCiPNET Secure Terminal opérationnel.'),
@@ -101,7 +103,7 @@ export const RaisaTerminal: React.FC<RaisaTerminalProps> = ({
         <button
           onClick={() => setCollapsed(false)}
           className="flex items-center gap-2 px-3 py-1.5 bg-black/90 hover:bg-surface-1 border border-accent-texte/60 hover:border-accent-texte rounded-lg shadow-xl text-xs font-mono text-texte-second hover:text-texte transition-all backdrop-blur-md group"
-          title="Ouvrir la console RAISA Watchdog"
+          title={t('raisa.ouvrir')}
         >
           <Terminal className="w-3.5 h-3.5 text-accent-texte" />
           <span className="text-accent-texte font-bold">RAISA</span>
@@ -129,7 +131,7 @@ export const RaisaTerminal: React.FC<RaisaTerminalProps> = ({
               <button
                 onClick={() => setCollapsed(true)}
                 className="p-1 hover:bg-surface-3/60 rounded text-texte-attenue hover:text-texte transition-colors"
-                title="Réduire le terminal"
+                title={t('raisa.reduire')}
               >
                 <ChevronDown className="w-3.5 h-3.5" />
               </button>

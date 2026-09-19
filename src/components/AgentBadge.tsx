@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, ChevronDown, ChevronUp } from 'lucide-react';
+import { useT } from '../i18n';
 
 const CLEARANCE_LEVELS = [
   { level: 1, label: 'NIVEAU 1', color: 'var(--classe-safe)', description: 'Accès général' },
@@ -14,6 +15,7 @@ interface AgentBadgeProps {
 }
 
 export const AgentBadge: React.FC<AgentBadgeProps> = ({ hasActivePlayer = false }) => {
+  const t = useT();
   const [expanded, setExpanded] = useState(false);
   const [clearance] = useState(CLEARANCE_LEVELS[3]);
   const [badgeId] = useState(() => 'SCP-19-' + Math.floor(Math.random() * 90000 + 10000).toString());
@@ -61,10 +63,10 @@ export const AgentBadge: React.FC<AgentBadgeProps> = ({ hasActivePlayer = false 
                   style={{ border: `1px solid color-mix(in srgb, ${clearance.color} 30%, transparent)` }}
                 >
                   <div className="absolute top-3 left-0 right-0 h-2.5 bg-fond z-10" />
-                  <div className="text-2xl opacity-70">AGENT</div>
+                  <div className="text-2xl opacity-70">{t('rp.agent')}</div>
                 </div>
                 <div className="min-w-0">
-                  <div className="text-xs font-mono text-texte-attenue mb-0.5">IDENTIFIANT</div>
+                  <div className="text-xs font-mono text-texte-attenue mb-0.5">{t('rp.identifiant')}</div>
                   <div className="text-xs font-mono font-bold text-texte">{badgeId}</div>
                   <div className="text-xs font-mono mt-1" style={{ color: clearance.color }}>
                     {clearance.label}

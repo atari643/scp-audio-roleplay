@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { WikiLink } from '../services/linkExtractor';
 import { splitDisplayWords } from '../services/wordAlignment';
+import { useT } from '../i18n';
 
 /**
  * Le texte d'une réplique, rendu mot à mot pour pouvoir suivre la lecture.
@@ -80,6 +81,7 @@ export const SpokenLine: React.FC<SpokenLineProps> = ({
   onEnqueueLink,
   onOpenLink
 }) => {
+  const t = useT();
   const { words, decorations } = useMemo(
     () => ({ words: splitDisplayWords(text), decorations: buildDecorations(text, links) }),
     [text, links]
@@ -124,7 +126,7 @@ export const SpokenLine: React.FC<SpokenLineProps> = ({
         <span
           key={`r${i}`}
           className={`redacted-block mx-1${actif ? ' mot-lu' : ''}`}
-          title="[ACCRÉDITATION NIVEAU 5 REQUISE - DONNÉE SOUS SÉQUESTRE RAISA]"
+          title={t('rp.caviarde')}
         >
           ██████
         </span>

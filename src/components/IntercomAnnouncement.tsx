@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Volume2, X } from 'lucide-react';
 import { sfx } from '../services/sfxService';
+import { useT } from '../i18n';
 
 const ANNOUNCEMENTS = [
   "Rappel a tout le personnel : le port du dosimetre est obligatoire en Zone de Confinement B.",
@@ -16,6 +17,7 @@ interface IntercomAnnouncementProps {
 }
 
 export const IntercomAnnouncement: React.FC<IntercomAnnouncementProps> = ({ trigger }) => {
+  const t = useT();
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState('');
   const [flash, setFlash] = useState(false);
@@ -67,8 +69,8 @@ export const IntercomAnnouncement: React.FC<IntercomAnnouncementProps> = ({ trig
       <button
         onClick={() => setVisible(false)}
         className="shrink-0 w-8 h-8 flex items-center justify-center rounded-sm text-texte-attenue hover:text-texte hover:bg-surface-3 transition-colors"
-        title="Fermer l'annonce"
-        aria-label="Fermer l'annonce"
+        title={t('rp.fermerAnnonce')}
+        aria-label={t('rp.fermerAnnonce')}
       >
         <X className="w-4 h-4" />
       </button>

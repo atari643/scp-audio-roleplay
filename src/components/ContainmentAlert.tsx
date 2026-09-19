@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ShieldAlert } from 'lucide-react';
 import { ObjectClass } from '../types/scp';
+import { useT } from '../i18n';
 
 interface ContainmentAlertProps {
   objectClass: ObjectClass;
@@ -24,6 +25,7 @@ const CLASS_LEVELS: Record<string, { level: number; label: string; color: string
 export const ContainmentAlert: React.FC<ContainmentAlertProps> = ({
   objectClass, scpNumber, show, onDismiss
 }) => {
+  const t = useT();
   const [visible, setVisible] = useState(false);
   const alertDef = CLASS_LEVELS[objectClass];
 
@@ -74,7 +76,7 @@ export const ContainmentAlert: React.FC<ContainmentAlertProps> = ({
         <button
           onClick={() => { setVisible(false); onDismissRef.current(); }}
           className="-m-1 ml-0.5 p-2 text-texte-attenue hover:text-texte-second"
-          aria-label="Fermer l'alerte de confinement"
+          aria-label={t('rp.fermerAlerte')}
         >
           [x]
         </button>

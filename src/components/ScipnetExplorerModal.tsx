@@ -674,7 +674,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                         >
                           <div className="flex items-center justify-between mb-1">
                             <span className="text-xs font-mono text-texte-attenue">{t('explorateur.fichier')}</span>
-                            <span className="text-xs font-bold text-classe-euclid group-hover:underline">OUVRIR &gt;</span>
+                            <span className="text-xs font-bold text-classe-euclid group-hover:underline">{t('explorateur.ouvrirCourt')} &gt;</span>
                           </div>
                           <span className="font-mono font-bold text-texte text-xs tracking-wider">
                             {scp}
@@ -760,7 +760,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                             <td className="p-2 text-texte-attenue uppercase text-xs">{entity.category}</td>
                             <td className="p-2 text-texte-second">Niveau {entity.clearanceLevel}</td>
                             <td className="p-2 text-texte-attenue truncate max-w-xs">{entity.title}</td>
-                            <td className="p-2 text-right text-accent-texte font-bold">Ouvrir &gt;</td>
+                            <td className="p-2 text-right text-accent-texte font-bold">{t('explorateur.ouvrir')} &gt;</td>
                           </tr>
                         ))}
                       </tbody>

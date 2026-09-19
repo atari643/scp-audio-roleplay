@@ -4,6 +4,7 @@ import { ObjectClass } from '../../types/scp';
 import { sfx } from '../../services/sfxService';
 import { ScpSeriesInfo } from '../../data/seriesData';
 import { prefetchScpSeries } from '../../services/queryClient';
+import { useT } from '../../i18n';
 
 interface MobileSearchFiltersProps {
   onSearch: (query: string) => void;
@@ -49,6 +50,7 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
   entiteFiltreNom,
   languageCode = 'fr'
 }) => {
+  const t = useT();
   const [localQuery, setLocalQuery] = useState(activeQuery);
 
   useEffect(() => {
@@ -78,7 +80,7 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
     <div className="space-y-2.5 mb-4">
       {entiteFiltreNom && (
         <div className="flex items-center justify-between gap-2 px-3 py-2 mb-2 rounded-lg bg-surface-3/40 border border-accent-texte/60 font-mono text-xs">
-          <span className="text-accent-texte truncate">Dossiers de <strong className="text-texte">{entiteFiltreNom}</strong></span>
+          <span className="text-accent-texte truncate">{t('lecteurMobile.dossiersDe')}<strong className="text-texte">{entiteFiltreNom}</strong></span>
           <button
             onClick={() => {
               sfx.playTerminalBeep();
@@ -99,7 +101,7 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
           type="text"
           value={localQuery}
           onChange={handleInputChange}
-          placeholder="Rechercher un SCP (ex: 049, 173, statue, keter)..."
+          placeholder={t('lecteurMobile.rechercher')}
           /* 16 px minimum : en dessous, Safari iOS zoome tout seul à la prise de focus
              et l'utilisateur se retrouve dans une page agrandie dont il doit sortir. */
           className="w-full bg-surface-1/90 border border-bordure/80 rounded-xl pl-9 pr-12 py-2.5 text-[16px] leading-tight font-mono text-texte placeholder:text-texte-attenue placeholder:text-xs focus:outline-none focus:border-accent-texte transition-colors shadow-inner"
@@ -108,8 +110,8 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
           <button
             onClick={handleClear}
             className="absolute right-0 flex h-11 w-11 items-center justify-center text-texte-attenue hover:text-texte"
-            title="Effacer la recherche"
-            aria-label="Effacer la recherche"
+            title={t('recherche.effacer')}
+            aria-label={t('recherche.effacer')}
           >
             <X className="w-4 h-4" />
           </button>

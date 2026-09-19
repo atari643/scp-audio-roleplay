@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ListPlus, ChevronDown, ChevronRight, X } from 'lucide-react';
 import { WikiLink } from '../services/linkExtractor';
+import { useT } from '../i18n';
 
 interface ReadingQueueProps {
   queue: WikiLink[];
@@ -24,6 +25,7 @@ const KIND_LABEL: Record<WikiLink['kind'], string> = {
  * écoute fait perdre sa place. Le clic met donc de côté, et on enchaîne quand on veut.
  */
 export const ReadingQueue: React.FC<ReadingQueueProps> = ({ queue, onOpen, onRemove, onClear }) => {
+  const t = useT();
   const [open, setOpen] = useState(false);
 
   if (queue.length === 0) return null;
@@ -38,7 +40,7 @@ export const ReadingQueue: React.FC<ReadingQueueProps> = ({ queue, onOpen, onRem
       >
         {open ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
         <ListPlus className="w-3.5 h-3.5" />
-        <span>À suivre</span>
+        <span>{t('file.aSuivre')}</span>
         <span className="reading-queue__count">{queue.length}</span>
       </button>
 
