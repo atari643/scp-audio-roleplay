@@ -2,7 +2,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { LanguageBranch, ObjectClass, ScpItemSummary, SUPPORTED_LANGUAGES } from '../../types/scp';
 import { PlayerStatus, SpeechSegment } from '../../types/audioRoleplay';
-import { ScpEntity } from '../../data/departmentsData';
+// `import type` et non `import` : seul le type est utilisé ici, et un import de
+// valeur tirerait les 73 Ko du calque éditorial dans le paquet d'entrée, que la
+// vue soit affichée ou non.
+import type { ScpEntity } from '../../data/departmentsData';
 import { SCP_SERIES } from '../../data/seriesData';
 import { cromApi } from '../../services/cromApi';
 import { chargerEntites, dossiersDeLEntite, entiteParId } from '../../services/entityService';

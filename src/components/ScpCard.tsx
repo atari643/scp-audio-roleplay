@@ -1,9 +1,15 @@
 import React from 'react';
-import { Headphones, Star, ArrowUpRight, ShieldAlert, FileText, Radio } from 'lucide-react';
-import { ObjectClass, ScpItemSummary } from '../types/scp';
+import { Star, ArrowRight } from 'lucide-react';
+import { ScpItemSummary } from '../types/scp';
 import { sfx } from '../services/sfxService';
 import { prefetchScpDossier } from '../services/queryClient';
 import { BadgesEcoute } from './BadgesEcoute';
+import {
+  habillageClasse,
+  styleBadgeClasse,
+  styleLisereClasse,
+  styleRegleClasse
+} from './classification';
 import type { MetaDossier } from '../services/corpusFilters';
 
 interface ScpCardProps {
@@ -16,72 +22,16 @@ interface ScpCardProps {
   onToggleFavorite: (item: ScpItemSummary, e: React.MouseEvent) => void;
 }
 
-const CLASS_CONFIG: Record<ObjectClass, { bg: string; text: string; border: string; stamp: string; glow: string }> = {
-  Safe: { 
-    bg: 'bg-emerald-950/80', 
-    text: 'text-emerald-400', 
-    border: 'border-emerald-700/60',
-    stamp: 'stamp-confidential',
-    glow: 'hover:border-emerald-600/70 hover:shadow-emerald-950/40'
-  },
-  Euclid: { 
-    bg: 'bg-amber-950/80', 
-    text: 'text-amber-400', 
-    border: 'border-amber-700/60',
-    stamp: 'stamp-restricted',
-    glow: 'hover:border-amber-600/70 hover:shadow-amber-950/40'
-  },
-  Keter: { 
-    bg: 'bg-red-950/90', 
-    text: 'text-red-400', 
-    border: 'border-red-600/70',
-    stamp: 'stamp-keter',
-    glow: 'hover:border-red-500 hover:shadow-red-950/60'
-  },
-  Thaumiel: { 
-    bg: 'bg-purple-950/80', 
-    text: 'text-purple-400', 
-    border: 'border-purple-700/60',
-    stamp: 'stamp-top-secret',
-    glow: 'hover:border-purple-600/70 hover:shadow-purple-950/40'
-  },
-  Apollyon: { 
-    bg: 'bg-rose-950/95', 
-    text: 'text-rose-300 font-bold', 
-    border: 'border-rose-600/80',
-    stamp: 'stamp-top-secret',
-    glow: 'hover:border-rose-500 hover:shadow-rose-950/80'
-  },
-  Archon: { 
-    bg: 'bg-indigo-950/80', 
-    text: 'text-indigo-400', 
-    border: 'border-indigo-700/60',
-    stamp: 'stamp-restricted',
-    glow: 'hover:border-indigo-600/70 hover:shadow-indigo-950/40'
-  },
-  Neutralized: { 
-    bg: 'bg-slate-900', 
-    text: 'text-slate-400', 
-    border: 'border-slate-700/60',
-    stamp: 'stamp-confidential',
-    glow: 'hover:border-slate-500'
-  },
-  Decommissioned: { 
-    bg: 'bg-stone-900', 
-    text: 'text-stone-400', 
-    border: 'border-stone-700/60',
-    stamp: 'stamp-confidential',
-    glow: 'hover:border-stone-500'
-  },
-  'Non assigné': { 
-    bg: 'bg-slate-900/60', 
-    text: 'text-slate-400', 
-    border: 'border-slate-800',
-    stamp: 'stamp-confidential',
-    glow: 'hover:border-slate-600'
-  }
-};
-
+/**
+ * Fiche d'un dossier au catalogue.
+ *
+ * Elle est pensée comme une fiche cartonnée, pas comme une carte d'application :
+ * angles droits, fond uni, et une seule couleur — le liseré de classification sur
+ * le bord gauche. L'ancienne version cumulait un filigrane de classe en corps 60,
+ * un point rouge clignotant, une mention « SECTEUR-19 » décorative et un pied
+ * « AUDIO ROLEPLAY » à radio pulsante ; le titre du dossier, lui, était en corps
+ * 14. La hiérarchie est remise à l'endroit : numéro, titre, extrait.
+ */
 export const ScpCard: React.FC<ScpCardProps> = ({
   item,
   isFavorite,
@@ -90,93 +40,90 @@ export const ScpCard: React.FC<ScpCardProps> = ({
   onSelect,
   onToggleFavorite
 }) => {
-  const conf = CLASS_CONFIG[item.objectClass] || CLASS_CONFIG['Non assigné'];
+  const habillage = habillageClasse(item.objectClass);
 
-  const handleMouseEnter = () => {
+  const precharger = () => {
     prefetchScpDossier(item.slug, languageCode);
   };
 
   return (
-    <div
+    <article
       onClick={() => {
         sfx.playTerminalBeep();
         onSelect(item);
       }}
-      onMouseEnter={handleMouseEnter}
-      onTouchStart={handleMouseEnter}
-      className={`group relative bg-scp-card/90 hover:bg-scp-cardHover border border-scp-border rounded-xl p-4 transition-all duration-200 cursor-pointer shadow-lg flex flex-col justify-between overflow-hidden scipnet-box ${conf.glow}`}
+      onMouseEnter={precharger}
+      onTouchStart={precharger}
+      className="group relative flex flex-col justify-between bg-surface-2 hover:bg-surface-3 border border-bordure hover:border-bordure-forte border-l-4 rounded p-4 cursor-pointer transition-colors shadow-relief"
+      style={styleLisereClasse(item.objectClass)}
     >
-      {/* Background Watermark Stamp */}
-      <div className="absolute -right-4 -bottom-3 opacity-15 pointer-events-none select-none font-mono font-black text-6xl tracking-widest uppercase rotate-[-12deg]">
-        {item.objectClass.toUpperCase()}
-      </div>
-
       <div>
-        {/* Top Technical Metadata Bar */}
-        <div className="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-scp-border/80 text-[10px] font-mono text-slate-400">
-          <span className="tracking-widest flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block group-hover:animate-ping" />
-            DOC-ID // {item.scpNumber.toUpperCase()}
+        {/* Référence du document et classement personnel */}
+        <div
+          className="flex items-center justify-between gap-2 mb-3 pb-2 border-b"
+          style={styleRegleClasse(item.objectClass)}
+        >
+          <span className="flex items-center gap-1.5 font-mono text-xs tracking-technique truncate">
+            <span style={{ color: habillage.couleur }}>{habillage.abrege}</span>
+            <span className="text-bordure-forte" aria-hidden="true">/</span>
+            <span className="text-texte-attenue truncate">{item.scpNumber.toUpperCase()}</span>
           </span>
 
-          <div className="flex items-center gap-2">
-            <span className="text-slate-500 hidden sm:inline">SECTEUR-19</span>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleFavorite(item, e);
-              }}
-              title={isFavorite ? 'Retirer des favoris' : 'Classer dans les favoris'}
-              className={`p-1 rounded-md border transition-all ${
-                isFavorite
-                  ? 'bg-amber-950/70 border-amber-600/70 text-amber-400'
-                  : 'bg-scp-surface border-scp-border text-slate-500 hover:text-amber-400 hover:border-amber-600/50'
-              }`}
-            >
-              <Star className={`w-3.5 h-3.5 ${isFavorite ? 'fill-amber-400' : ''}`} />
-            </button>
-          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite(item, e);
+            }}
+            title={isFavorite ? 'Retirer des dossiers classés' : 'Classer ce dossier'}
+            aria-pressed={isFavorite}
+            className={`shrink-0 w-7 h-7 flex items-center justify-center rounded-sm border transition-colors ${
+              isFavorite
+                ? 'border-classe-euclid text-classe-euclid'
+                : 'border-bordure text-texte-attenue hover:text-classe-euclid hover:border-classe-euclid'
+            }`}
+          >
+            <Star className={`w-3.5 h-3.5 ${isFavorite ? 'fill-current' : ''}`} />
+          </button>
         </div>
 
-        {/* Item Number & Classification Header */}
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <span className="font-mono text-lg font-black text-white group-hover:text-red-400 transition-colors tracking-wide flex items-center gap-2">
-            <span>{item.scpNumber}</span>
+        {/* Numéro et classe */}
+        <div className="flex items-baseline justify-between gap-2 mb-2">
+          <span className="font-mono text-xl font-bold text-texte group-hover:text-accent-texte transition-colors tracking-tight">
+            {item.scpNumber}
           </span>
 
-          <span className={`text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded border ${conf.bg} ${conf.text} ${conf.border}`}>
+          <span
+            className="shrink-0 font-mono text-xs font-semibold uppercase tracking-technique px-2 py-0.5 rounded-sm border"
+            style={styleBadgeClasse(item.objectClass)}
+          >
             {item.objectClass}
           </span>
         </div>
 
-        {/* Title */}
-        <h3 className="text-sm font-semibold text-slate-200 mb-2 line-clamp-1 group-hover:text-white transition-colors font-mono">
+        {/* Titre : en serif, comme dans le dossier lui-même. */}
+        <h3 className="font-serif text-base text-texte leading-snug mb-1.5 line-clamp-2">
           {item.alternateTitle ? item.alternateTitle : item.title}
         </h3>
 
-        {/* Snippet preview */}
         {item.snippet && (
-          <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-3 font-sans">
+          <p className="font-serif text-sm text-texte-attenue leading-relaxed line-clamp-2 mb-3">
             {item.snippet}
           </p>
         )}
       </div>
 
       {/* Durée, type d'écoute, notoriété, note — issus de l'index de corpus. */}
-      <BadgesEcoute meta={meta} rating={item.rating} className="pt-3" />
+      <div>
+        <BadgesEcoute meta={meta} rating={item.rating} className="pt-2" />
 
-      {/* Card Footer: Action & Roleplay Badge */}
-      <div className="pt-2 border-t border-scp-border/80 flex items-center justify-between text-xs font-mono">
-        <div className="flex items-center gap-1.5 text-[11px] text-red-400 font-semibold">
-          <Radio className="w-3.5 h-3.5 text-red-500 animate-pulse" />
-          <span>AUDIO ROLEPLAY</span>
+        <div className="mt-2 pt-2 border-t border-bordure-faible flex items-center justify-between font-mono text-xs text-texte-attenue">
+          <span className="tracking-technique uppercase">Audio</span>
+          <span className="flex items-center gap-1 group-hover:text-accent-texte transition-colors">
+            Ouvrir
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </span>
         </div>
-
-        <span className="text-[11px] text-slate-400 group-hover:text-white flex items-center gap-1 transition-colors">
-          <span>Ouvrir dossier</span>
-          <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform text-red-400" />
-        </span>
       </div>
-    </div>
+    </article>
   );
 };

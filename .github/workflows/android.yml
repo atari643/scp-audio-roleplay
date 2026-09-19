@@ -1,0 +1,65 @@
+name: APK Android
+
+# Deux usages :
+#
+#  · à la demande, un APK de debug en artefact — de quoi faire tester
+#    l'application à quelqu'un sans attendre la validation du Play Store ;
+#  · sur un tag `v*`, le même APK attaché à une GitHub Release, donc un lien
+#    d'installation partageable immédiatement.
+#
+# Cet APK est signé avec la clé de debug d'Android : il s'installe, il tourne,
+# mais il ne peut pas être publié sur le Play Store et ne se met pas à jour
+# par-dessus une version signée avec la vraie clé. La production passe par
+# `npm run android:release` en local, avec le keystore qui ne quitte jamais la
+# machine — voir PUBLICATION.md.
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - run: npm ci
+
+      - name: Construire le web et synchroniser Capacitor
+        run: npm run cap:sync
+
+      - name: Construire l'APK de debug
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scp-audio-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          retention-days: 30
+
+      - name: Attacher l'APK à la release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: android/app/build/outputs/apk/debug/*.apk
+          body: |
+            APK de test signé avec la clé de debug d'Android.
+
+            Pour l'installer, autorisez les sources inconnues sur le téléphone.
+            La version du Play Store, elle, est signée avec la clé de
+            publication : voir PUBLICATION.md.

@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  X, Sparkles, Star, Volume2, VolumeX, Tv, Terminal, 
+  X, ChevronRight, Sparkles, Star, Volume2, VolumeX, Tv, Terminal, 
   Radio, Globe, Monitor, Smartphone, ShieldAlert
 } from 'lucide-react';
 import { LanguageBranch, SUPPORTED_LANGUAGES } from '../../types/scp';
@@ -52,13 +52,22 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
       />
 
       {/* Drawer Panel */}
-      <div className="relative z-10 w-4/5 max-w-sm bg-slate-950 border-l border-red-900/60 h-full p-5 flex flex-col justify-between overflow-y-auto shadow-2xl">
+      <div
+        className="relative z-10 w-4/5 max-w-sm bg-fond border-l border-accent-texte/60 h-full p-5 flex flex-col justify-between overflow-y-auto shadow-2xl"
+        /* Le tiroir occupe toute la hauteur : il doit contourner l'encoche en haut et la
+           barre de gestes en bas, sinon ses deux extrémités deviennent inatteignables. */
+        style={{
+          paddingTop: 'calc(1.25rem + env(safe-area-inset-top, 0px))',
+          paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))',
+          paddingRight: 'calc(1.25rem + env(safe-area-inset-right, 0px))'
+        }}
+      >
         <div>
           {/* Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
+          <div className="flex items-center justify-between pb-4 border-b border-bordure mb-5">
             <div className="flex items-center gap-2">
-              <ShieldAlert className="w-5 h-5 text-red-500" />
-              <span className="text-xs font-mono font-bold text-white tracking-wider">
+              <ShieldAlert className="w-5 h-5 text-accent-texte" />
+              <span className="text-xs font-mono font-bold text-texte tracking-wider">
                 CENTRE TACTIQUE
               </span>
             </div>
@@ -67,7 +76,7 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
                 sfx.playTerminalBeep();
                 onClose();
               }}
-              className="p-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 hover:text-white"
+              className="w-11 h-11 flex items-center justify-center rounded-lg bg-surface-1 border border-bordure text-texte-attenue hover:text-texte"
             >
               <X className="w-4 h-4" />
             </button>
@@ -82,16 +91,16 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
                 onClose();
                 onOpenVoiceStudio();
               }}
-              className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-cyan-700 text-left active:scale-[0.99] transition-all"
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-surface-1/80 border border-bordure hover:border-role-agent text-left active:scale-[0.99] transition-all"
             >
               <div className="flex items-center gap-2.5">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
+                <Sparkles className="w-4 h-4 text-role-agent" />
                 <div>
-                  <div className="text-xs font-mono font-bold text-white">Voice Studio Neural</div>
-                  <div className="text-[10px] font-mono text-slate-400">Profilage vocal des acteurs</div>
+                  <div className="text-xs font-mono font-bold text-texte">Voice Studio Neural</div>
+                  <div className="text-xs font-mono text-texte-attenue">Profilage vocal des acteurs</div>
                 </div>
               </div>
-              <span className="text-xs text-cyan-400">→</span>
+              <ChevronRight className="w-3.5 h-3.5 text-texte-attenue" />
             </button>
 
             {/* Favorites */}
@@ -101,16 +110,16 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
                 onClose();
                 onOpenFavorites();
               }}
-              className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-amber-700 text-left active:scale-[0.99] transition-all"
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-surface-1/80 border border-bordure hover:border-classe-euclid text-left active:scale-[0.99] transition-all"
             >
               <div className="flex items-center gap-2.5">
-                <Star className="w-4 h-4 text-amber-400 fill-current" />
+                <Star className="w-4 h-4 text-classe-euclid fill-current" />
                 <div>
-                  <div className="text-xs font-mono font-bold text-white">Dossiers Favoris</div>
-                  <div className="text-[10px] font-mono text-slate-400">{favoritesCount} dossiers sauvegardés</div>
+                  <div className="text-xs font-mono font-bold text-texte">Dossiers Favoris</div>
+                  <div className="text-xs font-mono text-texte-attenue">{favoritesCount} dossiers sauvegardés</div>
                 </div>
               </div>
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-surface-3 text-classe-euclid border border-classe-euclid">
                 {favoritesCount}
               </span>
             </button>
@@ -122,22 +131,22 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
                 onClose();
                 onOpenRaisa();
               }}
-              className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-red-700 text-left active:scale-[0.99] transition-all"
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-surface-1/80 border border-bordure hover:border-accent-texte text-left active:scale-[0.99] transition-all"
             >
               <div className="flex items-center gap-2.5">
-                <Terminal className="w-4 h-4 text-red-400" />
+                <Terminal className="w-4 h-4 text-accent-texte" />
                 <div>
-                  <div className="text-xs font-mono font-bold text-white">Console RAISA</div>
-                  <div className="text-[10px] font-mono text-slate-400">Ligne de commande & télémétrie</div>
+                  <div className="text-xs font-mono font-bold text-texte">Console RAISA</div>
+                  <div className="text-xs font-mono text-texte-attenue">Ligne de commande & télémétrie</div>
                 </div>
               </div>
-              <span className="text-xs text-red-400">CLI</span>
+              <span className="text-xs text-accent-texte">CLI</span>
             </button>
           </div>
 
           {/* Section: Ambiance & Affichage */}
-          <div className="mt-6 pt-4 border-t border-slate-800">
-            <div className="text-[10px] font-mono text-slate-500 font-bold uppercase mb-2.5">
+          <div className="mt-6 pt-4 border-t border-bordure">
+            <div className="text-xs font-mono text-texte-attenue font-bold uppercase mb-2.5">
               SYSTÈME & IMMERSION
             </div>
 
@@ -150,12 +159,12 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
                 }}
                 className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all ${
                   sfxEnabled
-                    ? 'bg-emerald-950/40 border-emerald-700 text-emerald-300'
-                    : 'bg-slate-900 border-slate-800 text-slate-500'
+                    ? 'bg-surface-3/40 border-classe-safe text-classe-safe'
+                    : 'bg-surface-1 border-bordure text-texte-attenue'
                 }`}
               >
                 {sfxEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                <span className="text-[10px] font-mono font-bold">SONS SFX</span>
+                <span className="text-xs font-mono font-bold">SONS SFX</span>
               </button>
 
               {/* CRT Filter */}
@@ -166,12 +175,12 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
                 }}
                 className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all ${
                   crtEnabled
-                    ? 'bg-red-950/40 border-red-700 text-red-300'
-                    : 'bg-slate-900 border-slate-800 text-slate-500'
+                    ? 'bg-surface-3/40 border-accent-texte text-accent-texte'
+                    : 'bg-surface-1 border-bordure text-texte-attenue'
                 }`}
               >
                 <Tv className="w-4 h-4" />
-                <span className="text-[10px] font-mono font-bold">ÉCRAN CRT</span>
+                <span className="text-xs font-mono font-bold">ÉCRAN CRT</span>
               </button>
             </div>
 
@@ -183,24 +192,24 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
               }}
               className={`w-full mt-2 p-2.5 rounded-xl border flex items-center justify-between text-xs font-mono transition-all ${
                 ambienceActive
-                  ? 'bg-emerald-950/50 border-emerald-700 text-emerald-300'
-                  : 'bg-slate-900 border-slate-800 text-slate-400'
+                  ? 'bg-surface-3/50 border-classe-safe text-classe-safe'
+                  : 'bg-surface-1 border-bordure text-texte-attenue'
               }`}
             >
               <div className="flex items-center gap-2">
-                <Radio className={`w-4 h-4 ${ambienceActive ? 'animate-pulse text-emerald-400' : ''}`} />
+                <Radio className={`w-4 h-4 ${ambienceActive ? 'text-classe-safe' : ''}`} />
                 <span>Bruit Blanc Confinement</span>
               </div>
-              <span className="text-[10px] font-bold">
+              <span className="text-xs font-bold">
                 {ambienceActive ? 'ACTIF' : 'INACTIF'}
               </span>
             </button>
           </div>
 
           {/* Languages */}
-          <div className="mt-6 pt-4 border-t border-slate-800">
-            <div className="text-[10px] font-mono text-slate-500 font-bold uppercase mb-2 flex items-center gap-1">
-              <Globe className="w-3 h-3 text-red-500" />
+          <div className="mt-6 pt-4 border-t border-bordure">
+            <div className="text-xs font-mono text-texte-attenue font-bold uppercase mb-2 flex items-center gap-1">
+              <Globe className="w-3 h-3 text-accent-texte" />
               <span>BRANCHE LINGUISTIQUE</span>
             </div>
             <div className="grid grid-cols-2 gap-1.5">
@@ -213,8 +222,8 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
                   }}
                   className={`p-2 rounded-lg border text-left text-xs font-mono flex items-center gap-1.5 transition-all ${
                     currentLanguage.code === lang.code
-                      ? 'bg-red-950 border-red-600 text-white font-bold'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-surface-3 border-accent-texte text-texte font-bold'
+                      : 'bg-surface-1 border-bordure text-texte-attenue hover:text-texte'
                   }`}
                 >
                   <span>{lang.flag}</span>
@@ -226,17 +235,17 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
         </div>
 
         {/* Bottom Switch to Desktop button */}
-        <div className="pt-4 border-t border-slate-800 mt-4">
+        <div className="pt-4 border-t border-bordure mt-4">
           <button
             onClick={() => {
               sfx.playTerminalBeep();
               onClose();
               onSwitchToDesktop();
             }}
-            className="w-full py-2.5 px-3 rounded-xl bg-slate-900 border border-amber-600/70 text-amber-300 hover:text-white text-xs font-mono font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg"
+            className="w-full py-2.5 px-3 rounded-xl bg-surface-1 border border-classe-euclid/70 text-classe-euclid hover:text-texte text-xs font-mono font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg"
           >
-            <Monitor className="w-4 h-4 text-amber-400" />
-            <span>Passer en Mode Bureau 🖥️</span>
+            <Monitor className="w-4 h-4 text-classe-euclid" />
+            <span>Passer en mode bureau</span>
           </button>
         </div>
       </div>

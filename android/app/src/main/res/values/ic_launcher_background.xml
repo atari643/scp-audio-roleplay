@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <!-- Fond de l'icône adaptative : le noir de l'application, pas le blanc que
+         Capacitor pose par défaut. Le sceau y est dessiné en clair. -->
+    <color name="ic_launcher_background">#0A0C10</color>
 </resources>

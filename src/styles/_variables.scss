@@ -1,29 +1,204 @@
-// SCSS Variables for SCP Foundation Classified Terminal Theme
-$color-bg: #0b0e14;
-$color-surface: #121722;
-$color-card: #181f2e;
-$color-card-hover: #202a3e;
-$color-border: #2a364f;
+// =============================================================================
+// JETONS — Poste de supervision d'archive de la Fondation
+// =============================================================================
+//
+// Deux teintes de commandement, et deux seulement :
+//
+//   ROUGE  — classification, danger, action primaire, élément en cours de lecture
+//   CYAN   — données, réseau, horodatage, télémétrie : tout ce qui est machine
+//
+// Les couleurs de classification ne décorent rien : elles disent de quelle classe
+// est un dossier, et c'est l'information qu'on balaye sur une grille de soixante.
+//
+// ---------------------------------------------------------------------------
+// LA RÈGLE DE SURFACE PORTEUSE — à lire avant de toucher à une valeur
+// ---------------------------------------------------------------------------
+//
+// Relever les surfaces et garder un rouge Fondation sombre sont incompatibles
+// au-delà d'un certain point. Mesuré, pas supposé : `#ec6058` ne tolère qu'un
+// fond à 2,09 % de luminance, or `$surface-3` est à 2,84 %. D'où `#f0706a`,
+// qui tolère 3,03 %.
+//
+//   Le texte COLORÉ ne vit que jusqu'à `$surface-3`.
+//   `$surface-4` ne porte que du texte neutre — `$texte` (9,17:1) et
+//   `$texte-second` (6,02:1) — ou du texte clair sur un aplat d'accent.
+//   JAMAIS de texte rouge sur `$surface-4` : il y tombe à 3,58:1.
+//
+// C'est la seule exception : tous les autres jetons colorés passent aussi sur
+// `$surface-4` (4,64 à 5,38). La vérification se rejoue sur le CSS bâti, pas sur
+// ce fichier — c'est elle qui a rattrapé un calibrage du rouge que le typecheck
+// ne voyait pas.
 
-// Brand & Alert Accents
-$color-scp-red: #dc2626;
-$color-scp-red-dark: #7f1d1d;
-$color-scp-red-glow: rgba(220, 38, 38, 0.4);
-$color-amber: #f59e0b;
-$color-emerald: #10b981;
-$color-cyan: #06b6d4;
-$color-purple: #a855f7;
+// ---------------------------------------------------------------------------
+// Surfaces — cinq niveaux.
+//
+// L'écart total du fond au niveau le plus haut vaut 1,86. Il valait 1,27 dans la
+// version précédente, avec des écarts de 1,06 entre niveaux voisins : les
+// panneaux ne se détachaient pas de la page, et la teinte bleue, à 1 % de
+// luminance, était physiquement invisible. Relever la rampe est ce qui rend la
+// couleur perceptible, avant même d'en ajouter.
+// ---------------------------------------------------------------------------
+$fond:      #0b0e14; // la page
+$surface-1: #141924; // panneaux, en-têtes, barres          (×1,10)
+$surface-2: #1c2332; // cartes, segments, champs            (×1,12)
+$surface-3: #262f42; // survol — DERNIER niveau porteur de couleur  (×1,17)
+$surface-4: #33405a; // sélection, barre de titre, piste de curseur (×1,29)
 
-// Text Colors
-$text-primary: #f8fafc;
-$text-secondary: #cbd5e1;
-$text-muted: #94a3b8;
-$text-dim: #64748b;
+// ---------------------------------------------------------------------------
+// Bordures — trois niveaux.
+//
+// `forte` tient 3,21:1 jusqu'à `$surface-3` : elle peut porter du sens à elle
+// seule. Sur `$surface-4`, c'est l'accent qui prend le relais.
+// ---------------------------------------------------------------------------
+$bordure-faible: #242d3c;
+$bordure:        #394862;
+$bordure-forte:  #6b7d9c;
 
-// Fonts
-$font-mono: 'JetBrains Mono', 'Consolas', monospace;
-$font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+// ---------------------------------------------------------------------------
+// Texte — 11,8:1 / 7,8:1 / 5,3:1 sur $surface-3
+//
+// `$texte-attenue` est le jeton le plus employé de l'application (plus de deux
+// cents fois) : l'éclaircir relève à lui seul le plancher général.
+// ---------------------------------------------------------------------------
+$texte:         #eef1f6;
+$texte-second:  #bcc6d4;
+$texte-attenue: #97a3b6;
 
-// Transitions
-$transition-fast: 150ms ease;
-$transition-normal: 250ms ease;
+// ---------------------------------------------------------------------------
+// Accent — le rouge de la Fondation.
+//
+// Deux valeurs distinctes, parce qu'un rouge qui va bien en aplat ne va pas en
+// texte : `$accent` porte le texte clair à 4,87:1, `$accent-texte` se lit
+// jusqu'à `$surface-3` à 4,61:1.
+// ---------------------------------------------------------------------------
+$accent:        #c4302b; // aplats, boutons primaires, filets
+$accent-fort:   #a8241f; // état pressé
+$accent-texte:  #f0706a; // texte, icônes, anneau de focus
+$accent-sourd:  rgba(196, 48, 43, 0.14); // teinte de fond très légère
+
+// ---------------------------------------------------------------------------
+// Système — le second ton de commandement.
+//
+// Un cyan acier pour ce qui relève de la machine et non de l'éditorial :
+// horodatage, nœud réseau, télémétrie, journal RAISA, compteurs du lecteur.
+// C'est lui qui empêche l'interface de n'être qu'un mur de gris entre deux
+// touches de rouge — sans pour autant ouvrir la porte à une troisième teinte.
+// ---------------------------------------------------------------------------
+$systeme:       #68c6d2;
+$systeme-fort:  #3f9aa8; // aplats et filets
+
+// ---------------------------------------------------------------------------
+// Classification — un jeton par classe d'objet, tous ≥ 4,61:1 sur $surface-3.
+// N'utiliser NULLE PART ailleurs que sur un badge ou un liseré de classe.
+// ---------------------------------------------------------------------------
+$classe-safe:           #57c79a;
+$classe-euclid:         #ecb04a;
+$classe-keter:          #f0706a;
+$classe-thaumiel:       #c79cf0;
+$classe-apollyon:       #ff8d82;
+$classe-archon:         #9db1f7;
+$classe-neutralisee:    #97a3b6;
+
+// ---------------------------------------------------------------------------
+// Rôles de lecture — liseré de 4 px, nom du locuteur, et un fond à 6 % de teinte.
+//
+// Assez pour distinguer une réplique d'anomalie d'une réplique de chercheur en
+// vision périphérique ; pas assez pour refaire sept cartes colorées empilées.
+// L'état « en lecture » doit rester plus fort que n'importe quelle teinte de rôle.
+// ---------------------------------------------------------------------------
+$role-narrateur:  #a2b6d2;
+$role-chercheur:  #57c79a;
+$role-anomalie:   #f0706a;
+$role-classed:    #ecb04a;
+$role-agent:      #68c6d2; // = $systeme : un officier FIM est un rôle d'opérations
+$role-commandant: #c79cf0;
+$role-intercom:   #97a3b6;
+
+// ---------------------------------------------------------------------------
+// Polices — trois rôles, jamais interchangeables
+//
+//   serif : la prose des dossiers, ce qu'on lit vingt minutes d'affilée
+//   sans  : le chrome d'interface (boutons, libellés, navigation)
+//   mono  : les données et le terminal (numéros SCP, ACS, horloges, RAISA)
+// ---------------------------------------------------------------------------
+$font-serif: 'Source Serif 4', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+$font-sans:  'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+$font-mono:  'JetBrains Mono', 'Consolas', 'Menlo', monospace;
+
+// ---------------------------------------------------------------------------
+// Échelle typographique — plancher à 12 px.
+// Les 216 `text-[9px]` / `text-[10px]` de l'ancienne version passaient sous le
+// seuil de lisibilité ; une étiquette illisible ne dit rien.
+// ---------------------------------------------------------------------------
+$t-xs:   12px;
+$t-sm:   13px;
+$t-base: 15px;
+$t-md:   16px;  // prose des dossiers
+$t-lg:   18px;
+$t-xl:   21px;
+$t-2xl:  26px;
+$t-3xl:  32px;
+
+$interligne-prose:  1.7;
+$interligne-chrome: 1.4;
+
+// Colonne de lecture : 68 caractères. L'ancien `max-w-4xl` en donnait ~110.
+$largeur-lecture: 68ch;
+
+// ---------------------------------------------------------------------------
+// Rayons — un document classifié a des angles droits.
+// ---------------------------------------------------------------------------
+$r-sm: 2px;
+$r:    3px;
+
+// ---------------------------------------------------------------------------
+// Ombres — neutres. Une seule ombre teintée subsiste, pour « en lecture ».
+// ---------------------------------------------------------------------------
+$ombre-1: 0 1px 2px rgba(0, 0, 0, 0.45);
+$ombre-2: 0 2px 8px rgba(0, 0, 0, 0.5);
+$ombre-3: 0 8px 28px rgba(0, 0, 0, 0.6);
+$ombre-lecture: 0 0 0 1px rgba(240, 112, 106, 0.4), 0 4px 18px rgba(0, 0, 0, 0.55);
+
+// Filet clair d'un pixel sur l'arête haute : c'est ce qui fait qu'un panneau se
+// lit comme posé sur la page plutôt que découpé dedans.
+$relief-haut: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+
+// ---------------------------------------------------------------------------
+// Espacement
+// ---------------------------------------------------------------------------
+$e-1:  4px;
+$e-2:  8px;
+$e-3: 12px;
+$e-4: 16px;
+$e-6: 24px;
+$e-8: 32px;
+$e-12: 48px;
+
+// ---------------------------------------------------------------------------
+// Transitions — courtes. Une interface d'archive ne doit pas se faire attendre.
+// ---------------------------------------------------------------------------
+$transition-fast:   120ms ease;
+$transition-normal: 180ms ease;
+
+// ---------------------------------------------------------------------------
+// Alias de compatibilité
+//
+// Les anciens noms restent définis et pointent sur les nouveaux jetons : les
+// composants pas encore migrés continuent de s'afficher correctement.
+// ---------------------------------------------------------------------------
+$color-bg:          $fond;
+$color-surface:     $surface-1;
+$color-card:        $surface-2;
+$color-card-hover:  $surface-3;
+$color-border:      $bordure;
+$color-scp-red:     $accent;
+$color-scp-red-dark: $accent-fort;
+$color-scp-red-glow: rgba(196, 48, 43, 0.4);
+$color-amber:       $classe-euclid;
+$color-emerald:     $classe-safe;
+$color-cyan:        $systeme;
+$color-purple:      $classe-thaumiel;
+$text-primary:      $texte;
+$text-secondary:    $texte-second;
+$text-muted:        $texte-attenue;
+$text-dim:          $texte-attenue;

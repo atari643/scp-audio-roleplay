@@ -22,10 +22,10 @@ function makeLog(level: LogLevel, module: string, message: string): LogEntry {
 }
 
 const LEVEL_COLORS: Record<LogLevel, string> = {
-  info:    'text-cyan-400',
-  warn:    'text-amber-400',
-  alert:   'text-red-400',
-  success: 'text-emerald-400',
+  info:    'text-role-agent',
+  warn:    'text-classe-euclid',
+  alert:   'text-accent-texte',
+  success: 'text-classe-safe',
 };
 
 interface RaisaTerminalProps {
@@ -100,35 +100,35 @@ export const RaisaTerminal: React.FC<RaisaTerminalProps> = ({
       {collapsed ? (
         <button
           onClick={() => setCollapsed(false)}
-          className="flex items-center gap-2 px-3 py-1.5 bg-black/90 hover:bg-slate-900 border border-red-900/60 hover:border-red-600 rounded-lg shadow-xl text-[11px] font-mono text-slate-300 hover:text-white transition-all backdrop-blur-md group"
+          className="flex items-center gap-2 px-3 py-1.5 bg-black/90 hover:bg-surface-1 border border-accent-texte/60 hover:border-accent-texte rounded-lg shadow-xl text-xs font-mono text-texte-second hover:text-texte transition-all backdrop-blur-md group"
           title="Ouvrir la console RAISA Watchdog"
         >
-          <Terminal className="w-3.5 h-3.5 text-red-500 group-hover:animate-pulse" />
-          <span className="text-red-400 font-bold">RAISA</span>
-          <span className="hidden sm:inline text-slate-500">WATCHDOG</span>
-          <span className="text-slate-700">|</span>
-          <span className="text-emerald-400">● ACTIF</span>
-          <span className="text-slate-500 font-bold">({logs.length})</span>
-          <ChevronUp className="w-3 h-3 text-slate-500 ml-0.5" />
+          <Terminal className="w-3.5 h-3.5 text-accent-texte" />
+          <span className="text-accent-texte font-bold">RAISA</span>
+          <span className="hidden sm:inline text-texte-attenue">WATCHDOG</span>
+          <span className="text-texte-attenue">|</span>
+          <span className="text-systeme">● ACTIF</span>
+          <span className="text-texte-attenue font-bold">({logs.length})</span>
+          <ChevronUp className="w-3 h-3 text-texte-attenue ml-0.5" />
         </button>
       ) : (
         /* Expanded Floating Terminal Window */
         <div
-          className="w-[calc(100vw-24px)] sm:w-[540px] bg-black/98 border border-red-800/80 rounded-xl shadow-2xl overflow-hidden animate-slide-down"
+          className="w-[calc(100vw-24px)] sm:w-[540px] bg-black/98 border border-accent-texte/80 rounded-xl shadow-2xl overflow-hidden animate-slide-down"
           style={{ backdropFilter: 'blur(12px)' }}
         >
           {/* Terminal Window Header */}
-          <div className="flex items-center justify-between px-3 py-1.5 bg-slate-900/90 border-b border-red-900/60 font-mono text-xs">
+          <div className="flex items-center justify-between px-3 py-1.5 bg-surface-1/90 border-b border-accent-texte/60 font-mono text-xs">
             <div className="flex items-center gap-2">
-              <Terminal className="w-3.5 h-3.5 text-red-500" />
-              <span className="text-red-400 font-bold text-[10px] tracking-wider">RAISA WATCHDOG CONSOLE v4.19</span>
-              <span className="text-[10px] text-emerald-400 font-bold">● CONNECTÉ</span>
+              <Terminal className="w-3.5 h-3.5 text-accent-texte" />
+              <span className="text-accent-texte font-bold text-xs tracking-wider">RAISA WATCHDOG CONSOLE v4.19</span>
+              <span className="text-xs text-systeme font-bold">● CONNECTÉ</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-slate-500">{logs.length} événements</span>
+              <span className="text-xs text-texte-attenue">{logs.length} événements</span>
               <button
                 onClick={() => setCollapsed(true)}
-                className="p-1 hover:bg-red-950/60 rounded text-slate-400 hover:text-white transition-colors"
+                className="p-1 hover:bg-surface-3/60 rounded text-texte-attenue hover:text-texte transition-colors"
                 title="Réduire le terminal"
               >
                 <ChevronDown className="w-3.5 h-3.5" />
@@ -139,18 +139,18 @@ export const RaisaTerminal: React.FC<RaisaTerminalProps> = ({
           {/* Terminal Content */}
           <div
             ref={scrollRef}
-            className="p-2.5 space-y-1 overflow-y-auto no-scrollbar font-mono text-[10px]"
+            className="p-2.5 space-y-1 overflow-y-auto no-scrollbar font-mono text-xs"
             style={{ height: 175 }}
           >
             {logs.map(log => (
               <div key={log.id} className="raisa-log-line flex gap-2 leading-tight">
-                <span className="text-slate-600 shrink-0 select-none">[{log.time}]</span>
+                <span className="text-texte-attenue shrink-0 select-none">[{log.time}]</span>
                 <span className={`${LEVEL_COLORS[log.level]} shrink-0 w-24 truncate font-bold`}>{log.module}:</span>
-                <span className="text-slate-300">{log.message}</span>
+                <span className="text-texte-second">{log.message}</span>
               </div>
             ))}
-            <div className="flex gap-2 text-red-500/70 pt-0.5">
-              <span className="text-slate-700 select-none">[{new Date().toISOString().substring(11, 19)}]</span>
+            <div className="flex gap-2 text-accent-texte/70 pt-0.5">
+              <span className="text-texte-attenue select-none">[{new Date().toISOString().substring(11, 19)}]</span>
               <span className="font-bold">RAISA_NODE:</span>
               <span className="animate-alarm-pulse font-bold">_ █</span>
             </div>

@@ -1,8 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { 
-  X, 
-  Minus, 
-  Square, 
   Folder, 
   FolderOpen, 
   FileText, 
@@ -33,6 +30,7 @@ import {
 import { versScpEntity } from '../data/entityPresentation';
 import { EntityIllustration } from './illustrations/ScpIllustrations';
 import { sfx } from '../services/sfxService';
+import { FenetreScipnet } from './FenetreScipnet';
 
 interface ScipnetExplorerModalProps {
   isOpen: boolean;
@@ -86,39 +84,39 @@ const STYLE_CATEGORIE: Record<
   }
 > = {
   departement: {
-    icone: Building2, texte: 'text-purple-300', texteActif: 'text-purple-200',
-    fondActif: 'bg-purple-950/90', bordure: 'border-purple-700', bordureArbre: 'border-purple-900/60',
-    fondSelection: 'bg-purple-900/80', bordureSelection: 'border-purple-500', icôneCouleur: 'text-purple-400'
+    icone: Building2, texte: 'text-classe-thaumiel', texteActif: 'text-classe-thaumiel',
+    fondActif: 'bg-surface-3/90', bordure: 'border-classe-thaumiel', bordureArbre: 'border-classe-thaumiel/60',
+    fondSelection: 'bg-surface-3/80', bordureSelection: 'border-classe-thaumiel', icôneCouleur: 'text-classe-thaumiel'
   },
   chercheur: {
-    icone: User, texte: 'text-cyan-300', texteActif: 'text-cyan-200',
-    fondActif: 'bg-cyan-950/90', bordure: 'border-cyan-700', bordureArbre: 'border-cyan-900/60',
-    fondSelection: 'bg-cyan-900/80', bordureSelection: 'border-cyan-500', icôneCouleur: 'text-cyan-400'
+    icone: User, texte: 'text-role-agent', texteActif: 'text-role-agent',
+    fondActif: 'bg-surface-3/90', bordure: 'border-role-agent', bordureArbre: 'border-role-agent/60',
+    fondSelection: 'bg-surface-3/80', bordureSelection: 'border-role-agent', icôneCouleur: 'text-role-agent'
   },
   faction: {
-    icone: Radio, texte: 'text-amber-300', texteActif: 'text-amber-200',
-    fondActif: 'bg-amber-950/90', bordure: 'border-amber-700', bordureArbre: 'border-amber-900/60',
-    fondSelection: 'bg-amber-900/80', bordureSelection: 'border-amber-500', icôneCouleur: 'text-amber-400'
+    icone: Radio, texte: 'text-classe-euclid', texteActif: 'text-classe-euclid',
+    fondActif: 'bg-surface-3/90', bordure: 'border-classe-euclid', bordureArbre: 'border-classe-euclid/60',
+    fondSelection: 'bg-surface-3/80', bordureSelection: 'border-classe-euclid', icôneCouleur: 'text-classe-euclid'
   },
   site: {
-    icone: Shield, texte: 'text-emerald-300', texteActif: 'text-emerald-200',
-    fondActif: 'bg-emerald-950/90', bordure: 'border-emerald-700', bordureArbre: 'border-emerald-900/60',
-    fondSelection: 'bg-emerald-900/80', bordureSelection: 'border-emerald-500', icôneCouleur: 'text-emerald-400'
+    icone: Shield, texte: 'text-classe-safe', texteActif: 'text-classe-safe',
+    fondActif: 'bg-surface-3/90', bordure: 'border-classe-safe', bordureArbre: 'border-classe-safe/60',
+    fondSelection: 'bg-surface-3/80', bordureSelection: 'border-classe-safe', icôneCouleur: 'text-classe-safe'
   },
   zone: {
-    icone: ShieldAlert, texte: 'text-lime-300', texteActif: 'text-lime-200',
-    fondActif: 'bg-lime-950/90', bordure: 'border-lime-700', bordureArbre: 'border-lime-900/60',
-    fondSelection: 'bg-lime-900/80', bordureSelection: 'border-lime-500', icôneCouleur: 'text-lime-400'
+    icone: ShieldAlert, texte: 'text-classe-safe', texteActif: 'text-classe-safe',
+    fondActif: 'bg-surface-3/90', bordure: 'border-classe-safe', bordureArbre: 'border-classe-safe/60',
+    fondSelection: 'bg-surface-3/80', bordureSelection: 'border-classe-safe', icôneCouleur: 'text-classe-safe'
   },
   fim: {
-    icone: Layers, texte: 'text-red-300', texteActif: 'text-red-200',
-    fondActif: 'bg-red-950/90', bordure: 'border-red-700', bordureArbre: 'border-red-900/60',
-    fondSelection: 'bg-red-900/80', bordureSelection: 'border-red-500', icôneCouleur: 'text-red-400'
+    icone: Layers, texte: 'text-accent-texte', texteActif: 'text-accent-texte',
+    fondActif: 'bg-surface-3/90', bordure: 'border-accent-texte', bordureArbre: 'border-accent-texte/60',
+    fondSelection: 'bg-surface-3/80', bordureSelection: 'border-accent-texte', icôneCouleur: 'text-accent-texte'
   },
   commandement: {
-    icone: Database, texte: 'text-slate-300', texteActif: 'text-slate-100',
-    fondActif: 'bg-slate-800/90', bordure: 'border-slate-500', bordureArbre: 'border-slate-700/60',
-    fondSelection: 'bg-slate-700/80', bordureSelection: 'border-slate-400', icôneCouleur: 'text-slate-300'
+    icone: Database, texte: 'text-texte-second', texteActif: 'text-texte',
+    fondActif: 'bg-surface-2/90', bordure: 'border-bordure-forte', bordureArbre: 'border-bordure/60',
+    fondSelection: 'bg-surface-3/80', bordureSelection: 'border-bordure-forte', icôneCouleur: 'text-texte-second'
   }
 };
 
@@ -237,67 +235,31 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-      {/* Windows 2000 / SCiPNET Window Frame */}
-      <div className="w-full max-w-6xl bg-slate-950 win2k-window rounded-none overflow-hidden flex flex-col h-[92vh] max-h-[880px] shadow-2xl">
-        
-        {/* Titlebar */}
-        <div className="bg-gradient-to-r from-red-950 via-slate-900 to-slate-950 px-2.5 py-1.5 flex items-center justify-between border-b border-red-800/80 select-none">
-          <div className="flex items-center gap-2 overflow-hidden">
-            <div className="w-4 h-4 bg-red-700 border border-red-400 flex items-center justify-center text-[10px] font-mono font-bold text-white shrink-0">
-              🗀
-            </div>
-            <span className="font-mono text-xs font-bold text-white tracking-wide truncate">
-              SCiPNET EXPLORER v3.2 - [ SYSTÈME DE FICHIERS HIÉRARCHIQUE DES 10 000 ARCHIVES ]
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1 shrink-0">
-            <button
-              onClick={onClose}
-              className="w-5 h-5 win2k-btn flex items-center justify-center text-slate-300 hover:text-white"
-              title="Réduire"
-            >
-              <Minus className="w-3 h-3" />
-            </button>
-            <button
-              className="w-5 h-5 win2k-btn flex items-center justify-center text-slate-300 hover:text-white"
-              title="Agrandir"
-            >
-              <Square className="w-2.5 h-2.5" />
-            </button>
-            <button
-              onClick={() => {
-                sfx.playTerminalBeep();
-                onClose();
-              }}
-              className="w-5 h-5 win2k-btn-red flex items-center justify-center text-white font-bold text-xs leading-none"
-              title="Fermer [Echap]"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
+    <FenetreScipnet
+      isOpen={isOpen}
+      onClose={onClose}
+      titre="Explorateur SCiPNET"
+      classification="Répertoire des entités · CL-5"
+      icone={<FolderOpen className="w-4 h-4" />}
+      largeur="max-w-6xl"
+      hauteur="pleine"
+      barreEtat={
+        <div className="flex flex-wrap items-center justify-between gap-2 uppercase">
+          <span className="tabular-nums">{totalEntites} entités répertoriées</span>
+          <span>Réseau intranet SCiPNET</span>
         </div>
-
-        {/* Menu Bar */}
-        <div className="bg-slate-900 border-b border-slate-700 px-3 py-1 flex items-center gap-4 text-[11px] font-mono text-slate-300 select-none">
-          <span className="hover:text-white cursor-pointer">Fichier</span>
-          <span className="hover:text-white cursor-pointer">Édition</span>
-          <span className="hover:text-white cursor-pointer">Affichage</span>
-          <span className="hover:text-white cursor-pointer">Outils</span>
-          <span className="hover:text-white cursor-pointer text-red-400 font-semibold">Accréditation-RAISA CL-5</span>
-          <span className="hover:text-white cursor-pointer ml-auto">Aide Intranet</span>
-        </div>
-
+      }
+    >
+      <div className="flex flex-col flex-1 min-h-0">
         {/* Address Bar & Tools */}
-        <div className="bg-slate-900/90 border-b border-slate-800 px-3 py-1.5 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+        <div className="bg-surface-1/90 border-b border-bordure px-3 py-1.5 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
           <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-            <span className="text-slate-400 text-[11px] uppercase tracking-wider shrink-0 font-bold">
+            <span className="text-texte-attenue text-xs uppercase tracking-wider shrink-0 font-bold">
               ADRESSE :
             </span>
-            <div className="win2k-inset px-2 py-0.5 bg-slate-950 text-slate-200 text-xs font-mono flex-1 truncate flex items-center gap-1.5 border border-slate-700">
-              <HardDrive className="w-3.5 h-3.5 text-red-400 shrink-0" />
-              <span className="text-red-400 font-bold">{getAddressPath()}</span>
+            <div className="win2k-inset px-2 py-0.5 bg-fond text-texte text-xs font-mono flex-1 truncate flex items-center gap-1.5 border border-bordure">
+              <HardDrive className="w-3.5 h-3.5 text-accent-texte shrink-0" />
+              <span className="text-accent-texte font-bold">{getAddressPath()}</span>
             </div>
           </div>
 
@@ -309,23 +271,23 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                 value={jumperVal}
                 onChange={(e) => setJumperVal(e.target.value)}
                 placeholder="N° SCP (ex: 173)"
-                className="win2k-inset px-2 py-0.5 bg-black text-amber-300 border border-slate-700 text-[11px] w-28 font-mono outline-none"
+                className="win2k-inset px-2 py-0.5 bg-black text-classe-euclid border border-bordure text-xs w-28 font-mono outline-none"
               />
               <button
                 type="submit"
-                className="win2k-btn px-2 py-0.5 text-[11px] text-amber-300 hover:text-white font-bold"
+                className="win2k-btn px-2 py-0.5 text-xs text-classe-euclid hover:text-texte font-bold"
               >
                 GO
               </button>
             </form>
 
-            <div className="flex items-center gap-1 border-l border-slate-700 pl-2">
+            <div className="flex items-center gap-1 border-l border-bordure pl-2">
               <button
                 onClick={() => {
                   sfx.playTerminalBeep();
                   setViewMode('grid');
                 }}
-                className={`win2k-btn px-2 py-0.5 text-[11px] ${viewMode === 'grid' ? 'bg-slate-800 text-white font-bold' : 'text-slate-400'}`}
+                className={`win2k-btn px-2 py-0.5 text-xs ${viewMode === 'grid' ? 'bg-surface-2 text-texte font-bold' : 'text-texte-attenue'}`}
               >
                 Grille
               </button>
@@ -334,7 +296,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                   sfx.playTerminalBeep();
                   setViewMode('list');
                 }}
-                className={`win2k-btn px-2 py-0.5 text-[11px] ${viewMode === 'list' ? 'bg-slate-800 text-white font-bold' : 'text-slate-400'}`}
+                className={`win2k-btn px-2 py-0.5 text-xs ${viewMode === 'list' ? 'bg-surface-2 text-texte font-bold' : 'text-texte-attenue'}`}
               >
                 Détails
               </button>
@@ -346,9 +308,9 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
         <div className="flex-1 flex overflow-hidden">
           
           {/* LEFT PANE: Hierarchical File & Folder Tree */}
-          <div className="w-64 sm:w-80 bg-slate-900/90 border-r border-slate-800 flex flex-col select-none overflow-y-auto font-mono text-xs p-2">
-            <div className="text-[10px] uppercase font-bold text-slate-400 mb-2 px-1 flex items-center gap-1.5 border-b border-slate-800 pb-1">
-              <Folder className="w-3.5 h-3.5 text-amber-400" />
+          <div className="w-64 sm:w-80 bg-surface-1/90 border-r border-bordure flex flex-col select-none overflow-y-auto font-mono text-xs p-2">
+            <div className="text-xs uppercase font-bold text-texte-attenue mb-2 px-1 flex items-center gap-1.5 border-b border-bordure pb-1">
+              <Folder className="w-3.5 h-3.5 text-classe-euclid" />
               <span>ARBORESCENCE DU SYSTÈME SCiPNET</span>
             </div>
 
@@ -360,15 +322,15 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
               }}
               className={`w-full text-left px-2 py-1 flex items-center justify-between rounded transition-colors mb-1 ${
                 currentSelection.type === 'root'
-                  ? 'bg-red-950/80 text-white border border-red-700/80 font-bold'
-                  : 'text-slate-300 hover:bg-slate-800/60'
+                  ? 'bg-surface-3/80 text-texte border border-accent-texte/80 font-bold'
+                  : 'text-texte-second hover:bg-surface-2/60'
               }`}
             >
               <div className="flex items-center gap-1.5 truncate">
-                <HardDrive className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                <HardDrive className="w-3.5 h-3.5 text-accent-texte shrink-0" />
                 <span className="truncate">C:\SCIPNET\ARCHIVES</span>
               </div>
-              <span className="text-[10px] text-slate-500">({totalEntites})</span>
+              <span className="text-xs text-texte-attenue">({totalEntites})</span>
             </button>
 
             {/* 01 à 07 : les catégories du répertoire, tirées du wiki.
@@ -389,19 +351,19 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                       setCurrentSelection({ type: 'category', category: cat.id });
                     }}
                     className={`px-1.5 py-1 flex items-center justify-between cursor-pointer rounded ${
-                      actif ? `${style.fondActif} ${style.texteActif} border ${style.bordure} font-bold` : `${style.texte} hover:text-white`
+                      actif ? `${style.fondActif} ${style.texteActif} border ${style.bordure} font-bold` : `${style.texte} hover:text-texte`
                     }`}
                   >
                     <div className="flex items-center gap-1">
-                      <span onClick={(e) => toggleBranch(cat.id, e)} className="p-0.5 hover:bg-slate-700 rounded">
+                      <span onClick={(e) => toggleBranch(cat.id, e)} className="p-0.5 hover:bg-surface-3 rounded">
                         {expandedBranches[cat.id] ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
                       </span>
                       <Icone className={`w-3.5 h-3.5 ${style.icôneCouleur}`} />
-                      <span className="text-[11px] font-bold">
+                      <span className="text-xs font-bold">
                         {String(rang + 1).padStart(2, '0')}_{cat.pluriel.toUpperCase().replace(/\s+/g, '_')}
                       </span>
                     </div>
-                    <span className={`text-[10px] ${style.icôneCouleur}/80`}>({entites.length})</span>
+                    <span className={`text-xs ${style.icôneCouleur}/80`}>({entites.length})</span>
                   </div>
 
                   {expandedBranches[cat.id] && (
@@ -417,12 +379,12 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                             }}
                             className={`w-full text-left px-1.5 py-0.5 text-[10.5px] rounded truncate flex items-center justify-between ${
                               isSelected
-                                ? `${style.fondSelection} text-white font-bold border ${style.bordureSelection}`
-                                : 'text-slate-400 hover:text-slate-200'
+                                ? `${style.fondSelection} text-texte font-bold border ${style.bordureSelection}`
+                                : 'text-texte-attenue hover:text-texte'
                             }`}
                           >
-                            <span className="truncate">📁 {entity.name}</span>
-                            <span className={`text-[9px] ${style.icôneCouleur}/70 shrink-0`}>{entity.code}</span>
+                            <span className="truncate">{entity.name}</span>
+                            <span className={`text-xs ${style.icôneCouleur}/70 shrink-0`}>{entity.code}</span>
                           </button>
                         );
                       })}
@@ -432,7 +394,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                             sfx.playTerminalBeep();
                             setCurrentSelection({ type: 'category', category: cat.id });
                           }}
-                          className="w-full text-left px-1.5 py-0.5 text-[10px] italic text-slate-500 hover:text-slate-300"
+                          className="w-full text-left px-1.5 py-0.5 text-xs italic text-texte-attenue hover:text-texte-second"
                         >
                           … et {entites.length - LIMITE_ARBRE} autres — tout afficher
                         </button>
@@ -445,7 +407,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
 
 
             {/* 5. REGISTRE SCP (10 000 DOSSIERS PAR SÉRIES) */}
-            <div className="mt-2 pt-2 border-t border-slate-800">
+            <div className="mt-2 pt-2 border-t border-bordure">
               <div
                 onClick={() => {
                   sfx.playTerminalBeep();
@@ -453,22 +415,22 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                 }}
                 className={`px-1.5 py-1 flex items-center justify-between cursor-pointer rounded ${
                   currentSelection.type === 'category' && currentSelection.category === 'series'
-                    ? 'bg-amber-950/90 text-amber-200 border border-amber-600 font-bold'
-                    : 'text-amber-300 hover:text-white'
+                    ? 'bg-surface-3/90 text-classe-euclid border border-classe-euclid font-bold'
+                    : 'text-classe-euclid hover:text-texte'
                 }`}
               >
                 <div className="flex items-center gap-1">
-                  <span onClick={(e) => toggleBranch('series', e)} className="p-0.5 hover:bg-slate-700 rounded">
+                  <span onClick={(e) => toggleBranch('series', e)} className="p-0.5 hover:bg-surface-3 rounded">
                     {expandedBranches.series ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
                   </span>
-                  <Database className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="text-[11px] font-bold">05_REGISTRE_SCP_10K</span>
+                  <Database className="w-3.5 h-3.5 text-classe-euclid" />
+                  <span className="text-xs font-bold">05_REGISTRE_SCP_10K</span>
                 </div>
-                <span className="text-[10px] text-amber-400 font-bold">10 000</span>
+                <span className="text-xs text-classe-euclid font-bold">10 000</span>
               </div>
 
               {expandedBranches.series && (
-                <div className="ml-4 pl-2 border-l border-amber-900/60 space-y-0.5 my-1">
+                <div className="ml-4 pl-2 border-l border-classe-euclid/60 space-y-0.5 my-1">
                   {SCP_SERIES.map((ser) => {
                     const isSelected = currentSelection.type === 'series' && currentSelection.series.id === ser.id;
                     return (
@@ -478,14 +440,14 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                           sfx.playTerminalBeep();
                           setCurrentSelection({ type: 'series', series: ser });
                         }}
-                        className={`w-full text-left px-1.5 py-0.5 text-[10px] rounded truncate flex items-center justify-between ${
+                        className={`w-full text-left px-1.5 py-0.5 text-xs rounded truncate flex items-center justify-between ${
                           isSelected
-                            ? 'bg-amber-900/80 text-amber-100 font-bold border border-amber-500'
-                            : 'text-slate-400 hover:text-slate-200'
+                            ? 'bg-surface-3/80 text-classe-euclid font-bold border border-classe-euclid'
+                            : 'text-texte-attenue hover:text-texte'
                         }`}
                       >
-                        <span className="truncate">📂 {ser.name}</span>
-                        <span className="text-[9px] text-slate-500 shrink-0">{ser.range.split(' ')[0]}</span>
+                        <span className="truncate">{ser.name}</span>
+                        <span className="text-xs text-texte-attenue shrink-0">{ser.range.split(' ')[0]}</span>
                       </button>
                     );
                   })}
@@ -495,22 +457,22 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
           </div>
 
           {/* RIGHT PANE: Directory Contents */}
-          <div className="flex-1 flex flex-col bg-slate-950 overflow-hidden">
+          <div className="flex-1 flex flex-col bg-fond overflow-hidden">
             
             {/* Filter Input */}
-            <div className="p-2 border-b border-slate-800 flex items-center justify-between gap-2 text-xs font-mono bg-slate-900/50">
+            <div className="p-2 border-b border-bordure flex items-center justify-between gap-2 text-xs font-mono bg-surface-1/50">
               <div className="flex items-center gap-2 flex-1 max-w-md">
-                <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <Search className="w-3.5 h-3.5 text-texte-attenue shrink-0" />
                 <input
                   type="text"
                   value={searchFilter}
                   onChange={(e) => setSearchFilter(e.target.value)}
                   placeholder="Filtrer dans ce dossier..."
-                  className="win2k-inset px-2 py-0.5 bg-slate-950 text-slate-200 text-xs w-full outline-none font-mono border border-slate-700"
+                  className="win2k-inset px-2 py-0.5 bg-fond text-texte text-xs w-full outline-none font-mono border border-bordure"
                 />
               </div>
 
-              <span className="text-[11px] text-slate-400 font-mono shrink-0">
+              <span className="text-xs text-texte-attenue font-mono shrink-0">
                 {currentSelection.type === 'entity' ? currentSelection.entity.code
                   : currentSelection.type === 'series' ? currentSelection.series.name
                   : `${getRightPaneEntities().length} ÉLÉMENT(S)`}
@@ -524,53 +486,53 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
               {currentSelection.type === 'entity' ? (
                 <div className="space-y-4 animate-fade-in">
                   {/* Entity Technical Folder Banner */}
-                  <div className="win2k-window p-4 bg-slate-900 border border-slate-700 shadow-xl">
+                  <div className="win2k-window p-4 bg-surface-1 border border-bordure shadow-xl">
                     <div className="flex flex-col sm:flex-row items-start gap-4 mb-3">
-                      <div className="w-24 h-24 bg-slate-950 win2k-inset p-1.5 shrink-0 border border-slate-700 flex items-center justify-center">
+                      <div className="w-24 h-24 bg-fond win2k-inset p-1.5 shrink-0 border border-bordure flex items-center justify-center">
                         <EntityIllustration id={currentSelection.entity.id} className="w-full h-full" />
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-bold text-red-400">{currentSelection.entity.code}</span>
-                          <span className={`text-[10px] px-1.5 py-0.2 rounded border font-bold ${currentSelection.entity.badgeBg} ${currentSelection.entity.badgeBorder} ${currentSelection.entity.badgeText}`}>
+                          <span className="text-xs font-bold text-accent-texte">{currentSelection.entity.code}</span>
+                          <span className={`text-xs px-1.5 py-0.5 rounded border font-bold ${currentSelection.entity.badgeBg} ${currentSelection.entity.badgeBorder} ${currentSelection.entity.badgeText}`}>
                             CL-{currentSelection.entity.clearanceLevel}
                           </span>
-                          <span className="text-slate-500 text-[10px] uppercase">[{currentSelection.entity.category}]</span>
+                          <span className="text-texte-attenue text-xs uppercase">[{currentSelection.entity.category}]</span>
                         </div>
 
-                        <h3 className="text-base sm:text-lg font-bold text-white mb-1">
+                        <h3 className="text-base sm:text-lg font-bold text-texte mb-1">
                           {currentSelection.entity.name}
                         </h3>
 
-                        <p className="text-xs text-slate-400 mb-2">
+                        <p className="text-xs text-texte-attenue mb-2">
                           {currentSelection.entity.title}
                           {currentSelection.entity.director && ` — Dirigé par : ${currentSelection.entity.director}`}
                         </p>
 
                         {currentSelection.entity.motto && (
-                          <div className="text-[11px] italic text-amber-300/90 bg-amber-950/40 px-2 py-1 rounded border border-amber-900/50">
+                          <div className="text-xs italic text-classe-euclid/90 bg-surface-3/40 px-2 py-1 rounded border border-classe-euclid/50">
                             « {currentSelection.entity.motto} »
                           </div>
                         )}
                       </div>
                     </div>
 
-                    <p className="text-xs text-slate-300 leading-relaxed pt-2 border-t border-slate-800">
+                    <p className="text-xs text-texte-second leading-relaxed pt-2 border-t border-bordure">
                       {currentSelection.entity.lore}
                     </p>
 
                     {/* Action buttons inside entity folder */}
-                    <div className="flex flex-wrap items-center gap-2 pt-3 mt-3 border-t border-slate-800">
+                    <div className="flex flex-wrap items-center gap-2 pt-3 mt-3 border-t border-bordure">
                       <button
                         onClick={() => {
                           sfx.playTerminalBeep();
                           onSelectEntity(currentSelection.entity);
                         }}
-                        className="win2k-btn px-3 py-1 text-xs text-white font-bold flex items-center gap-1.5 hover:bg-red-950"
+                        className="win2k-btn px-3 py-1 text-xs text-texte font-bold flex items-center gap-1.5 hover:bg-surface-3"
                       >
-                        <FileText className="w-3.5 h-3.5 text-red-400" />
-                        <span>📄 OUVRIR LE DOSSIER DÉCLASSIFIÉ COMPLET</span>
+                        <FileText className="w-3.5 h-3.5 text-accent-texte" />
+                        <span>Ouvrir le dossier déclassifié complet</span>
                       </button>
 
                       {onSelectSeriesFilter && (
@@ -580,10 +542,10 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                             onSelectSeriesFilter(currentSelection.entity.queryKeywords[0] || currentSelection.entity.name);
                             onClose();
                           }}
-                          className="win2k-btn px-3 py-1 text-xs text-amber-300 hover:text-white flex items-center gap-1.5"
+                          className="win2k-btn px-3 py-1 text-xs text-classe-euclid hover:text-texte flex items-center gap-1.5"
                         >
-                          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                          <span>⚡ RECHERCHER LES ARCHIVES LIÉES DANS LE CATALOGUE</span>
+                          <Sparkles className="w-3.5 h-3.5 text-classe-euclid" />
+                          <span>Rechercher les archives liées</span>
                         </button>
                       )}
                     </div>
@@ -591,8 +553,8 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
 
                   {/* Files inside this folder: Linked SCP Anomalies */}
                   <div>
-                    <div className="text-xs font-bold text-slate-400 uppercase mb-2 flex items-center gap-2 flex-wrap">
-                      <FolderOpen className="w-3.5 h-3.5 text-red-400" />
+                    <div className="text-xs font-bold text-texte-attenue uppercase mb-2 flex items-center gap-2 flex-wrap">
+                      <FolderOpen className="w-3.5 h-3.5 text-accent-texte" />
                       <span>DOSSIERS RATTACHÉS À CETTE ENTITÉ :</span>
                       {/* Le décompte sépare ce que le wiki DÉCLARE de ce que le texte
                           se contente de mentionner. C'est ce qui remplace l'ancienne
@@ -600,7 +562,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                       {(() => {
                         const { confirmes, mentions } = compterDossiers(currentSelection.entity.id, languageCode);
                         return (
-                          <span className="text-[10px] font-mono normal-case text-slate-500">
+                          <span className="text-xs font-mono normal-case text-texte-attenue">
                             {confirmes} confirmé{confirmes > 1 ? 's' : ''}
                             {mentions > 0 && ` · ${mentions} mention${mentions > 1 ? 's' : ''}`}
                           </span>
@@ -619,16 +581,16 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                               onClose();
                             }
                           }}
-                          className="win2k-btn p-2.5 text-left flex items-center justify-between hover:border-red-500/80 group"
+                          className="win2k-btn p-2.5 text-left flex items-center justify-between hover:border-accent-texte/80 group"
                         >
                           <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-red-400 shrink-0" />
+                            <FileText className="w-4 h-4 text-accent-texte shrink-0" />
                             <div>
-                              <div className="font-bold text-white text-xs">{scpSlug}</div>
-                              <div className="text-[10px] text-slate-400">Dossier classifié SCiPNET</div>
+                              <div className="font-bold text-texte text-xs">{scpSlug}</div>
+                              <div className="text-xs text-texte-attenue">Dossier classifié SCiPNET</div>
                             </div>
                           </div>
-                          <span className="text-[11px] text-red-400 font-bold group-hover:translate-x-0.5 transition-transform">
+                          <span className="text-xs text-accent-texte font-bold group-hover:translate-x-0.5 transition-transform">
                             OUVRIR &gt;
                           </span>
                         </button>
@@ -636,7 +598,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                     </div>
 
                     {currentSelection.entity.iconicScps.length > LIMITE_DOSSIERS && (
-                      <p className="mt-2 text-[11px] font-mono text-slate-500">
+                      <p className="mt-2 text-xs font-mono text-texte-attenue">
                         {currentSelection.entity.iconicScps.length - LIMITE_DOSSIERS} autres dossiers rattachés —
                         les mieux notés sont affichés en premier.
                       </p>
@@ -646,26 +608,26 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
               ) : currentSelection.type === 'series' ? (
                 /* CASE 2: SERIES DOSSIER VIEW (10K DOSSIERS) */
                 <div className="space-y-4 animate-fade-in">
-                  <div className="win2k-window p-4 bg-slate-900 border border-amber-900/60 shadow-xl">
+                  <div className="win2k-window p-4 bg-surface-1 border border-classe-euclid/60 shadow-xl">
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div>
-                        <span className="text-[10px] text-amber-400 uppercase font-bold tracking-widest">
+                        <span className="text-xs text-classe-euclid uppercase font-bold tracking-widest">
                           REGISTRE OFFICIEL // 10 000 DOSSIERS SCiPNET
                         </span>
-                        <h3 className="text-lg font-bold text-white tracking-wide">
+                        <h3 className="text-lg font-bold text-texte tracking-wide">
                           {currentSelection.series.name.toUpperCase()} : {currentSelection.series.range}
                         </h3>
                       </div>
-                      <span className="px-2 py-1 text-[11px] font-bold border border-amber-600/70 text-amber-300 bg-amber-950/80 rounded">
+                      <span className="px-2 py-1 text-xs font-bold border border-classe-euclid/70 text-classe-euclid bg-surface-3/80 rounded">
                         {currentSelection.series.totalEstimate}
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                    <p className="text-xs text-texte-second leading-relaxed mb-4">
                       {currentSelection.series.description}
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800">
+                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-bordure">
                       {(onSelectSeries || onSelectSeriesFilter) && (
                         <button
                           onClick={() => {
@@ -677,10 +639,10 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                             }
                             onClose();
                           }}
-                          className="win2k-btn px-3 py-1 text-xs font-bold text-amber-300 hover:text-white flex items-center gap-1.5"
+                          className="win2k-btn px-3 py-1 text-xs font-bold text-classe-euclid hover:text-texte flex items-center gap-1.5"
                         >
-                          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                          <span>⚡ CHARGER ET PARCOURIR LES 1000 DOSSIERS DANS LE CATALOGUE</span>
+                          <Sparkles className="w-3.5 h-3.5 text-classe-euclid" />
+                          <span>Parcourir les 1 000 dossiers de la série</span>
                         </button>
                       )}
                     </div>
@@ -688,8 +650,8 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
 
                   {/* Sample files */}
                   <div>
-                    <div className="text-xs font-bold text-slate-400 uppercase mb-2 flex items-center gap-2">
-                      <FileText className="w-3.5 h-3.5 text-amber-400" />
+                    <div className="text-xs font-bold text-texte-attenue uppercase mb-2 flex items-center gap-2">
+                      <FileText className="w-3.5 h-3.5 text-classe-euclid" />
                       <span>DOSSIERS PHARES DE CETTE SÉRIE :</span>
                     </div>
 
@@ -704,13 +666,13 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                               onClose();
                             }
                           }}
-                          className="win2k-btn p-2.5 text-left flex flex-col justify-between hover:border-amber-500/80 group"
+                          className="win2k-btn p-2.5 text-left flex flex-col justify-between hover:border-classe-euclid/80 group"
                         >
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] font-mono text-slate-500">FICHIER</span>
-                            <span className="text-[10px] font-bold text-amber-400 group-hover:underline">OUVRIR &gt;</span>
+                            <span className="text-xs font-mono text-texte-attenue">FICHIER</span>
+                            <span className="text-xs font-bold text-classe-euclid group-hover:underline">OUVRIR &gt;</span>
                           </div>
-                          <span className="font-mono font-bold text-white text-xs tracking-wider">
+                          <span className="font-mono font-bold text-texte text-xs tracking-wider">
                             {scp}
                           </span>
                         </button>
@@ -729,35 +691,35 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                           sfx.playTerminalBeep();
                           setCurrentSelection({ type: 'entity', entity });
                         }}
-                        className="win2k-window p-3 bg-slate-900/80 hover:bg-slate-900 border border-slate-700/80 hover:border-red-600/80 cursor-pointer transition-all flex flex-col justify-between group"
+                        className="win2k-window p-3 bg-surface-1/80 hover:bg-surface-1 border border-bordure/80 hover:border-accent-texte/80 cursor-pointer transition-all flex flex-col justify-between group"
                       >
                         <div className="flex items-start gap-3 mb-2">
-                          <div className="w-12 h-12 bg-slate-950 win2k-inset p-1 shrink-0 border border-slate-700 flex items-center justify-center">
+                          <div className="w-12 h-12 bg-fond win2k-inset p-1 shrink-0 border border-bordure flex items-center justify-center">
                             <EntityIllustration id={entity.id} className="w-full h-full" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-1 mb-0.5">
-                              <span className="text-[10px] font-bold text-red-400 truncate">{entity.code}</span>
-                              <span className={`text-[9px] px-1 py-0.2 rounded border font-bold ${entity.badgeBg} ${entity.badgeBorder} ${entity.badgeText}`}>
+                              <span className="text-xs font-bold text-accent-texte truncate">{entity.code}</span>
+                              <span className={`text-xs px-1 py-0.5 rounded border font-bold ${entity.badgeBg} ${entity.badgeBorder} ${entity.badgeText}`}>
                                 CL-{entity.clearanceLevel}
                               </span>
                             </div>
-                            <h4 className="text-xs font-bold text-white truncate group-hover:text-red-300">
+                            <h4 className="text-xs font-bold text-texte truncate group-hover:text-accent-texte">
                               {entity.name}
                             </h4>
-                            <p className="text-[10px] text-slate-400 truncate">
+                            <p className="text-xs text-texte-attenue truncate">
                               {entity.title}
                             </p>
                           </div>
                         </div>
 
-                        <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed mb-2">
+                        <p className="text-xs text-texte-second line-clamp-2 leading-relaxed mb-2">
                           {entity.description}
                         </p>
 
-                        <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[10px]">
-                          <span className="text-slate-500">{entity.iconicScps.length} SCP(s) associés</span>
-                          <span className="text-red-400 font-bold group-hover:underline flex items-center gap-1">
+                        <div className="pt-2 border-t border-bordure flex items-center justify-between text-xs">
+                          <span className="text-texte-attenue">{entity.iconicScps.length} SCP(s) associés</span>
+                          <span className="text-accent-texte font-bold group-hover:underline flex items-center gap-1">
                             <span>ENTRER DANS LE DOSSIER</span>
                             <ChevronRight className="w-3 h-3" />
                           </span>
@@ -767,10 +729,10 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                   </div>
                 ) : (
                   /* Table view */
-                  <div className="win2k-inset bg-slate-950 border border-slate-700 text-xs overflow-x-auto">
+                  <div className="win2k-inset bg-fond border border-bordure text-xs overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-900 border-b border-slate-700 text-[10px] text-slate-400 uppercase">
+                        <tr className="bg-surface-1 border-b border-bordure text-xs text-texte-attenue uppercase">
                           <th className="p-2">Code</th>
                           <th className="p-2">Nom de l'Entité</th>
                           <th className="p-2">Catégorie</th>
@@ -787,14 +749,14 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                               sfx.playTerminalBeep();
                               setCurrentSelection({ type: 'entity', entity });
                             }}
-                            className="border-b border-slate-800/80 hover:bg-slate-900/80 cursor-pointer transition-colors"
+                            className="border-b border-bordure/80 hover:bg-surface-1/80 cursor-pointer transition-colors"
                           >
-                            <td className="p-2 font-bold text-red-400 whitespace-nowrap">{entity.code}</td>
-                            <td className="p-2 font-bold text-white whitespace-nowrap">{entity.name}</td>
-                            <td className="p-2 text-slate-400 uppercase text-[10px]">{entity.category}</td>
-                            <td className="p-2 text-slate-300">Niveau {entity.clearanceLevel}</td>
-                            <td className="p-2 text-slate-400 truncate max-w-xs">{entity.title}</td>
-                            <td className="p-2 text-right text-red-400 font-bold">Ouvrir &gt;</td>
+                            <td className="p-2 font-bold text-accent-texte whitespace-nowrap">{entity.code}</td>
+                            <td className="p-2 font-bold text-texte whitespace-nowrap">{entity.name}</td>
+                            <td className="p-2 text-texte-attenue uppercase text-xs">{entity.category}</td>
+                            <td className="p-2 text-texte-second">Niveau {entity.clearanceLevel}</td>
+                            <td className="p-2 text-texte-attenue truncate max-w-xs">{entity.title}</td>
+                            <td className="p-2 text-right text-accent-texte font-bold">Ouvrir &gt;</td>
                           </tr>
                         ))}
                       </tbody>
@@ -804,28 +766,9 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
               )}
 
             </div>
-
-            {/* Bottom Status Bar */}
-            <div className="bg-slate-900 win2k-statusbar px-3 py-1 border-t border-slate-700 flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-slate-400">
-              <div className="flex items-center gap-3">
-                <span>{totalEntites} entités répertoriées | 10 000 dossiers SCP</span>
-                <span>•</span>
-                <span className="text-emerald-400 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span>Réseau Intranet SCiPNET v3.2</span>
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>Chiffrement SSL-128bit</span>
-                <span>•</span>
-                <span className="text-slate-500">SITE-19 NODE 01</span>
-              </div>
-            </div>
-
           </div>
         </div>
-
       </div>
-    </div>
+    </FenetreScipnet>
   );
 };

@@ -29,7 +29,7 @@ export const DeclassifiedStamp: React.FC<DeclassifiedStampProps> = ({ show, obje
   return (
     <div className={`pointer-events-none select-none absolute top-4 right-4 z-20 ${slammed ? 'animate-stamp-slam' : 'opacity-0'}`}>
       <div
-        className="font-mono font-black text-xs tracking-widest border-2 px-3 py-1.5 rounded"
+        className="font-mono font-bold text-xs tracking-widest border-2 px-3 py-1.5 rounded"
         style={{
           border: `3px solid ${isKeter ? 'rgba(220,38,38,0.75)' : 'rgba(245,158,11,0.65)'}`,
           color: isKeter ? 'rgba(220,38,38,0.85)' : 'rgba(245,158,11,0.75)',

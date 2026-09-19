@@ -6,6 +6,10 @@ const FAVORITES_KEY = 'scp_audio_favorites_v1';
 const VOICE_PROFILES_KEY = 'scp_voice_profiles_v1';
 const RECENT_HISTORY_KEY = 'scp_recent_history_v1';
 const READING_QUEUE_KEY = 'scp_reading_queue_v1';
+const DEVICE_MODE_KEY = 'scp_device_mode';
+
+/** Vue choisie : automatique selon la largeur, ou forcée par l'utilisateur. */
+export type DeviceMode = 'auto' | 'desktop' | 'mobile';
 
 export const DEFAULT_ROLE_PROFILES: Record<CharacterRole, Omit<VoiceProfile, 'voiceURI'>> = {
   narrator: {
@@ -88,6 +92,21 @@ export const DEFAULT_ROLE_PROFILES: Record<CharacterRole, Omit<VoiceProfile, 'vo
 };
 
 export const storageService = {
+  /** Vue mémorisée entre deux visites ; « auto » tant que rien n'a été forcé. */
+  getDeviceMode(): DeviceMode {
+    try {
+      const data = localStorage.getItem(DEVICE_MODE_KEY);
+      if (data === 'desktop' || data === 'mobile' || data === 'auto') return data;
+    } catch {}
+    return 'auto';
+  },
+
+  saveDeviceMode(mode: DeviceMode): void {
+    try {
+      localStorage.setItem(DEVICE_MODE_KEY, mode);
+    } catch {}
+  },
+
   getFavorites(): ScpItemSummary[] {
     try {
       const data = localStorage.getItem(FAVORITES_KEY);

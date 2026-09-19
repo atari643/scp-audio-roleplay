@@ -1,20 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { 
-  ArrowLeft, 
-  Play, 
-  Pause, 
-  Star, 
-  ExternalLink, 
-  FileText, 
-  User, 
-  Sparkles, 
-  ShieldAlert,
+import {
+  ArrowLeft,
+  Play,
+  Pause,
+  Star,
+  ExternalLink,
+  FileText,
+  Sparkles,
   Radio,
-  Sliders,
-  AlertTriangle,
-  Biohazard,
-  Terminal,
-  Activity
+  Crosshair
 } from 'lucide-react';
 import { ScpItemDetail } from '../types/scp';
 import { CharacterRole, SpeechSegment } from '../types/audioRoleplay';
@@ -24,6 +18,7 @@ import { WikiLink } from '../services/linkExtractor';
 import { SpokenLine } from './SpokenLine';
 import { ReadingQueue } from './ReadingQueue';
 import { BandeauEntites } from './BandeauEntites';
+import { habillageClasse, styleBadgeClasse, styleFondClasse } from './classification';
 
 interface ScpReaderProps {
   scp: ScpItemDetail;
@@ -48,59 +43,34 @@ interface ScpReaderProps {
   onOuvrirEntite?: (id: string) => void;
 }
 
-const ROLE_STYLES: Record<CharacterRole, { border: string; bg: string; text: string; badge: string; iconColor: string }> = {
-  narrator: {
-    border: 'border-blue-700/60',
-    bg: 'bg-blue-950/25',
-    text: 'text-slate-100',
-    badge: 'bg-blue-950/90 border-blue-600/70 text-blue-300 font-mono',
-    iconColor: 'text-blue-400'
-  },
-  researcher: {
-    border: 'border-emerald-700/60',
-    bg: 'bg-emerald-950/25',
-    text: 'text-emerald-100',
-    badge: 'bg-emerald-950/90 border-emerald-600/70 text-emerald-300 font-mono',
-    iconColor: 'text-emerald-400'
-  },
-  anomaly: {
-    border: 'border-red-700/80',
-    bg: 'bg-red-950/35',
-    text: 'text-red-100 font-medium',
-    badge: 'bg-red-950 border-red-500 text-red-400 font-bold font-mono',
-    iconColor: 'text-red-500'
-  },
-  classD: {
-    border: 'border-amber-700/60',
-    bg: 'bg-amber-950/25',
-    text: 'text-amber-100',
-    badge: 'bg-amber-950/90 border-amber-600/70 text-amber-300 font-mono',
-    iconColor: 'text-amber-400'
-  },
-  agent: {
-    border: 'border-cyan-700/60',
-    bg: 'bg-cyan-950/25',
-    text: 'text-cyan-100',
-    badge: 'bg-cyan-950/90 border-cyan-600/70 text-cyan-300 font-mono',
-    iconColor: 'text-cyan-400'
-  },
-  commander: {
-    border: 'border-purple-700/60',
-    bg: 'bg-purple-950/30',
-    text: 'text-purple-100',
-    badge: 'bg-purple-950 border-purple-600 text-purple-300 font-bold font-mono',
-    iconColor: 'text-purple-400'
-  },
-  intercom: {
-    border: 'border-slate-700/80',
-    bg: 'bg-slate-900/80',
-    text: 'text-slate-300 font-mono text-xs',
-    badge: 'bg-slate-800 border-slate-600 text-slate-300 font-mono',
-    iconColor: 'text-slate-400'
-  }
+/**
+ * Couleur d'un rôle de lecture.
+ *
+ * L'ancienne version donnait à chacun des sept rôles un fond teinté, une bordure
+ * teintée, un texte teinté ET un badge teinté : sept cartes de couleurs
+ * différentes qui s'empilaient sur toute la hauteur du dossier. On ne voyait plus
+ * le texte, seulement les cartes.
+ *
+ * Nouveau modèle, emprunté au script de doublage : fond neutre pour tous, et la
+ * couleur du rôle portée par deux choses seulement — le liseré de 3 px à gauche
+ * et le nom du locuteur. C'est assez pour savoir qui parle d'un coup d'œil, et
+ * assez discret pour que la réplique reste l'élément principal.
+ */
+const COULEUR_ROLE: Record<CharacterRole, string> = {
+  narrator: 'var(--role-narrateur)',
+  researcher: 'var(--role-chercheur)',
+  anomaly: 'var(--role-anomalie)',
+  classD: 'var(--role-classed)',
+  agent: 'var(--role-agent)',
+  commander: 'var(--role-commandant)',
+  intercom: 'var(--role-intercom)'
 };
 
-// Render text with interactive redaction blocks
+const BOUTON_OUTIL =
+  'inline-flex items-center gap-1.5 h-8 px-3 rounded text-xs font-mono ' +
+  'bg-surface-2 border border-bordure text-texte-second ' +
+  'hover:bg-surface-3 hover:text-texte hover:border-bordure-forte transition-colors';
+
 export const ScpReader: React.FC<ScpReaderProps> = ({
   scp,
   segments,
@@ -123,19 +93,20 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
   const [activeTab, setActiveTab] = useState<'roleplay' | 'raw'>('roleplay');
   const segmentRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
-  // Centered view scrolling for karaoke tracking
+  const habillage = habillageClasse(scp.objectClass);
+
+  // Recentrage sur la réplique active, pour suivre la voix à l'œil.
   const scrollToActiveSegment = (index: number, smooth: boolean = true) => {
     const el = segmentRefs.current[index];
     if (!el) return;
 
-    // Header is sticky ~95px, bottom audio player is fixed ~85px
+    // L'en-tête est collant (~95 px) et le lecteur audio est fixé en bas (~85 px).
     const headerOffset = 110;
     const playerOffset = 95;
     const rect = el.getBoundingClientRect();
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const elementTopInDoc = rect.top + scrollTop;
 
-    // Center element in visible viewport area
     const availableHeight = window.innerHeight - headerOffset - playerOffset;
     const targetTop = elementTopInDoc - headerOffset - Math.max(20, (availableHeight - rect.height) / 2);
 
@@ -145,7 +116,6 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
     });
   };
 
-  // Auto-scroll when active segment changes
   useEffect(() => {
     if (!autoScroll) return;
     const timer = setTimeout(() => {
@@ -154,131 +124,106 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
     return () => clearTimeout(timer);
   }, [currentSegmentIndex, autoScroll]);
 
-  const isKeterOrEuclid = scp.objectClass === 'Keter' || scp.objectClass === 'Euclid' || scp.objectClass === 'Apollyon';
-
   return (
-    <div className="max-w-4xl mx-auto pb-36 pt-2 px-3 sm:px-6 font-sans">
-      {/* Top SCiPNET Terminal Action Bar */}
-      <div className="flex items-center justify-between gap-3 mb-5 pb-3 border-b border-scp-border font-mono text-xs">
+    <div className="max-w-4xl mx-auto pb-36 pt-2 px-3 sm:px-6">
+      {/* Barre d'outils du dossier */}
+      <div className="flex items-center justify-between gap-3 mb-5 pb-3 border-b border-bordure">
         <button
           onClick={() => {
             sfx.playTerminalBeep();
             onBack();
           }}
-          className="flex items-center gap-1.5 text-slate-300 hover:text-white bg-scp-surface hover:bg-scp-card px-3 py-1.5 rounded-lg border border-scp-border transition-colors group"
+          className={`${BOUTON_OUTIL} group`}
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-          <span>[ RETOUR AU CATALOGUE ]</span>
+          <span>Catalogue</span>
         </button>
 
         <div className="flex items-center gap-2">
-          {/* Toggle Favorite */}
           <button
             onClick={() => {
               sfx.playTerminalBeep();
               onToggleFavorite();
             }}
-            title={isFavorite ? 'Retirer du dossier personnel' : 'Archiver dans les favoris'}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors ${
+            title={isFavorite ? 'Retirer des dossiers classés' : 'Classer ce dossier'}
+            aria-pressed={isFavorite}
+            className={
               isFavorite
-                ? 'bg-amber-950/70 border-amber-600/70 text-amber-400 font-bold'
-                : 'bg-scp-surface border-scp-border text-slate-400 hover:text-amber-400'
-            }`}
+                ? 'inline-flex items-center gap-1.5 h-8 px-3 rounded text-xs font-mono border border-classe-euclid text-classe-euclid transition-colors'
+                : BOUTON_OUTIL
+            }
           >
-            <Star className={`w-3.5 h-3.5 ${isFavorite ? 'fill-amber-400' : ''}`} />
-            <span className="hidden sm:inline">{isFavorite ? '[ CLASSÉ FAVORI ]' : '[ CLASSER ]'}</span>
+            <Star className={`w-3.5 h-3.5 ${isFavorite ? 'fill-current' : ''}`} />
+            <span className="hidden sm:inline">{isFavorite ? 'Classé' : 'Classer'}</span>
           </button>
 
-          {/* Original Wiki Link */}
           <a
             href={scp.url}
             target="_blank"
             rel="noopener noreferrer"
-            title="Consulter l'archive originale Wikidot"
-            className="flex items-center gap-1.5 bg-scp-surface hover:bg-scp-card text-slate-400 hover:text-slate-200 px-3 py-1.5 rounded-lg border border-scp-border transition-colors"
+            title="Consulter l'archive originale sur le wiki"
+            className={BOUTON_OUTIL}
           >
             <ExternalLink className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">[ WIKIDOT ORIGINE ]</span>
+            <span className="hidden sm:inline">Source</span>
           </a>
         </div>
       </div>
 
-      {/* Official ACS (Anomaly Classification System) Dossier Header */}
-      <div className={`relative bg-scp-surface border-2 rounded-2xl mb-6 shadow-2xl overflow-hidden scipnet-box ${
-        scp.objectClass === 'Keter' || scp.objectClass === 'Apollyon'
-          ? 'border-red-600/80 hazard-stripes'
-          : scp.objectClass === 'Euclid'
-          ? 'border-amber-600/80 hazard-stripes-amber'
-          : 'border-emerald-600/80'
-      }`}>
-        {/* Classified Watermark Background Stamp */}
-        <div className="absolute right-4 bottom-2 opacity-15 pointer-events-none select-none font-mono font-black text-7xl sm:text-8xl rotate-[-10deg] tracking-widest text-red-500">
-          TOP SECRET
+      {/* En-tête de classification (ACS)
+          Seule la classe d'objet est connue du corpus : on n'invente ni niveau de
+          perturbation ni niveau de risque pour remplir la grille. Ce qui est
+          affiché est ce que le dossier dit. */}
+      <header
+        className="relative border border-bordure rounded mb-6 overflow-hidden shadow-relief"
+        style={styleFondClasse(scp.objectClass)}
+      >
+        {/* Liseré de classification. Rayé pour Keter et Apollyon seulement. */}
+        <div
+          className={`h-1 ${habillage.dangereuse ? 'hazard-stripes' : ''}`}
+          style={habillage.dangereuse ? undefined : { backgroundColor: habillage.couleur }}
+          aria-hidden="true"
+        />
+
+        <div className="px-3 sm:px-5 py-2 border-b border-bordure-faible flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-mono text-xs text-texte-attenue tracking-technique uppercase">
+          <span>Dossier classifié RAISA · Accréditation 4</span>
+          <span className="text-systeme">Confinement maintenu · Site-19</span>
         </div>
 
-        {/* ACS System Top Bar */}
-        <div className="bg-slate-950/90 border-b border-scp-border/80 px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] text-slate-400">
-          <div className="flex items-center gap-3">
-            <span className="text-red-400 font-bold tracking-wider">
-              DOSSIER CLASSIFIÉ RAISA // SEC-02
-            </span>
-            <span className="hidden sm:inline text-slate-600">•</span>
-            <span className="text-slate-300 hidden sm:inline">NIVEAU D'ACCRÉDITATION : 4 (SECRET DÉFENSE)</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-emerald-400 font-bold">CONFINEMENT MAINTENU // SITE-19</span>
-          </div>
-        </div>
-
-        {/* ACS Content Body */}
-        <div className="p-5 sm:p-7 relative z-10">
-          <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
-            <div>
+        <div className="p-4 sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-3 mb-2">
-                <span className="font-mono text-3xl sm:text-4xl font-black text-white tracking-wider terminal-glow-red">
+                <span className="font-mono text-3xl font-bold text-texte tracking-tight">
                   {scp.scpNumber}
                 </span>
 
-                {/* ACS Containment Class Badge */}
-                <span className={`text-xs font-mono font-black uppercase px-3 py-1 rounded border tracking-wider flex items-center gap-1.5 shadow ${
-                  scp.objectClass === 'Keter' || scp.objectClass === 'Apollyon'
-                    ? 'bg-red-950 border-red-500 text-red-300'
-                    : scp.objectClass === 'Euclid'
-                    ? 'bg-amber-950 border-amber-500 text-amber-300'
-                    : 'bg-emerald-950 border-emerald-500 text-emerald-300'
-                }`}>
-                  <Biohazard className="w-3.5 h-3.5" />
-                  <span>CLASSE : {scp.objectClass}</span>
+                <span
+                  className="font-mono text-xs font-semibold uppercase tracking-technique px-2.5 py-1 rounded-sm border"
+                  style={styleBadgeClasse(scp.objectClass)}
+                >
+                  Classe · {scp.objectClass}
                 </span>
               </div>
 
-              <h2 className="text-lg sm:text-xl font-bold font-mono text-slate-100 mb-1">
+              <h2 className="font-serif text-xl text-texte leading-snug">
                 {scp.alternateTitle ? scp.alternateTitle : scp.title}
               </h2>
             </div>
 
-            {/* Play Button */}
             <button
-              onClick={() => {
-                if (isPlaying) {
-                  speechEngine.pause();
-                } else {
-                  speechEngine.play();
-                }
-              }}
-              className="flex items-center gap-2.5 bg-red-700 hover:bg-red-600 text-white text-xs sm:text-sm font-mono font-bold px-5 py-3 rounded-xl shadow-xl shadow-red-950/60 transition-all hover:scale-105 active:scale-95 shrink-0"
+              onClick={() => (isPlaying ? speechEngine.pause() : speechEngine.play())}
+              className="shrink-0 inline-flex items-center gap-2 h-11 px-5 rounded bg-accent hover:bg-accent-texte active:bg-accent-fort text-texte text-sm font-mono font-semibold transition-colors"
             >
               {isPlaying ? (
                 <>
-                  <Pause className="w-4 h-4 fill-white" />
-                  <span>METTRE EN PAUSE</span>
+                  <Pause className="w-4 h-4 fill-current" />
+                  <span>Pause</span>
                 </>
               ) : (
                 <>
-                  <Play className="w-4 h-4 fill-white ml-0.5" />
-                  <span>LANCER L'ÉCOUTE ROLEPLAY</span>
+                  <Play className="w-4 h-4 fill-current" />
+                  <span>Écouter</span>
                 </>
               )}
             </button>
@@ -286,44 +231,50 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
 
           <BandeauEntites slug={scp.slug} languageCode={languageCode} onOuvrirEntite={onOuvrirEntite} />
 
-          {/* Tags */}
-          {scp.tags && (
-            <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-scp-border/60">
-              {scp.tags.map(t => (
-                <span key={t} className="text-[10px] font-mono bg-slate-900/80 border border-scp-border px-2 py-0.5 rounded text-slate-400">
-                  #{t}
+          {scp.tags && scp.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-4 pt-4 border-t border-bordure-faible">
+              {scp.tags.map((t) => (
+                <span
+                  key={t}
+                  className="font-mono text-xs px-1.5 py-0.5 rounded-sm border border-bordure text-texte-attenue"
+                >
+                  {t}
                 </span>
               ))}
             </div>
           )}
         </div>
-      </div>
+      </header>
 
-      {/* Tabs & Auto-Scroll Header */}
-      <div className="flex items-center justify-between gap-2 mb-4 border-b border-scp-border pb-2 font-mono">
-        <div className="flex items-center gap-2">
+      {/* Onglets et suivi de lecture */}
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-bordure pb-2">
+        <div className="flex items-center gap-1" role="tablist">
           <button
+            role="tab"
+            aria-selected={activeTab === 'roleplay'}
             onClick={() => setActiveTab('roleplay')}
-            className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all ${
+            className={`inline-flex items-center gap-1.5 h-8 px-3 rounded text-xs font-mono transition-colors ${
               activeTab === 'roleplay'
-                ? 'bg-red-950/70 border-red-700/70 text-red-300 font-bold shadow'
-                : 'bg-transparent border-transparent text-slate-400 hover:text-slate-200'
+                ? 'bg-surface-4 text-texte border border-accent-texte shadow-relief'
+                : 'text-texte-attenue hover:text-texte border border-transparent'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-red-400" />
-            <span>Transcription Multi-Voix ({segments.length} répliques)</span>
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Transcription · {segments.length} répliques</span>
           </button>
 
           <button
+            role="tab"
+            aria-selected={activeTab === 'raw'}
             onClick={() => setActiveTab('raw')}
-            className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all ${
+            className={`inline-flex items-center gap-1.5 h-8 px-3 rounded text-xs font-mono transition-colors ${
               activeTab === 'raw'
-                ? 'bg-red-950/70 border-red-700/70 text-red-300 font-bold shadow'
-                : 'bg-transparent border-transparent text-slate-400 hover:text-slate-200'
+                ? 'bg-surface-4 text-texte border border-accent-texte shadow-relief'
+                : 'text-texte-attenue hover:text-texte border border-transparent'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>Archive Brute</span>
+            <span>Archive brute</span>
           </button>
         </div>
 
@@ -334,21 +285,22 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
                 sfx.playTerminalBeep();
                 scrollToActiveSegment(currentSegmentIndex, true);
               }}
-              title="Recentrer immédiatement l'affichage sur la réplique active"
-              className="flex items-center gap-1 text-[11px] font-mono text-slate-300 hover:text-red-300 bg-slate-900/90 border border-slate-700/80 hover:border-red-600/70 px-2 py-1 rounded-lg transition-colors shadow-sm"
+              title="Recentrer l'affichage sur la réplique en cours"
+              className={BOUTON_OUTIL}
             >
-              <Activity className="w-3 h-3 text-red-400 shrink-0" />
-              <span>[ RECENTRER ]</span>
+              <Crosshair className="w-3.5 h-3.5" />
+              <span>Recentrer</span>
             </button>
 
-            <label className="flex items-center gap-1.5 text-[11px] font-mono text-slate-300 cursor-pointer select-none bg-slate-900/90 border border-slate-700/80 px-2.5 py-1 rounded-lg hover:border-slate-500 transition-colors">
+            <label className="inline-flex items-center gap-2 h-8 px-3 rounded text-xs font-mono text-texte-second bg-surface-2 border border-bordure cursor-pointer select-none hover:border-bordure-forte transition-colors">
               <input
                 type="checkbox"
                 checked={autoScroll}
                 onChange={(e) => setAutoScroll(e.target.checked)}
-                className="accent-red-600 rounded cursor-pointer w-3.5 h-3.5"
+                className="w-3.5 h-3.5 cursor-pointer"
+                style={{ accentColor: 'var(--accent)' }}
               />
-              <span>{autoScroll ? 'SUIVI : ON' : 'SUIVI : OFF'}</span>
+              <span>Suivi</span>
             </label>
           </div>
         )}
@@ -364,34 +316,31 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
         />
       )}
 
-      {/* Tab 1: Roleplay Script View */}
       {activeTab === 'roleplay' ? (
-        <div className="space-y-3 scp-document">
+        <div className="space-y-1.5 scp-document">
           {segments.map((segment, index) => {
             const isCurrent = index === currentSegmentIndex;
             const isActivelyPlaying = isCurrent && isPlaying;
-            const style = ROLE_STYLES[segment.role] || ROLE_STYLES.narrator;
+            const couleurRole = COULEUR_ROLE[segment.role] || COULEUR_ROLE.narrator;
 
-            // Render log markers distinctly
+            // Les marqueurs de journal séparent deux parties du dossier : ils se
+            // lisent comme un intertitre, pas comme une réplique.
             if (segment.isLogMarker) {
               return (
                 <div
                   key={segment.id}
-                  ref={(el) => { segmentRefs.current[index] = el; }}
+                  ref={(el) => {
+                    segmentRefs.current[index] = el;
+                  }}
                   onClick={() => onPlaySegment(index)}
-                  className={`cursor-pointer text-center py-2.5 px-4 my-4 rounded-xl border transition-all font-mono text-xs tracking-wider flex items-center justify-center gap-2 ${
-                    isCurrent 
-                      ? 'bg-red-950/90 border-red-500 text-red-200 ring-2 ring-red-500/70 scale-[1.015] shadow-xl shadow-red-950/60' 
-                      : 'bg-slate-900/80 border-slate-700/80 text-slate-400 hover:border-slate-500'
+                  className={`cursor-pointer my-5 py-2.5 px-4 rounded border font-mono text-xs uppercase tracking-technique flex items-center justify-center gap-2 transition-colors ${
+                    isCurrent
+                      ? 'bg-surface-3 border-accent-texte text-texte shadow-lecture'
+                      : 'bg-surface-1 border-bordure text-texte-attenue hover:border-bordure-forte'
                   }`}
                 >
-                  <Radio className={`w-3.5 h-3.5 text-red-400 ${isActivelyPlaying ? 'animate-pulse' : ''}`} />
-                  <span className="font-bold tracking-widest">{segment.text.toUpperCase()}</span>
-                  {isCurrent && !isPlaying && (
-                    <span className="text-[10px] bg-amber-950 text-amber-300 border border-amber-600/70 px-1.5 py-0.2 rounded ml-2">
-                      EN PAUSE
-                    </span>
-                  )}
+                  <Radio className="w-3.5 h-3.5 shrink-0" />
+                  <span className="font-semibold">{segment.text.toUpperCase()}</span>
                 </div>
               );
             }
@@ -399,100 +348,104 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
             return (
               <div
                 key={segment.id}
-                ref={(el) => { segmentRefs.current[index] = el; }}
+                ref={(el) => {
+                  segmentRefs.current[index] = el;
+                }}
                 onClick={() => {
                   sfx.playTerminalBeep();
                   onPlaySegment(index);
                 }}
-                className={`group relative p-4 rounded-xl border transition-all duration-200 cursor-pointer ${
+                style={
+                  isCurrent
+                    ? undefined
+                    : {
+                        borderLeftColor: couleurRole,
+                        // 6 % : la réplique se rattache à son rôle d'un coup d'œil,
+                        // sans que le fond dispute la place au texte.
+                        backgroundColor: `color-mix(in srgb, ${couleurRole} 6%, var(--surface-1))`
+                      }
+                }
+                className={`group relative py-3 pl-4 pr-3 rounded-r border-l-4 border-y border-r cursor-pointer transition-colors ${
                   segment.links && segment.links.length > 0 ? 'segment-has-link ' : ''
                 }${
-                  isCurrent
-                    ? isActivelyPlaying
-                      ? 'bg-red-950/40 border-red-500 ring-2 ring-red-500/80 shadow-2xl shadow-red-950/90 scale-[1.015]'
-                      : 'bg-amber-950/25 border-amber-500/80 ring-1 ring-amber-500/60 shadow-lg shadow-amber-950/50 scale-[1.005]'
-                    : `${style.bg} ${style.border} hover:border-slate-500`
+                  isActivelyPlaying
+                    ? 'bg-surface-3 border-accent-texte shadow-lecture'
+                    : isCurrent
+                    ? 'bg-surface-2 border-classe-euclid'
+                    : 'segment-repos border-y-transparent border-r-transparent'
                 }`}
               >
-                {/* Speaker Header */}
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-md border flex items-center gap-1.5 ${
-                      isCurrent ? 'bg-black/90 border-red-500 text-white shadow' : style.badge
-                    }`}>
-                      <User className="w-3 h-3" />
-                      <span className="font-bold">{segment.speaker}</span>
+                {/* Qui parle */}
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <div className="flex items-center gap-2 flex-wrap min-w-0">
+                    <span
+                      className="etiquette-locuteur truncate"
+                      style={{ color: isCurrent ? 'var(--texte)' : couleurRole }}
+                    >
+                      {segment.speaker}
                       {segment.gender === 'female' && (
-                        <span className="text-[11px] font-black text-pink-400 ml-0.5" title="Scientifique / Personnage Féminin">♀</span>
+                        <span className="ml-1 opacity-70" title="Personnage féminin">♀</span>
                       )}
                       {segment.gender === 'male' && (
-                        <span className="text-[11px] font-black text-blue-400 ml-0.5" title="Scientifique / Personnage Masculin">♂</span>
+                        <span className="ml-1 opacity-70" title="Personnage masculin">♂</span>
                       )}
                     </span>
 
-                    {/* Role & Voice Signature badges */}
-                    {segment.voiceSignature && (
-                      <span className="hidden sm:inline text-[9px] font-mono text-emerald-400 bg-emerald-950/60 px-1.5 py-0.2 rounded border border-emerald-800/40" title={`Timbre unique : ${segment.voiceSignature.pitch}`}>
-                        Voix unique
-                      </span>
-                    )}
-
                     {segment.isHeader && (
-                      <span className="text-[10px] font-mono uppercase px-1.5 py-0.2 rounded bg-slate-800/80 border border-slate-600/70 text-slate-300 font-semibold">
-                        Protocole
+                      <span className="font-mono text-xs uppercase tracking-technique text-texte-attenue">
+                        · Protocole
                       </span>
                     )}
 
                     {isActivelyPlaying && (
-                      <div className="flex items-center gap-1.5 text-[10px] font-mono text-red-400 font-bold">
+                      <span className="flex items-end gap-0.5 h-4 shrink-0" aria-label="Lecture en cours">
                         <span className="visualizer-bar" />
                         <span className="visualizer-bar" />
                         <span className="visualizer-bar" />
-                        <span className="ml-1 tracking-wide animate-pulse">TRANSMISSION ACTIVE</span>
-                      </div>
+                      </span>
                     )}
 
                     {isCurrent && !isPlaying && (
-                      <div className="flex items-center gap-1 text-[10px] font-mono text-amber-400 bg-amber-950/80 px-2 py-0.2 rounded border border-amber-600/60">
-                        <span>CURSEUR ACTIF // EN PAUSE</span>
-                      </div>
+                      <span className="font-mono text-xs text-classe-euclid tracking-technique uppercase">
+                        · En pause
+                      </span>
                     )}
                   </div>
 
-                  <span className="text-[10px] font-mono text-slate-500 group-hover:text-slate-400">
-                    #{segment.id}
+                  {/* Métadonnées secondaires : présentes, mais elles attendent
+                      qu'on les cherche au lieu de disputer la place au texte. */}
+                  <span className="shrink-0 font-mono text-xs text-transparent group-hover:text-texte-attenue transition-colors tabular-nums">
+                    {segment.voiceSignature ? '♪ ' : ''}
+                    {segment.id}
                   </span>
                 </div>
 
-                {/* Spoken Line & Stage Directions */}
-                <div className="text-sm leading-relaxed">
-                  {segment.stageDirections && segment.stageDirections.length > 0 && (
-                    <div className="text-xs italic text-slate-400 mb-1 font-mono">
-                      {segment.stageDirections.map((d, i) => (
-                        <span key={i} className="mr-2 text-amber-300/80">
-                          ({d})
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <p className={`${style.text} ${isCurrent ? 'font-medium text-white' : ''}`}>
-                    <SpokenLine
-                      text={segment.text}
-                      links={segment.links}
-                      activeWordIndex={isCurrent ? activeWordIndex : -1}
-                      onEnqueueLink={onEnqueueLink}
-                      onOpenLink={onOpenLink}
-                    />
+                {segment.stageDirections && segment.stageDirections.length > 0 && (
+                  <p className="font-serif italic text-sm text-texte-attenue mb-1">
+                    {segment.stageDirections.map((d, i) => (
+                      <span key={i} className="mr-2">({d})</span>
+                    ))}
                   </p>
-                </div>
+                )}
+
+                <p className={`prose-dossier max-w-lecture ${isCurrent ? 'text-texte' : ''}`}>
+                  <SpokenLine
+                    text={segment.text}
+                    links={segment.links}
+                    activeWordIndex={isCurrent ? activeWordIndex : -1}
+                    onEnqueueLink={onEnqueueLink}
+                    onOpenLink={onOpenLink}
+                  />
+                </p>
               </div>
             );
           })}
         </div>
       ) : (
-        /* Tab 2: Raw Archive Text */
-        <div className="bg-scp-surface border border-scp-border rounded-xl p-5 sm:p-7 font-mono text-sm leading-relaxed text-slate-300 whitespace-pre-wrap">
-          {scp.textContent}
+        <div className="bg-surface-1 border border-bordure rounded p-5 sm:p-7">
+          <pre className="prose-dossier max-w-lecture whitespace-pre-wrap font-serif">
+            {scp.textContent}
+          </pre>
         </div>
       )}
     </div>

@@ -8,12 +8,61 @@
 @tailwind components;
 @tailwind utilities;
 
+// ---------------------------------------------------------------------------
+// Socle du document
+//
+// La sans-serif tient le chrome d'interface ; la serif est réservée à la prose
+// des dossiers (`.prose-dossier`) et la monospace aux données et au terminal.
+// C'est la séparation qui fait qu'un dossier ressemble à un document plutôt
+// qu'à un journal de console.
+// ---------------------------------------------------------------------------
+html {
+  // Aucun `font-size` forcé : le réglage de taille du navigateur doit passer.
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background-color: $color-bg;
-  color: $text-primary;
+  background-color: $fond;
+  color: $texte;
   font-family: $font-sans;
+  font-size: $t-base;
+  line-height: $interligne-chrome;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   @include custom-scrollbar;
+}
+
+// Les titres restent en interface : c'est le corps du dossier qui passe en serif.
+h1, h2, h3, h4 {
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+// ---------------------------------------------------------------------------
+// Socle tactile
+//
+// `touch-action: manipulation` supprime le délai de 300 ms que les navigateurs
+// mobiles s'accordent pour guetter un double-tap de zoom : sans lui, chaque
+// appui sur un bouton de l'application répond un tiers de seconde trop tard.
+// Le surlignage gris d'Android, lui, tombe par-dessus des fonds déjà colorés et
+// donne un clignotement sale ; les états `active:` du thème le remplacent.
+// ---------------------------------------------------------------------------
+button,
+a,
+[role='button'],
+input,
+select,
+textarea,
+summary {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+// Une sélection rouge sourd plutôt que le rouge vif de Tailwind.
+::selection {
+  background: rgba(196, 48, 43, 0.45);
+  color: $texte;
 }
 
 .no-scrollbar::-webkit-scrollbar {

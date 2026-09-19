@@ -53,9 +53,13 @@ captures/
 .idea/navEditor.xml
 
 # Keystore files
-# Uncomment the following lines if you do not want to check your keystore files in.
-#*.jks
-#*.keystore
+# DÉCOMMENTÉ VOLONTAIREMENT : ce dépôt est public. Une clé de signature poussée
+# sur GitHub ne peut plus jamais servir — c'est elle, et elle seule, qui prouve
+# au Play Store que les mises à jour viennent bien de vous, et Google ne la
+# remplace pas. Le fichier de mots de passe suit la même règle.
+*.jks
+*.keystore
+keystore.properties
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild

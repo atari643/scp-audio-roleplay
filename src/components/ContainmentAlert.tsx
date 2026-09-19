@@ -10,10 +10,10 @@ interface ContainmentAlertProps {
 }
 
 const CLASS_LEVELS: Record<string, { level: number; label: string; color: string }> = {
-  'Keter':     { level: 3, label: 'ALERTE KETER',     color: '#dc2626' },
-  'Apollyon':  { level: 4, label: 'APOLLYON CRITIQUE', color: '#dc2626' },
-  'Thaumiel':  { level: 2, label: 'ALERTE THAUMIEL',  color: '#a855f7' },
-  'Euclid':    { level: 1, label: 'SURVEILLANCE EUCLID', color: '#f59e0b' },
+  'Keter':     { level: 3, label: 'ALERTE KETER',     color: 'var(--classe-keter)' },
+  'Apollyon':  { level: 4, label: 'APOLLYON CRITIQUE', color: 'var(--classe-apollyon)' },
+  'Thaumiel':  { level: 2, label: 'ALERTE THAUMIEL',  color: 'var(--classe-thaumiel)' },
+  'Euclid':    { level: 1, label: 'SURVEILLANCE EUCLID', color: 'var(--classe-euclid)' },
 };
 
 /**
@@ -52,7 +52,7 @@ export const ContainmentAlert: React.FC<ContainmentAlertProps> = ({
       className="fixed top-16 left-3 z-[900] w-fit max-w-[calc(100vw-1.5rem)]"
     >
       <div
-        className="flex items-center gap-2 rounded-md border px-2.5 py-1.5 font-mono text-[11px] backdrop-blur-sm"
+        className="flex items-center gap-2 rounded-md border px-2.5 py-1.5 font-mono text-xs backdrop-blur-sm"
         style={{
           borderColor: `${alertDef.color}55`,
           backgroundColor: 'rgba(10,12,18,0.82)',
@@ -68,12 +68,12 @@ export const ContainmentAlert: React.FC<ContainmentAlertProps> = ({
         >
           {alertDef.label}
         </span>
-        <span className="text-slate-500 whitespace-nowrap">
+        <span className="text-texte-attenue whitespace-nowrap">
           · {scpNumber.toUpperCase()}
         </span>
         <button
           onClick={() => { setVisible(false); onDismissRef.current(); }}
-          className="-m-1 ml-0.5 p-2 text-slate-600 hover:text-slate-300"
+          className="-m-1 ml-0.5 p-2 text-texte-attenue hover:text-texte-second"
           aria-label="Fermer l'alerte de confinement"
         >
           [x]

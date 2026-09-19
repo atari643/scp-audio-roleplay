@@ -20,6 +20,18 @@ type StatusCallback = (status: PlayerStatus) => void;
 
 export type TtsEngineMode = 'neural' | 'system';
 
+/**
+ * Où joindre le point d'accès de synthèse.
+ *
+ * « /api/tts » sur les hébergements qui servent la fonction avec le site (développement,
+ * `npm run serve`, Vercel). Le miroir GitHub Pages, lui, est purement statique : sans URL
+ * complète pointant sur la fonction déployée ailleurs, Chrome et Firefox retomberaient sur
+ * `speechSynthesis` et perdraient les voix neurales. D'où cette variable, posée à la
+ * compilation par le workflow Pages. Edge et la WebView Android ne passent de toute façon
+ * pas par ici : `canSynthesizeDirectly()` leur fait joindre le service en direct.
+ */
+const POINT_ACCES_TTS = import.meta.env.VITE_TTS_ENDPOINT || '/api/tts';
+
 /** Un caviardage repéré dans l'audio synthétisé, en secondes. */
 interface CensorSpan {
   start: number;
@@ -853,7 +865,7 @@ class SpeechEngine {
       volume
     });
 
-    return `/api/tts?${params.toString()}`;
+    return `${POINT_ACCES_TTS}?${params.toString()}`;
   }
 
   // Pre-fetch an audio segment and store its blob URL in memory

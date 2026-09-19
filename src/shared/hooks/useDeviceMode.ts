@@ -1,60 +1,51 @@
 import { useState, useEffect, useCallback } from 'react';
+import { storageService, DeviceMode } from '../../services/storageService';
 
-export type DeviceMode = 'auto' | 'desktop' | 'mobile';
+export type { DeviceMode };
 
-const STORAGE_KEY = 'scp_device_mode';
+/** Seuil d'aiguillage automatique, aligné sur le `md` de Tailwind. */
+const REQUETE_MOBILE = '(max-width: 767px)';
 
+/**
+ * Choix de la vue : automatique selon la largeur, ou forcé par l'utilisateur.
+ *
+ * L'implémentation précédente gardait `window.innerWidth` dans un state et
+ * écoutait `resize`. Sur téléphone, la barre d'URL qui se rétracte déclenche
+ * `resize` en rafale : chaque pixel re-rendait l'application entière. On
+ * n'écoute donc plus qu'un booléen, via `matchMedia`, qui ne change qu'au
+ * franchissement du seuil.
+ */
 export function useDeviceMode() {
-  const [mode, setMode] = useState<DeviceMode>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === 'desktop' || saved === 'mobile' || saved === 'auto') {
-        return saved;
-      }
-    } catch {
-      // Ignore localStorage error
-    }
-    return 'auto';
-  });
+  const [mode, setMode] = useState<DeviceMode>(() => storageService.getDeviceMode());
 
-  const [windowWidth, setWindowWidth] = useState<number>(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth;
-    }
-    return 1024;
+  const [estEtroit, setEstEtroit] = useState<boolean>(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return false;
+    return window.matchMedia(REQUETE_MOBILE).matches;
   });
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mql = window.matchMedia(REQUETE_MOBILE);
+    const surChangement = (e: MediaQueryListEvent) => setEstEtroit(e.matches);
+    mql.addEventListener('change', surChangement);
+    return () => mql.removeEventListener('change', surChangement);
   }, []);
 
-  const setDeviceMode = useCallback((newMode: DeviceMode) => {
-    setMode(newMode);
-    try {
-      localStorage.setItem(STORAGE_KEY, newMode);
-    } catch {
-      // Ignore localStorage error
-    }
+  const setDeviceMode = useCallback((nouveau: DeviceMode) => {
+    setMode(nouveau);
+    storageService.saveDeviceMode(nouveau);
   }, []);
+
+  const isMobile = mode === 'mobile' || (mode === 'auto' && estEtroit);
 
   const toggleMode = useCallback(() => {
-    // If currently rendering as mobile, switch to desktop; if desktop, switch to mobile
-    const currentIsMobile = mode === 'mobile' || (mode === 'auto' && windowWidth < 768);
-    setDeviceMode(currentIsMobile ? 'desktop' : 'mobile');
-  }, [mode, windowWidth, setDeviceMode]);
-
-  const isMobile = mode === 'mobile' || (mode === 'auto' && windowWidth < 768);
+    setDeviceMode(isMobile ? 'desktop' : 'mobile');
+  }, [isMobile, setDeviceMode]);
 
   return {
     mode,
     isMobile,
     setDeviceMode,
-    toggleMode,
-    windowWidth
+    toggleMode
   };
 }

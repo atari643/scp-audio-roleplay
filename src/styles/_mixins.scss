@@ -1,27 +1,59 @@
 @use 'variables' as *;
 
-@mixin classified-border($color: $color-border) {
-  border: 1px solid $color;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+// Encadré de document : bordure franche, ombre neutre, angles droits.
+@mixin cadre-document($couleur: $bordure) {
+  border: 1px solid $couleur;
+  border-radius: $r;
+  box-shadow: $ombre-2;
 }
 
-@mixin pulse-glow($color: $color-scp-red) {
-  box-shadow: 0 0 15px rgba($color, 0.4);
+// Surface relevee : le filet clair d'un pixel sur l'arete haute est ce qui fait
+// qu'un panneau se lit comme pose sur la page plutot que decoupe dedans.
+@mixin surface-relevee($niveau: $surface-2) {
+  background-color: $niveau;
+  box-shadow: $relief-haut;
+}
+
+// Anneau de focus. Un seul dans toute l'application : c'est ce qui rend la
+// navigation au clavier possible. L'ancienne version en avait deux en tout.
+@mixin anneau-focus($couleur: $accent-texte) {
+  outline: 2px solid $couleur;
+  outline-offset: 2px;
+  border-radius: $r-sm;
+}
+
+// Cible tactile confortable. Le mobile est une cible de premier rang ici.
+@mixin cible-tactile($taille: 44px) {
+  min-width: $taille;
+  min-height: $taille;
 }
 
 @mixin custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: $bordure-forte $fond;
+
   &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
   &::-webkit-scrollbar-track {
-    background: $color-bg;
+    background: $fond;
   }
   &::-webkit-scrollbar-thumb {
-    background: $color-border;
-    border-radius: 3px;
+    background: $bordure;
+    border-radius: 0;
+    border: 2px solid $fond;
     &:hover {
-      background: $color-scp-red;
+      background: $bordure-forte;
     }
   }
+}
+
+// Étiquette technique : le petit texte monospace des métadonnées.
+@mixin etiquette-technique {
+  font-family: $font-mono;
+  font-size: $t-xs;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $texte-attenue;
 }

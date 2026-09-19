@@ -83,7 +83,7 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
       <div className="absolute top-4 right-4 z-20">
         <button
           onClick={handleFinish}
-          className="text-[11px] font-mono text-slate-600 hover:text-red-400 border border-slate-900 hover:border-red-900/60 bg-black px-3 py-1 rounded transition-colors"
+          className="text-xs font-mono text-texte-attenue hover:text-accent-texte border border-bordure-faible hover:border-accent-texte/60 bg-black px-3 py-1 rounded transition-colors"
         >
           [ PASSER L'INOCULATION ]
         </button>
@@ -91,10 +91,10 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
 
       <div className="relative z-10 flex flex-col items-center max-w-lg w-full text-center">
         {/* Top Warning Badge */}
-        <div className="flex items-center gap-2 px-3 py-1 rounded bg-red-950/80 border border-red-700 text-red-400 font-mono text-xs font-bold tracking-widest mb-6 animate-alarm-pulse">
-          <Biohazard className="w-4 h-4 text-red-500 animate-spin" style={{ animationDuration: '8s' }} />
+        <div className="flex items-center gap-2 px-3 py-1 rounded bg-surface-3/80 border border-accent-texte text-accent-texte font-mono text-xs font-bold tracking-widest mb-6 animate-alarm-pulse">
+          <Biohazard className="w-4 h-4 text-accent-texte animate-spin" style={{ animationDuration: '8s' }} />
           <span>AVERTISSEMENT RAISA : AGENT MÉMÉTIQUE TUEUR ACTIF</span>
-          <ShieldAlert className="w-4 h-4 text-red-500" />
+          <ShieldAlert className="w-4 h-4 text-accent-texte" />
         </div>
 
         {/* Berryman-Langford Hypnotic Fractal */}
@@ -127,7 +127,7 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
           {/* Moving Laser Scan Line */}
           {phase === 'scanning' && (
             <div
-              className="absolute left-0 right-0 h-1 bg-red-500 pointer-events-none"
+              className="absolute left-0 right-0 h-1 bg-accent-texte pointer-events-none"
               style={{
                 animation: 'memetic-scan 2.2s ease-in-out infinite',
                 boxShadow: '0 0 12px 3px rgba(239, 68, 68, 0.9)',
@@ -139,37 +139,37 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
 
         {/* Text and Protocol Notice */}
         <div className="w-full">
-          <h2 className="text-white font-mono font-bold text-base sm:text-lg tracking-wider mb-2">
+          <h2 className="text-texte font-mono font-bold text-base sm:text-lg tracking-wider mb-2">
             PROTOCOLE DE SÉCURITÉ BERRYMAN-LANGFORD
           </h2>
-          <p className="text-slate-400 font-mono text-xs leading-relaxed mb-6 max-w-md mx-auto">
+          <p className="text-texte-attenue font-mono text-xs leading-relaxed mb-6 max-w-md mx-auto">
             La consultation des dossiers classifiés de la Fondation requiert une inoculation
             mémétique certifiée. Tout personnel non vacciné subira un arrêt cardiaque réflexe.
           </p>
 
           {/* Phase 1: Initializing */}
           {phase === 'warning' && (
-            <div className="py-4 font-mono text-xs text-amber-400 flex items-center justify-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+            <div className="py-4 font-mono text-xs text-classe-euclid flex items-center justify-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-classe-euclid animate-ping" />
               <span>CALIBRATION DU SCANNER SYNAPTIQUE... NE DÉTOURNEZ PAS LE REGARD</span>
             </div>
           )}
 
           {/* Phase 2: Scanning */}
           {phase === 'scanning' && (
-            <div className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl shadow-xl">
+            <div className="w-full bg-fond border border-bordure p-4 rounded-xl shadow-xl">
               <div className="flex items-center justify-between text-xs font-mono mb-2">
-                <span className="text-amber-400 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+                <span className="text-classe-euclid flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-classe-euclid animate-ping" />
                   ANALYSE DU RYTHME CÉRÉBRAL
                 </span>
-                <span className="text-slate-400">ONDES THÊTA : {telemetryVal}</span>
+                <span className="text-texte-attenue">ONDES THÊTA : {telemetryVal}</span>
               </div>
 
               {/* Slow retro progress bar */}
-              <div className="h-2.5 bg-black rounded-full overflow-hidden border border-slate-700 p-0.5">
+              <div className="h-2.5 bg-black rounded-full overflow-hidden border border-bordure p-0.5">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-red-600 via-amber-500 to-emerald-500 transition-all duration-100 shadow-lg"
+                  className="h-full rounded-full bg-gradient-to-r from-surface-3 via-surface-3 to-surface-3 transition-all duration-100 shadow-lg"
                   style={{
                     width: `${scanProgress}%`,
                     boxShadow: '0 0 10px rgba(245, 158, 11, 0.5)'
@@ -177,23 +177,23 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
                 />
               </div>
 
-              <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 mt-2">
+              <div className="flex items-center justify-between text-xs font-mono text-texte-attenue mt-2">
                 <span>RÉSISTANCE COGNITIVE : 99.8%</span>
-                <span className="text-amber-300 font-bold">{Math.round(scanProgress)}% EFFECTUÉ</span>
+                <span className="text-classe-euclid font-bold">{Math.round(scanProgress)}% EFFECTUÉ</span>
               </div>
             </div>
           )}
 
           {/* Phase 3: Confirmed */}
           {phase === 'confirmed' && (
-            <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/80 text-center animate-fade-scale shadow-2xl">
-              <div className="text-emerald-400 font-mono font-bold text-sm sm:text-base flex items-center justify-center gap-2 mb-1">
+            <div className="p-4 rounded-xl bg-surface-3/60 border border-classe-safe/80 text-center animate-fade-scale shadow-2xl">
+              <div className="text-classe-safe font-mono font-bold text-sm sm:text-base flex items-center justify-center gap-2 mb-1">
                 <span>✓ INOCULATION MÉMÉTIQUE VALIDÉE</span>
               </div>
-              <div className="text-xs font-mono text-emerald-200">
+              <div className="text-xs font-mono text-classe-safe">
                 STATUT : IMMUNISÉ // AUTORISATION ACCORDÉE PAR RAISA
               </div>
-              <div className="text-[11px] font-mono text-slate-400 mt-2">
+              <div className="text-xs font-mono text-texte-attenue mt-2">
                 Ouverture sécurisée du terminal SCiPNET...
               </div>
             </div>
@@ -201,7 +201,7 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
         </div>
 
         {/* Subtle Footer Telemetry */}
-        <div className="mt-8 text-[10px] font-mono text-slate-600 tracking-widest">
+        <div className="mt-8 text-xs font-mono text-texte-attenue tracking-widest">
           SÉCURITÉ SITE-19 // RAISA WATCHDOG ID : #941-MEM-BERRYMAN
         </div>
       </div>

@@ -60,7 +60,7 @@ export const ReadingQueue: React.FC<ReadingQueueProps> = ({ queue, onOpen, onRem
               <button
                 type="button"
                 onClick={() => onRemove(link.target)}
-                className="px-3 border-t border-slate-800/60 text-slate-500 hover:text-red-400 shrink-0"
+                className="px-3 border-t border-bordure/60 text-texte-attenue hover:text-accent-texte shrink-0"
                 style={{ minWidth: 44 }}
                 aria-label={`Retirer ${link.label} de la file`}
               >
@@ -71,7 +71,7 @@ export const ReadingQueue: React.FC<ReadingQueueProps> = ({ queue, onOpen, onRem
           <button
             type="button"
             onClick={onClear}
-            className="w-full py-2 text-[10px] font-mono uppercase tracking-wider text-slate-500 hover:text-slate-300 border-t border-slate-800/60"
+            className="w-full py-2 text-xs font-mono uppercase tracking-wider text-texte-attenue hover:text-texte-second border-t border-bordure/60"
           >
             Vider la file
           </button>

@@ -1,0 +1,30 @@
+name: "💡 Idée de fonctionnalité"
+description: "Une voix, un effet, un filtre, un écran qui manque."
+title: "[Idée] "
+labels: ["idée"]
+body:
+  - type: textarea
+    id: besoin
+    attributes:
+      label: Le manque
+      description: "Qu'est-ce que vous vouliez faire, et qu'est-ce qui vous en a empêché ?"
+      placeholder: "Je voulais écouter un dossier en marchant, mais la lecture s'arrête quand l'écran s'éteint."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposition
+    attributes:
+      label: Ce que vous imaginez
+      description: "Facultatif — le manque bien décrit suffit souvent."
+
+  - type: dropdown
+    id: portee
+    attributes:
+      label: Où cela se passe
+      options:
+        - Sur téléphone
+        - Sur ordinateur
+        - Les deux
+    validations:
+      required: true

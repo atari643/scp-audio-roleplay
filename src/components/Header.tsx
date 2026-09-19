@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ShieldAlert, 
-  Volume2, 
-  VolumeX, 
-  Sliders, 
-  Bookmark, 
-  Globe, 
-  Terminal,
+import {
+  ShieldAlert,
+  Volume2,
+  VolumeX,
+  Sliders,
+  Bookmark,
+  Globe,
   Dices,
   Tv,
-  Radio,
   FolderOpen
 } from 'lucide-react';
 import { LanguageBranch, SUPPORTED_LANGUAGES } from '../types/scp';
@@ -29,6 +27,26 @@ interface HeaderProps {
   onToggleCrt: () => void;
 }
 
+/**
+ * Gabarit commun à tous les boutons de la barre d'actions.
+ *
+ * L'ancienne version donnait à chaque bouton sa propre couleur de bordure au
+ * survol (ambre pour l'explorateur, rouge pour le studio, cyan pour le son) :
+ * six boutons, quatre traitements. Un seul gabarit désormais — la
+ * différenciation passe par l'icône et le libellé, pas par la teinte.
+ */
+const BOUTON_BARRE =
+  'inline-flex items-center gap-1.5 h-9 px-2.5 rounded text-xs font-mono ' +
+  'bg-surface-2 border border-bordure text-texte-second ' +
+  'hover:bg-surface-3 hover:text-texte hover:border-forte transition-colors';
+
+// État actif : l'élément se relève d'un cran. Le libellé reste en `texte` et
+// non en rouge, parce que `surface-4` ne porte pas de texte rouge (3,58:1) —
+// c'est la bordure qui dit l'accent.
+const BOUTON_BARRE_ACTIF =
+  'inline-flex items-center gap-1.5 h-9 px-2.5 rounded text-xs font-mono ' +
+  'bg-surface-4 border border-accent-texte text-texte shadow-relief transition-colors';
+
 export const Header: React.FC<HeaderProps> = ({
   currentLanguage,
   onLanguageChange,
@@ -47,8 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const timeStr = now.toISOString().substring(11, 19);
-      setSiteTime(timeStr);
+      setSiteTime(now.toISOString().substring(11, 19));
     };
     updateTime();
     const interval = setInterval(updateTime, 1000);
@@ -56,170 +73,152 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 bg-scp-surface/95 backdrop-blur border-b border-scp-border">
-      {/* Top Security Clearance Marquee / RAISA Terminal Bar */}
-      <div className="bg-red-950/90 border-b border-red-700/60 text-red-200 text-xs px-3 py-1.5 flex items-center justify-between font-mono tracking-wider">
-        <div className="flex items-center gap-2 overflow-hidden">
-          <ShieldAlert className="w-3.5 h-3.5 text-red-400 animate-pulse shrink-0" />
-          <span className="font-bold text-white bg-red-800 px-1.5 py-0.2 rounded text-[10px] tracking-widest uppercase">
-            RESTREINT // O5-CLEARANCE
+    <header className="sticky top-0 z-40 bg-surface-1/95 backdrop-blur border-b border-bordure">
+      {/* Bandeau de niveau d'accréditation.
+          Il informe : ni bouclier pulsant, ni point clignotant. Le seul mouvement
+          de l'application est réservé à ce qui est en cours de lecture. */}
+      <div className="border-b border-faible bg-fond px-3 sm:px-6 py-1.5 flex items-center justify-between gap-3 font-mono text-xs">
+        <div className="flex items-center gap-2 min-w-0">
+          <ShieldAlert className="w-3.5 h-3.5 text-accent-texte shrink-0" aria-hidden="true" />
+          <span className="text-accent-texte font-semibold tracking-technique uppercase shrink-0">
+            Restreint · O5
           </span>
-          <span className="hidden sm:inline text-red-300/90 truncate">
-            AVERTISSEMENT RAISA : TOUT ACCÈS NON AUTORISÉ EST ENREGISTRÉ ET TRAITÉ PAR DÉPLOIEMENT FIM
+          <span className="text-bordure-forte hidden sm:inline" aria-hidden="true">|</span>
+          <span className="hidden sm:inline text-texte-attenue truncate tracking-technique">
+            Tout accès non autorisé est enregistré et traité par la RAISA
           </span>
-          <span className="sm:hidden text-red-300 truncate">ARCHIVE SITE-19</span>
+          <span className="sm:hidden text-texte-attenue truncate">Archive Site-19</span>
         </div>
-        
-        <div className="flex items-center gap-2 sm:gap-4 text-[10px] font-mono shrink-0">
-          <span className="text-emerald-400 hidden lg:inline flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-            SCiPNET NODE 19-B
-          </span>
-          <span className="text-red-300/90 bg-red-900/60 border border-red-700/50 px-2 py-0.5 rounded">
-            UTC {siteTime || '00:00:00'}
+
+        {/* Horodatage et nœud réseau : de l'information machine, donc du cyan
+            système. Le rouge reste à la classification, à gauche. */}
+        <div className="flex items-center gap-3 shrink-0 tracking-technique">
+          <span className="hidden lg:inline text-texte-attenue">Nœud SCiPNET 19-B</span>
+          <span className="text-bordure-forte hidden lg:inline" aria-hidden="true">|</span>
+          <span className="tabular-nums text-texte-attenue">
+            UTC <span className="text-systeme">{siteTime || '00:00:00'}</span>
           </span>
         </div>
       </div>
 
-      {/* Main Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex items-center justify-between gap-2">
-        {/* Brand & Emblem */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-900 via-red-950 to-black p-1.5 border border-red-600/60 flex items-center justify-center shadow-lg shadow-red-950/40 relative group cursor-pointer">
-            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
-              <circle cx="50" cy="50" r="46" stroke="#ef4444" strokeWidth="5" strokeDasharray="12 4" />
-              <circle cx="50" cy="50" r="30" stroke="#f8fafc" strokeWidth="4" />
-              <circle cx="50" cy="50" r="14" fill="#ef4444" />
-              <path d="M50 4 L50 20 M44 14 L50 20 L56 14" stroke="#f8fafc" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M89.8 73 L76 65 M73 73 L76 65 L82 68" stroke="#f8fafc" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M10.2 73 L24 65 M18 68 L24 65 L27 73" stroke="#f8fafc" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Barre principale */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+        {/* Emblème et titre */}
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 shrink-0 flex items-center justify-center">
+            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full" aria-hidden="true">
+              <circle cx="50" cy="50" r="46" stroke="var(--accent-texte)" strokeWidth="4" strokeDasharray="12 4" />
+              <circle cx="50" cy="50" r="30" stroke="var(--texte)" strokeWidth="3.5" />
+              <circle cx="50" cy="50" r="13" fill="var(--accent-texte)" />
+              <path d="M50 4 L50 20 M44 14 L50 20 L56 14" stroke="var(--texte)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M89.8 73 L76 65 M73 73 L76 65 L82 68" stroke="var(--texte)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M10.2 73 L24 65 M18 68 L24 65 L27 73" stroke="var(--texte)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <div className="absolute inset-0 rounded-lg border border-red-400/30 animate-pulse pointer-events-none" />
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-base sm:text-lg font-bold font-mono tracking-tight text-white flex items-center gap-1">
-                FONDATION <span className="text-red-500 terminal-glow-red">SCP</span>
-              </h1>
-              <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-900 text-red-400 border border-red-800/60 font-mono font-bold tracking-wider">
-                SCiPNET AUDIO
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400 hidden sm:flex items-center gap-1 font-mono">
-              <span>Terminal d'Archive RAISA</span>
-              <span className="text-slate-600">•</span>
-              <span className="text-red-400/80">Audio Théâtralisé</span>
+
+          <div className="min-w-0">
+            <h1 className="text-base font-mono font-bold tracking-tight text-texte truncate">
+              FONDATION <span className="text-accent-texte">SCP</span>
+            </h1>
+            <p className="text-xs text-texte-attenue hidden sm:block font-mono tracking-technique truncate">
+              Terminal d'archive RAISA · Lecture audio
             </p>
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* CRT Terminal Screen Toggle */}
-          <button
-            onClick={() => {
-              sfx.playTerminalBeep();
-              onToggleCrt();
-            }}
-            title={crtEnabled ? "Désactiver le filtre écran CRT" : "Activer l'effet moniteur CRT terminal"}
-            className={`flex items-center gap-1 text-xs font-mono px-2.5 py-1.5 rounded-lg border transition-all ${
-              crtEnabled
-                ? 'bg-red-950/80 border-red-500 text-red-300 shadow-sm shadow-red-900/50'
-                : 'bg-scp-card border-scp-border text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Tv className="w-3.5 h-3.5 text-red-400" />
-            <span className="hidden lg:inline text-[11px] font-semibold">
-              CRT {crtEnabled ? 'ON' : 'OFF'}
-            </span>
-          </button>
-
-          {/* Language Selector */}
-          <div className="relative flex items-center bg-scp-card border border-scp-border rounded-lg px-2 py-1 hover:border-scp-red transition-colors">
-            <Globe className="w-4 h-4 text-slate-400 mr-1.5 hidden sm:inline" />
+        {/* Actions */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Sélecteur de branche */}
+          <div className="relative flex items-center h-9 bg-surface-2 border border-bordure rounded px-2 focus-within:border-accent-texte transition-colors">
+            <Globe className="w-4 h-4 text-texte-attenue mr-1.5 hidden sm:block" aria-hidden="true" />
             <select
               value={currentLanguage.code}
               onChange={(e) => {
-                const lang = SUPPORTED_LANGUAGES.find(l => l.code === e.target.value);
+                const lang = SUPPORTED_LANGUAGES.find((l) => l.code === e.target.value);
                 if (lang) onLanguageChange(lang);
               }}
-              className="bg-transparent text-xs text-slate-200 font-mono font-medium cursor-pointer focus:outline-none pr-1"
+              className="bg-transparent text-xs text-texte-second font-mono cursor-pointer focus:outline-none pr-1"
               aria-label="Sélection de la branche SCP"
             >
               {SUPPORTED_LANGUAGES.map((lang) => (
-                <option key={lang.code} value={lang.code} className="bg-scp-surface text-slate-200 font-mono">
+                <option key={lang.code} value={lang.code} className="bg-surface-1 text-texte font-mono">
                   {lang.flag} {lang.name}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Random SCP Button */}
           <button
             onClick={() => {
               sfx.playTerminalBeep();
               onRandomScp();
             }}
-            title="Dossier SCP Aléatoire"
-            className="flex items-center gap-1 text-xs font-mono bg-scp-card hover:bg-scp-cardHover text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg border border-scp-border hover:border-amber-600/60 transition-all"
+            title="Ouvrir un dossier au hasard"
+            className={BOUTON_BARRE}
           >
-            <Dices className="w-3.5 h-3.5 text-amber-400" />
+            <Dices className="w-4 h-4" aria-hidden="true" />
             <span className="hidden md:inline">Aléatoire</span>
           </button>
 
-          {/* SCiPNET Explorer Button */}
           {onOpenExplorer && (
             <button
               onClick={() => {
                 sfx.playTerminalBeep();
                 onOpenExplorer();
               }}
-              title="Explorateur d'Entités SCiPNET (Départements, Chercheurs, GdI)"
-              className="flex items-center gap-1.5 text-xs bg-scp-card hover:bg-slate-800 text-amber-300 hover:text-amber-200 px-2.5 py-1.5 rounded-lg border border-amber-600/70 hover:border-amber-400 transition-all font-mono font-semibold"
+              title="Explorateur d'entités SCiPNET : départements, personnel, factions, sites"
+              className={BOUTON_BARRE}
             >
-              <FolderOpen className="w-3.5 h-3.5 text-amber-400" />
+              <FolderOpen className="w-4 h-4" aria-hidden="true" />
               <span className="hidden md:inline">Explorateur</span>
             </button>
           )}
 
-          {/* Voice Studio Button */}
           <button
             onClick={() => {
               sfx.playTerminalBeep();
               onOpenVoiceStudio();
             }}
-            title="Studio des Voix & Rôles"
-            className="flex items-center gap-1.5 text-xs bg-scp-card hover:bg-scp-cardHover text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg border border-scp-border hover:border-red-600/60 transition-all font-mono"
+            title="Studio des voix et des rôles"
+            className={BOUTON_BARRE}
           >
-            <Sliders className="w-3.5 h-3.5 text-red-400" />
-            <span className="hidden md:inline">Studio Voix</span>
+            <Sliders className="w-4 h-4" aria-hidden="true" />
+            <span className="hidden md:inline">Voix</span>
           </button>
 
-          {/* Sound FX Toggle */}
+          <button
+            onClick={() => {
+              sfx.playTerminalBeep();
+              onToggleCrt();
+            }}
+            title={crtEnabled ? 'Désactiver le filtre moniteur CRT' : 'Activer le filtre moniteur CRT'}
+            aria-pressed={crtEnabled}
+            className={crtEnabled ? BOUTON_BARRE_ACTIF : BOUTON_BARRE}
+          >
+            <Tv className="w-4 h-4" aria-hidden="true" />
+            <span className="hidden lg:inline">CRT</span>
+          </button>
+
           <button
             onClick={onToggleSfx}
-            title={sfxEnabled ? "Désactiver les effets sonores (bips, radio)" : "Activer les effets sonores"}
-            className={`p-1.5 rounded-lg border transition-colors ${
-              sfxEnabled 
-                ? 'bg-scp-card border-cyan-700/60 text-cyan-400 shadow-sm shadow-cyan-950/40' 
-                : 'bg-scp-card border-scp-border text-slate-500 hover:text-slate-400'
-            }`}
+            title={sfxEnabled ? 'Couper les effets sonores' : 'Activer les effets sonores'}
+            aria-pressed={sfxEnabled}
+            className={`${sfxEnabled ? BOUTON_BARRE_ACTIF : BOUTON_BARRE} w-9 justify-center px-0`}
           >
             {sfxEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
           </button>
 
-          {/* Favorites Button */}
           <button
             onClick={() => {
               sfx.playTerminalBeep();
               onOpenFavorites();
             }}
-            title="Dossiers sauvegardés"
-            className="relative p-1.5 bg-scp-card hover:bg-scp-cardHover text-slate-300 hover:text-amber-400 rounded-lg border border-scp-border transition-colors"
+            title="Dossiers classés"
+            className={`${BOUTON_BARRE} relative w-9 justify-center px-0`}
           >
             <Bookmark className="w-4 h-4" />
             {favoritesCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 text-[9px] font-bold text-white flex items-center justify-center font-mono shadow">
+              <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-sm bg-accent text-xs font-mono font-bold text-texte flex items-center justify-center tabular-nums">
                 {favoritesCount}
               </span>
             )}

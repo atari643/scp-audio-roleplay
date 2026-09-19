@@ -25,13 +25,13 @@ interface MobileSearchFiltersProps {
 }
 
 const CLASSES: Array<{ label: string; value: ObjectClass | 'ALL'; color: string }> = [
-  { label: 'TOUS', value: 'ALL', color: 'border-slate-700 text-slate-300' },
-  { label: 'SÛR', value: 'Safe', color: 'border-emerald-700 text-emerald-400' },
-  { label: 'EUCLIDE', value: 'Euclid', color: 'border-amber-700 text-amber-400' },
-  { label: 'KETER', value: 'Keter', color: 'border-red-700 text-red-400' },
-  { label: 'THAUMIEL', value: 'Thaumiel', color: 'border-purple-700 text-purple-400' },
-  { label: 'APOLLYON', value: 'Apollyon', color: 'border-rose-700 text-rose-400' },
-  { label: 'NEUTRALISÉ', value: 'Neutralized', color: 'border-slate-600 text-slate-400' }
+  { label: 'TOUS', value: 'ALL', color: 'border-bordure text-texte-second' },
+  { label: 'SÛR', value: 'Safe', color: 'border-classe-safe text-classe-safe' },
+  { label: 'EUCLIDE', value: 'Euclid', color: 'border-classe-euclid text-classe-euclid' },
+  { label: 'KETER', value: 'Keter', color: 'border-accent-texte text-accent-texte' },
+  { label: 'THAUMIEL', value: 'Thaumiel', color: 'border-classe-thaumiel text-classe-thaumiel' },
+  { label: 'APOLLYON', value: 'Apollyon', color: 'border-accent-texte text-accent-texte' },
+  { label: 'NEUTRALISÉ', value: 'Neutralized', color: 'border-bordure-forte text-texte-attenue' }
 ];
 
 export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
@@ -77,14 +77,14 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
   return (
     <div className="space-y-2.5 mb-4">
       {entiteFiltreNom && (
-        <div className="flex items-center justify-between gap-2 px-3 py-2 mb-2 rounded-lg bg-red-950/40 border border-red-800/60 font-mono text-[11px]">
-          <span className="text-red-200 truncate">Dossiers de <strong className="text-white">{entiteFiltreNom}</strong></span>
+        <div className="flex items-center justify-between gap-2 px-3 py-2 mb-2 rounded-lg bg-surface-3/40 border border-accent-texte/60 font-mono text-xs">
+          <span className="text-accent-texte truncate">Dossiers de <strong className="text-texte">{entiteFiltreNom}</strong></span>
           <button
             onClick={() => {
               sfx.playTerminalBeep();
               onFiltrerParEntite?.(null);
             }}
-            className="shrink-0 min-h-[44px] px-2 text-red-300 underline"
+            className="shrink-0 min-h-[44px] px-2 text-accent-texte underline"
           >
             retirer
           </button>
@@ -92,7 +92,7 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
       )}
       {/* Mobile Search Input */}
       <div className="relative flex items-center">
-        <div className="absolute left-3 text-slate-500 pointer-events-none">
+        <div className="absolute left-3 text-texte-attenue pointer-events-none">
           <Search className="w-4 h-4" />
         </div>
         <input
@@ -100,13 +100,16 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
           value={localQuery}
           onChange={handleInputChange}
           placeholder="Rechercher un SCP (ex: 049, 173, statue, keter)..."
-          className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-9 pr-9 py-2.5 text-xs font-mono text-white placeholder:text-slate-500 focus:outline-none focus:border-red-600 transition-colors shadow-inner"
+          /* 16 px minimum : en dessous, Safari iOS zoome tout seul à la prise de focus
+             et l'utilisateur se retrouve dans une page agrandie dont il doit sortir. */
+          className="w-full bg-surface-1/90 border border-bordure/80 rounded-xl pl-9 pr-12 py-2.5 text-[16px] leading-tight font-mono text-texte placeholder:text-texte-attenue placeholder:text-xs focus:outline-none focus:border-accent-texte transition-colors shadow-inner"
         />
         {localQuery && (
           <button
             onClick={handleClear}
-            className="absolute right-3 text-slate-400 hover:text-white"
+            className="absolute right-0 flex h-11 w-11 items-center justify-center text-texte-attenue hover:text-texte"
             title="Effacer la recherche"
+            aria-label="Effacer la recherche"
           >
             <X className="w-4 h-4" />
           </button>
@@ -115,8 +118,8 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
 
       {/* Horizontal Scrolling Object Class Pills */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs font-mono">
-        <span className="text-[10px] text-slate-500 font-bold uppercase shrink-0 flex items-center gap-1 pl-0.5">
-          <Filter className="w-3 h-3 text-red-500" />
+        <span className="text-xs text-texte-attenue font-bold uppercase shrink-0 flex items-center gap-1 pl-0.5">
+          <Filter className="w-3 h-3 text-accent-texte" />
           CLASSE :
         </span>
         {CLASSES.map((cls) => {
@@ -128,10 +131,10 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
                 sfx.playTerminalBeep();
                 onSelectClass(cls.value);
               }}
-              className={`shrink-0 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition-all active:scale-95 ${
+              className={`shrink-0 px-2.5 py-1 rounded-lg border text-xs font-bold transition-all active:scale-95 ${
                 isSelected
-                  ? 'bg-red-950 border-red-600 text-white shadow-sm'
-                  : `bg-slate-900/80 ${cls.color} opacity-80 hover:opacity-100`
+                  ? 'bg-surface-3 border-accent-texte text-texte shadow-sm'
+                  : `bg-surface-1/80 ${cls.color} opacity-80 hover:opacity-100`
               }`}
             >
               {cls.label}
@@ -143,8 +146,8 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
       {/* Horizontal Scrolling Series Pills — access to the full corpus */}
       {availableSeries && availableSeries.length > 0 && onSelectSeries && (
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs font-mono">
-          <span className="text-[10px] text-slate-500 font-bold uppercase shrink-0 flex items-center gap-1 pl-0.5">
-            <Library className="w-3 h-3 text-cyan-500" />
+          <span className="text-xs text-texte-attenue font-bold uppercase shrink-0 flex items-center gap-1 pl-0.5">
+            <Library className="w-3 h-3 text-role-agent" />
             SÉRIE :
           </span>
           <button
@@ -152,10 +155,10 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
               sfx.playTerminalBeep();
               onSelectSeries(null);
             }}
-            className={`shrink-0 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition-all active:scale-95 ${
+            className={`shrink-0 px-2.5 py-1 rounded-lg border text-xs font-bold transition-all active:scale-95 ${
               !selectedSeries
-                ? 'bg-cyan-950 border-cyan-600 text-white shadow-sm'
-                : 'bg-slate-900/80 border-slate-700 text-slate-300 opacity-80'
+                ? 'bg-surface-3 border-role-agent text-texte shadow-sm'
+                : 'bg-surface-1/80 border-bordure text-texte-second opacity-80'
             }`}
           >
             EMBLÉMATIQUES
@@ -171,10 +174,10 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
                   sfx.playTerminalBeep();
                   onSelectSeries(isSelected ? null : series.id);
                 }}
-                className={`shrink-0 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition-all active:scale-95 ${
+                className={`shrink-0 px-2.5 py-1 rounded-lg border text-xs font-bold transition-all active:scale-95 ${
                   isSelected
-                    ? 'bg-cyan-950 border-cyan-600 text-white shadow-sm'
-                    : 'bg-slate-900/80 border-slate-700 text-slate-300 opacity-80'
+                    ? 'bg-surface-3 border-role-agent text-texte shadow-sm'
+                    : 'bg-surface-1/80 border-bordure text-texte-second opacity-80'
                 }`}
               >
                 {series.name}
@@ -190,8 +193,8 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
         if (!activeSeriesObj?.subRanges || activeSeriesObj.subRanges.length === 0) return null;
 
         return (
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs font-mono bg-cyan-950/20 p-1.5 rounded-lg border border-cyan-900/40">
-            <span className="text-[10px] text-cyan-400 font-bold uppercase shrink-0">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs font-mono bg-surface-3/20 p-1.5 rounded-lg border border-role-agent/40">
+            <span className="text-xs text-role-agent font-bold uppercase shrink-0">
               TRANCHE :
             </span>
             <button
@@ -199,10 +202,10 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
                 sfx.playTerminalBeep();
                 onSelectSubRange?.(null);
               }}
-              className={`shrink-0 px-2 py-0.5 rounded text-[10px] font-bold border transition-all active:scale-95 ${
+              className={`shrink-0 px-2 py-0.5 rounded text-xs font-bold border transition-all active:scale-95 ${
                 !selectedSubRange
-                  ? 'bg-cyan-900/90 border-cyan-500 text-cyan-100 shadow-sm'
-                  : 'bg-slate-900/80 border-slate-800 text-slate-400'
+                  ? 'bg-surface-3/90 border-role-agent text-role-agent shadow-sm'
+                  : 'bg-surface-1/80 border-bordure text-texte-attenue'
               }`}
             >
               TOUT ({activeSeriesObj.totalEstimate})
@@ -216,10 +219,10 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
                     sfx.playTerminalBeep();
                     onSelectSubRange?.(isSubSelected ? null : sub.id);
                   }}
-                  className={`shrink-0 px-2 py-0.5 rounded text-[10px] font-bold border transition-all active:scale-95 ${
+                  className={`shrink-0 px-2 py-0.5 rounded text-xs font-bold border transition-all active:scale-95 ${
                     isSubSelected
-                      ? 'bg-cyan-900/90 border-cyan-400 text-cyan-100 shadow-sm'
-                      : 'bg-slate-900/80 border-slate-800 text-slate-400'
+                      ? 'bg-surface-3/90 border-role-agent text-role-agent shadow-sm'
+                      : 'bg-surface-1/80 border-bordure text-texte-attenue'
                   }`}
                 >
                   {sub.label}

@@ -1,0 +1,52 @@
+name: "📱 Problème d'affichage ou d'ergonomie mobile"
+description: "Un élément coupé, un bouton inatteignable, un défilement qui accroche."
+title: "[Mobile] "
+labels: ["mobile", "à trier"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Une capture d'écran vaut dix paragraphes : glissez-la directement dans
+        la description.
+
+  - type: input
+    id: appareil
+    attributes:
+      label: Appareil et version du système
+      placeholder: "Pixel 7, Android 15 — ou iPhone 13, iOS 18"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: contexte
+    attributes:
+      label: Comment l'application est ouverte
+      options:
+        - Navigateur mobile
+        - Application installée sur l'écran d'accueil
+        - Application Android (APK / Play Store)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ecran
+    attributes:
+      label: Écran concerné
+      options:
+        - Catalogue (liste des dossiers)
+        - Lecteur de dossier
+        - Feuille audio
+        - SCiPNET (entités)
+        - Tiroir tactique / réglages
+        - Studio vocal
+        - Autre
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Ce qui se passe
+      description: "Et ce que vous attendiez à la place. Joignez une capture si possible."
+    validations:
+      required: true

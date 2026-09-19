@@ -1,0 +1,23 @@
+# Normalisation des fins de ligne : le dépôt est développé sous Windows et
+# construit sous Linux en CI. Sans cette règle, un aller-retour entre les deux
+# transforme un fichier entier en « tout le fichier a changé ».
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Le wrapper Gradle doit rester exécutable et intact.
+gradlew text eol=lf
+gradlew.bat text eol=crlf
+*.jar binary
+
+# Binaires
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.mp3 binary
+*.woff2 binary
+
+# Données générées : illisibles en revue, et c'est normal.
+src/data/*.json linguist-generated=true

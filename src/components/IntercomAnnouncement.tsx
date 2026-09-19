@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2 } from 'lucide-react';
+import { Volume2, X } from 'lucide-react';
 import { sfx } from '../services/sfxService';
 
 const ANNOUNCEMENTS = [
@@ -39,37 +39,38 @@ export const IntercomAnnouncement: React.FC<IntercomAnnouncementProps> = ({ trig
 
   return (
     <div
-      className={`fixed top-20 sm:top-24 right-3 sm:right-6 z-40 max-w-md w-[calc(100%-24px)] sm:w-auto flex items-start gap-3 p-3.5 bg-black/95 border-2 border-amber-600/80 rounded-xl shadow-2xl animate-slide-down ${
-        flash ? 'animate-pa-flash border-amber-400' : ''
+      className={`fixed top-20 sm:top-24 right-3 sm:right-6 z-40 max-w-md w-[calc(100%-24px)] sm:w-auto flex items-start gap-3 p-3.5 bg-black/95 border-2 border-classe-euclid/80 rounded-xl shadow-2xl animate-slide-down ${
+        flash ? 'animate-pa-flash border-classe-euclid' : ''
       }`}
       style={{ backdropFilter: 'blur(12px)', textShadow: '0 0 8px rgba(245, 158, 11, 0.3)' }}
     >
       <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
-        <div className="w-7 h-7 rounded-lg bg-amber-950/80 border border-amber-500/60 flex items-center justify-center">
-          <Volume2 className="w-4 h-4 text-amber-400 animate-alarm-pulse" />
+        <div className="w-7 h-7 rounded-lg bg-surface-3/80 border border-classe-euclid/60 flex items-center justify-center">
+          <Volume2 className="w-4 h-4 text-classe-euclid animate-alarm-pulse" />
         </div>
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-[10px] tracking-widest text-amber-400 font-bold font-mono uppercase">
+          <span className="text-xs tracking-widest text-classe-euclid font-bold font-mono uppercase">
             DIFFUSION P.A. // SITE-19
           </span>
-          <span className="text-[8px] font-mono text-amber-600 border border-amber-700/50 px-1 py-0.2 rounded">
+          <span className="text-[8px] font-mono text-classe-euclid border border-classe-euclid/50 px-1 py-0.5 rounded">
             CANAL GÉNÉRAL
           </span>
         </div>
-        <p className="text-xs font-mono text-amber-100 leading-relaxed">
+        <p className="text-xs font-mono text-classe-euclid leading-relaxed">
           {message}
         </p>
       </div>
 
       <button
         onClick={() => setVisible(false)}
-        className="text-amber-500/60 hover:text-amber-300 font-mono text-xs shrink-0 p-1 hover:bg-amber-950/40 rounded transition-colors"
+        className="shrink-0 w-8 h-8 flex items-center justify-center rounded-sm text-texte-attenue hover:text-texte hover:bg-surface-3 transition-colors"
         title="Fermer l'annonce"
+        aria-label="Fermer l'annonce"
       >
-        ✕
+        <X className="w-4 h-4" />
       </button>
     </div>
   );

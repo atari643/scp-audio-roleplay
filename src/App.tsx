@@ -1,26 +1,35 @@
-import React from 'react';
-import { DesktopApp } from './desktop/DesktopApp';
-import { MobileApp } from './mobile/MobileApp';
+import React, { Suspense, lazy } from 'react';
 import { useScpApp } from './shared/hooks/useScpApp';
 import { useDeviceMode } from './shared/hooks/useDeviceMode';
 import { DeviceSwitcherBadge } from './shared/components/DeviceSwitcherBadge';
+import { EcranAttente } from './shared/components/EcranAttente';
 
 /**
- * Root Application Switcher:
- * Automatically routes to DesktopApp or MobileApp based on viewport/device detection,
- * while allowing instant manual toggle via DeviceSwitcherBadge.
- * 
- * Shared business logic is managed in `src/shared/hooks/useScpApp.ts`.
- * Desktop views & layout live in `src/desktop/`.
- * Mobile views & layout live in `src/mobile/`.
+ * Aiguilleur racine : route vers `DesktopApp` ou `MobileApp` selon la détection
+ * d'appareil, tout en laissant la bascule manuelle via `DeviceSwitcherBadge`.
+ *
+ * Les deux vues sont chargées en `lazy` **à dessein** : importées statiquement, les
+ * deux arbres se retrouvaient dans le même paquet, et un téléphone téléchargeait
+ * l'intégralité de l'interface desktop avant d'afficher quoi que ce soit. Le
+ * découpage se fait ici et nulle part ailleurs — la frontière `desktop/` `mobile/`
+ * reste intacte.
+ *
+ * La logique métier partagée vit dans `src/shared/hooks/useScpApp.ts`.
  */
+const DesktopApp = lazy(() =>
+  import('./desktop/DesktopApp').then(m => ({ default: m.DesktopApp }))
+);
+const MobileApp = lazy(() =>
+  import('./mobile/MobileApp').then(m => ({ default: m.MobileApp }))
+);
+
 export const App: React.FC = () => {
   const app = useScpApp();
   const { mode, isMobile, toggleMode, setDeviceMode } = useDeviceMode();
 
   return (
     <>
-      {/* Floating Tactical Switcher (Desktop ⇄ Mobile) */}
+      {/* Bascule tactique flottante (Bureau ⇄ Mobile) */}
       <DeviceSwitcherBadge
         mode={mode}
         isMobile={isMobile}
@@ -28,12 +37,14 @@ export const App: React.FC = () => {
         onSetMode={setDeviceMode}
       />
 
-      {/* Render dedicated view */}
-      {isMobile ? (
-        <MobileApp app={app} toggleMode={toggleMode} setDeviceMode={setDeviceMode} />
-      ) : (
-        <DesktopApp app={app} />
-      )}
+      {/* Vue dédiée, chargée à la demande */}
+      <Suspense fallback={<EcranAttente />}>
+        {isMobile ? (
+          <MobileApp app={app} toggleMode={toggleMode} setDeviceMode={setDeviceMode} />
+        ) : (
+          <DesktopApp app={app} />
+        )}
+      </Suspense>
     </>
   );
 };

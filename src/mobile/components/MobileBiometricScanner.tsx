@@ -61,17 +61,17 @@ export const MobileBiometricScanner: React.FC<MobileBiometricScannerProps> = ({
   }, [isScanning, isGranted, onGranted]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-between p-6 select-none animate-fadeIn">
+    <div className="fixed inset-0 z-50 bg-fond/95 backdrop-blur-xl flex flex-col items-center justify-between p-6 select-none animate-fadeIn">
       {/* Top Banner */}
       <div className="text-center mt-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/80 border border-red-700/80 text-xs font-mono text-red-400 mb-3">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-3/80 border border-accent-texte/80 text-xs font-mono text-accent-texte mb-3">
           <AlertTriangle className="w-3.5 h-3.5 animate-pulse" />
           <span>VÉRIFICATION BIOMÉTRIQUE REQUISE</span>
         </div>
-        <h2 className="text-lg font-bold font-mono text-white tracking-wider">
+        <h2 className="text-lg font-bold font-mono text-texte tracking-wider">
           ACCÈS AU DOSSIER
         </h2>
-        <p className="text-xs font-mono text-red-400 mt-1">
+        <p className="text-xs font-mono text-accent-texte mt-1">
           {scpTitle}
         </p>
       </div>
@@ -85,7 +85,7 @@ export const MobileBiometricScanner: React.FC<MobileBiometricScannerProps> = ({
               cx="80"
               cy="80"
               r="70"
-              className="text-slate-800"
+              className="text-texte-attenue"
               strokeWidth="6"
               stroke="currentColor"
               fill="transparent"
@@ -95,7 +95,7 @@ export const MobileBiometricScanner: React.FC<MobileBiometricScannerProps> = ({
               cy="80"
               r="70"
               className={`transition-all duration-75 ${
-                isGranted ? 'text-emerald-500' : 'text-red-500'
+                isGranted ? 'text-classe-safe' : 'text-accent-texte'
               }`}
               strokeWidth="6"
               strokeDasharray={440}
@@ -114,10 +114,10 @@ export const MobileBiometricScanner: React.FC<MobileBiometricScannerProps> = ({
             onTouchEnd={cancelScan}
             className={`absolute inset-4 rounded-full flex flex-col items-center justify-center transition-all ${
               isGranted
-                ? 'bg-emerald-950/80 border-2 border-emerald-500 text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.5)]'
+                ? 'bg-surface-3/80 border-2 border-classe-safe text-classe-safe shadow-[0_0_30px_rgba(16,185,129,0.5)]'
                 : isScanning
-                ? 'bg-red-950/80 border-2 border-red-500 text-red-400 shadow-[0_0_30px_rgba(220,38,38,0.5)] scale-95'
-                : 'bg-slate-900 border-2 border-slate-700 text-slate-400 active:scale-95'
+                ? 'bg-surface-3/80 border-2 border-accent-texte text-accent-texte shadow-[0_0_30px_rgba(220,38,38,0.5)] scale-95'
+                : 'bg-surface-1 border-2 border-bordure text-texte-attenue active:scale-95'
             }`}
           >
             {isGranted ? (
@@ -130,14 +130,14 @@ export const MobileBiometricScanner: React.FC<MobileBiometricScannerProps> = ({
 
         {/* Instructions */}
         <div className="mt-6 text-center">
-          <p className="text-xs font-mono text-slate-300 font-semibold">
+          <p className="text-xs font-mono text-texte-second font-semibold">
             {isGranted
               ? 'AUTORISATION ACCORDÉE // NIVEAU 4'
               : isScanning
               ? `SCAN EN COURS... ${progress}%`
               : 'MAINTENEZ LE POUCE POUR DÉVERROUILLER'}
           </p>
-          <p className="text-[10px] font-mono text-slate-500 mt-1">
+          <p className="text-xs font-mono text-texte-attenue mt-1">
             Protocole de sécurité RAISA / Empreinte SHA-256
           </p>
         </div>
@@ -150,7 +150,7 @@ export const MobileBiometricScanner: React.FC<MobileBiometricScannerProps> = ({
             sfx.playAccessGranted();
             onGranted();
           }}
-          className="text-[10px] font-mono text-slate-500 underline hover:text-slate-300"
+          className="text-xs font-mono text-texte-attenue underline hover:text-texte-second"
         >
           [Bypass d'urgence terminal Superviseur]
         </button>

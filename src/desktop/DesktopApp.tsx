@@ -165,7 +165,7 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
   }
 
   return (
-    <div className={`min-h-screen bg-scp-bg text-scp-text flex flex-col antialiased selection:bg-red-900 selection:text-white ${crtEnabled ? 'crt-screen' : ''}`}>
+    <div className={`min-h-screen bg-fond text-texte flex flex-col antialiased ${crtEnabled ? 'crt-screen' : ''}`}>
 
       {/* ===== ROLEPLAY EFFECT 3: Biometric Scanner ===== */}
       {showBiometric && pendingSlug && (
@@ -218,8 +218,8 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-6 pb-28">
         {/* Error notification */}
         {(searchError || detailError) && (
-          <div className="mb-6 p-4 rounded-xl bg-red-950/60 border border-red-700/60 text-red-200 text-xs sm:text-sm font-mono flex items-center gap-3">
-            <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" />
+          <div className="mb-6 p-4 rounded bg-surface-2 border border-bordure border-l-[3px] border-l-accent-texte text-texte-second text-sm font-mono flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-accent-texte shrink-0" />
             <div>Une erreur est survenue lors de la communication avec l'archive SCP.</div>
           </div>
         )}
@@ -228,8 +228,8 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
         {activeSlug ? (
           isDetailLoading ? (
             <div className="text-center py-28 flex flex-col items-center justify-center gap-3">
-              <Loader2 className="w-9 h-9 animate-spin text-red-500" />
-              <p className="text-sm font-mono text-slate-300">
+              <Loader2 className="w-8 h-8 animate-spin text-accent-texte" />
+              <p className="text-sm font-mono text-texte-second">
                 Déclassification et analyse roleplay de {activeSlug.toUpperCase()}...
               </p>
             </div>
@@ -274,30 +274,30 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
               />
             </div>
           ) : (
-            <div className="text-center py-20 bg-scp-surface border border-scp-border rounded-2xl px-6">
+            <div className="text-center py-20 bg-surface-1 border border-bordure rounded px-6">
               {englishFallback ? (
                 <>
-                  <Languages className="w-10 h-10 text-amber-500 mx-auto mb-3" />
-                  <p className="text-base font-mono text-amber-300 font-bold tracking-wide">
-                    PAGE PAS ENCORE TRADUITE
+                  <Languages className="w-9 h-9 text-classe-euclid mx-auto mb-3" />
+                  <p className="font-mono text-base text-texte font-semibold tracking-technique uppercase">
+                    Page pas encore traduite
                   </p>
-                  <p className="text-sm font-mono text-slate-400 mt-2">
+                  <p className="font-serif text-md text-texte-second mt-2 max-w-lecture mx-auto">
                     {activeSlug?.toUpperCase()} existe dans les archives anglophones mais n'a pas
                     encore de traduction française.
                   </p>
-                  <p className="text-xs font-mono text-slate-500 mt-1">
+                  <p className="font-mono text-xs text-texte-attenue mt-2">
                     Titre original : « {englishFallback.title} »
                   </p>
                   <div className="flex items-center justify-center gap-3 mt-5 flex-wrap">
                     <button
                       onClick={readInEnglish}
-                      className="text-xs font-mono px-4 py-2 rounded-lg bg-amber-950/80 text-amber-200 border border-amber-600/70 hover:border-amber-400 transition-colors"
+                      className="inline-flex items-center gap-1.5 h-9 px-4 rounded font-mono text-xs bg-accent hover:bg-accent-texte text-texte transition-colors"
                     >
-                      Lire la version anglaise →
+                      Lire la version anglaise
                     </button>
                     <button
                       onClick={handleBackToCatalog}
-                      className="text-xs font-mono text-slate-400 hover:text-slate-200 hover:underline"
+                      className="font-mono text-xs text-texte-attenue hover:text-texte underline underline-offset-4"
                     >
                       Retourner au catalogue
                     </button>
@@ -305,13 +305,13 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
                 </>
               ) : (
                 <>
-                  <AlertTriangle className="w-10 h-10 text-red-500 mx-auto mb-3" />
-                  <p className="text-sm font-mono text-slate-300">
+                  <AlertTriangle className="w-9 h-9 text-accent-texte mx-auto mb-3" />
+                  <p className="font-mono text-sm text-texte-second">
                     Dossier introuvable dans les archives.
                   </p>
                   <button
                     onClick={handleBackToCatalog}
-                    className="mt-4 text-xs font-mono text-red-400 hover:underline"
+                    className="mt-4 font-mono text-xs text-texte-attenue hover:text-texte underline underline-offset-4"
                   >
                     Retourner au catalogue
                   </button>
@@ -322,53 +322,50 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
         ) : (
           /* View 2: Archive Catalog & Search */
           <div>
-            {/* SCiPNET Classified Terminal Briefing Banner */}
-            <div className="scipnet-box p-5 sm:p-7 mb-6 shadow-2xl relative overflow-hidden bg-gradient-to-r from-scp-surface via-slate-900/90 to-red-950/40 border border-red-900/40">
-              {/* Rubber Stamp */}
-              <div className="absolute top-4 right-4 hidden md:block">
-                <span className="classified-stamp stamp-restricted">RESTREINT CL-4</span>
+            {/* Note de service d'ouverture.
+                L'ancienne version empilait un dégradé trois-tons, un tampon, des
+                rayures de danger et trois puces clignotantes de trois couleurs :
+                le bloc le plus chargé de l'application, juste au-dessus du
+                catalogue qu'il était censé introduire. Ici, un filet d'accent, un
+                titre, un paragraphe, et l'état du système en une ligne. */}
+            <section className="bg-surface-1 border border-bordure rounded mb-6 overflow-hidden">
+              <div className="h-0.5 bg-accent" aria-hidden="true" />
+
+              <div className="px-4 sm:px-6 py-2 border-b border-bordure-faible flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-mono text-xs uppercase tracking-technique text-texte-attenue">
+                <span className="inline-flex items-center gap-1.5">
+                  <Radio className="w-3.5 h-3.5" aria-hidden="true" />
+                  Nœud audio SCiPNET · Site-19
+                </span>
+                <span>Diffusion multi-voix</span>
               </div>
 
-              {/* Hazard Stripes mini bar at the top */}
-              <div className="hazard-stripes h-1 -mx-5 -mt-5 sm:-mx-7 sm:-mt-7 mb-4 opacity-75"></div>
-
-              <div className="relative z-10 max-w-3xl">
-                <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-red-400 font-semibold mb-2.5">
-                  <div className="flex items-center gap-1.5 bg-red-950/80 px-2 py-0.5 rounded border border-red-800/60">
-                    <Radio className="w-3.5 h-3.5 text-red-500 animate-pulse" />
-                    <span>SCiPNET DIRECT AUDIO NODE // SITE-19</span>
-                  </div>
-                  <span className="text-slate-500">•</span>
-                  <span className="text-slate-400">DIFFUSION TACTIQUE MULTI-VOIX AI</span>
-                </div>
-
-                <h2 className="text-xl sm:text-2xl font-bold font-mono text-white mb-2 tracking-tight flex items-center gap-2">
-                  <span>CENTRE D'ÉCOUTE ET D'ARCHIVES CLASSIFIÉES</span>
+              <div className="px-4 sm:px-6 py-5">
+                <h2 className="font-mono text-xl font-bold text-texte tracking-tight mb-2">
+                  Centre d'écoute des archives classifiées
                 </h2>
 
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-mono">
-                  Accès direct aux transcriptions audio et interrogatoires d'anomalies. Le système SCiPNET Neural
-                  analyse dynamiquement la composition des dialogues et assigne des fréquences vocales uniques aux
-                  chercheurs (détection de genre ♂/♀), narrateurs, officiers FIM et sujets Classe-D.
+                <p className="font-serif text-md text-texte-second max-w-lecture">
+                  Accès direct aux transcriptions audio et aux interrogatoires d'anomalies. Le
+                  système analyse la composition des dialogues et attribue une voix propre à
+                  chaque intervenant : narrateur, chercheurs, officiers FIM et sujets Classe-D.
                 </p>
 
-                {/* Telemetry Chips */}
-                <div className="mt-4 pt-3 border-t border-scp-border/80 flex flex-wrap gap-2 text-[11px] font-mono text-slate-400">
-                  <div className="flex items-center gap-1.5 bg-scp-card px-2 py-1 rounded border border-scp-border">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span className="text-slate-300">PROTOCOLE CROM V1.2 : CONNECTÉ</span>
+                <dl className="mt-5 pt-4 border-t border-bordure-faible flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs">
+                    <div className="flex items-center gap-2">
+                    <dt className="text-texte-attenue uppercase tracking-technique">Protocole CROM</dt>
+                    <dd className="text-systeme">connecté</dd>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-scp-card px-2 py-1 rounded border border-scp-border">
-                    <span className="text-amber-400">⚡</span>
-                    <span className="text-slate-300">EDGE NEURAL TTS + PROFILAGE SCIENTIFIQUE</span>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-texte-attenue uppercase tracking-technique">Synthèse</dt>
+                    <dd className="text-systeme">Edge Neural TTS</dd>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-scp-card px-2 py-1 rounded border border-scp-border">
-                    <span className="text-red-400">☣</span>
-                    <span className="text-slate-300">ISOLATION MÉMÉTIQUE NIVEAU 4</span>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-texte-attenue uppercase tracking-technique">Isolation mémétique</dt>
+                    <dd className="text-systeme">niveau 4</dd>
                   </div>
-                </div>
+                </dl>
               </div>
-            </div>
+            </section>
 
             {/* Search and Filters */}
             <SearchAndFilters
@@ -394,32 +391,32 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
             {/* Catalog Grid */}
             {isSearchLoading ? (
               <div className="text-center py-20 flex flex-col items-center justify-center gap-3">
-                <Loader2 className="w-8 h-8 animate-spin text-red-500" />
-                <p className="text-xs font-mono text-slate-400">
+                <Loader2 className="w-7 h-7 animate-spin text-accent-texte" />
+                <p className="font-mono text-xs text-texte-attenue">
                   Recherche dans la branche {currentLanguage.name}...
                 </p>
               </div>
             ) : filteredItems.length === 0 ? (
-              <div className="text-center py-16 bg-scp-surface border border-scp-border rounded-2xl">
-                <BookOpen className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-                <p className="text-sm font-mono text-slate-400">Aucun dossier ne correspond à vos filtres.</p>
+              <div className="text-center py-16 bg-surface-1 border border-bordure rounded">
+                <BookOpen className="w-9 h-9 text-texte-attenue mx-auto mb-3" />
+                <p className="font-mono text-sm text-texte-second">Aucun dossier ne correspond à ces filtres.</p>
                 <button
                   onClick={() => {
                     setSelectedClass('ALL');
                     setSearchQuery('');
                   }}
-                  className="mt-3 text-xs font-mono text-red-400 hover:underline"
+                  className="mt-3 font-mono text-xs text-texte-attenue hover:text-texte underline underline-offset-4"
                 >
                   Réinitialiser les filtres
                 </button>
               </div>
             ) : (
               <div>
-                <div className="flex items-center justify-between mb-3 text-xs font-mono text-slate-400">
-                  <span>
-                    AFFICHAGE : {Math.min(displayLimit, filteredItems.length)} / {filteredItems.length} DOSSIERS DISPONIBLES
+                <div className="flex items-center justify-between mb-3 font-mono text-xs uppercase tracking-technique text-texte-attenue">
+                  <span className="tabular-nums">
+                    {Math.min(displayLimit, filteredItems.length)} / {filteredItems.length} dossiers
                   </span>
-                  <span className="text-slate-500">BRANCHE : {currentLanguage.nativeName.toUpperCase()}</span>
+                  <span>Branche · {currentLanguage.nativeName}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -440,13 +437,13 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
                   <div className="mt-8 text-center flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button
                       onClick={() => setDisplayLimit((prev: number) => prev + 60)}
-                      className="win2k-btn px-5 py-2 font-mono text-xs font-bold text-amber-300 hover:text-white flex items-center gap-2 shadow-lg"
+                      className="inline-flex items-center gap-2 h-10 px-5 rounded bg-accent hover:bg-accent-texte text-texte font-mono text-xs font-semibold transition-colors"
                     >
-                      <span>⚡ CHARGER LES 60 SUIVANTS ({Math.min(displayLimit, filteredItems.length)} / {filteredItems.length})</span>
+                      <span className="tabular-nums">Charger 60 dossiers de plus ({Math.min(displayLimit, filteredItems.length)} / {filteredItems.length})</span>
                     </button>
                     <button
                       onClick={() => setDisplayLimit(filteredItems.length)}
-                      className="px-4 py-2 font-mono text-xs text-slate-400 hover:text-slate-200 border border-slate-700 rounded-lg hover:border-slate-500 transition-all"
+                      className="inline-flex items-center h-10 px-4 rounded font-mono text-xs bg-surface-2 border border-bordure text-texte-second hover:bg-surface-3 hover:text-texte hover:border-bordure-forte transition-colors"
                     >
                       Tout afficher ({filteredItems.length})
                     </button>

@@ -2,7 +2,30 @@
   "name": "scp-audio-roleplay-app",
   "private": true,
   "version": "1.0.0",
+  "description": "Lecteur audio roleplay multi-voix des dossiers de la Fondation SCP — React 19 + Vite, voix neurales Edge TTS, portage Android Capacitor",
+  "license": "MIT",
+  "author": "atari643",
+  "homepage": "https://github.com/atari643/scp-audio-roleplay#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atari643/scp-audio-roleplay.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atari643/scp-audio-roleplay/issues"
+  },
+  "keywords": [
+    "scp",
+    "text-to-speech",
+    "edge-tts",
+    "react",
+    "vite",
+    "capacitor",
+    "roleplay"
+  ],
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -13,8 +36,13 @@
     "entities:profil": "node scripts/build-entities.mjs --profil",
     "entities:repertoire": "node scripts/build-entities.mjs --repertoire",
     "entities": "node scripts/build-entities.mjs --lang en && node scripts/build-entities.mjs --lang fr",
+    "icones": "node scripts/generer-icones.mjs",
     "serve:build": "esbuild server/index.ts --bundle --platform=node --format=esm --target=node20 --outfile=dist-server/server.mjs --log-level=error",
-    "serve": "npm run serve:build && node dist-server/server.mjs"
+    "serve": "npm run serve:build && node dist-server/server.mjs",
+    "cap:sync": "npm run build && npx cap sync android",
+    "cap:open": "npx cap open android",
+    "android:debug": "npm run cap:sync && cd android && ./gradlew assembleDebug",
+    "android:release": "npm run cap:sync && cd android && ./gradlew bundleRelease"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.1",

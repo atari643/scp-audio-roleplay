@@ -1,5 +1,23 @@
 apply plugin: 'com.android.application'
 
+/**
+ * Signature de publication.
+ *
+ * Les identifiants vivent dans `android/keystore.properties`, qui n'est PAS
+ * suivi par git (voir `android/.gitignore`) — le dépôt est public, et une clé
+ * de signature exposée est définitivement perdue : c'est elle qui prouve au
+ * Play Store que les mises à jour viennent bien de vous.
+ *
+ * Tant que ce fichier n'existe pas, `assembleDebug` fonctionne normalement et
+ * `bundleRelease` produit un paquet non signé. La marche à suivre pour créer la
+ * clé est dans PUBLICATION.md.
+ */
+def fichierCles = rootProject.file('keystore.properties')
+def cles = new Properties()
+if (fichierCles.exists()) {
+    cles.load(new FileInputStream(fichierCles))
+}
+
 android {
     namespace = "fr.fondation.scpaudio"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,10 +34,28 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (cles.containsKey('storeFile')) {
+                storeFile rootProject.file(cles['storeFile'])
+                storePassword cles['storePassword']
+                keyAlias cles['keyAlias']
+                keyPassword cles['keyPassword']
+            }
+        }
+    }
+
     buildTypes {
         release {
+            // `minifyEnabled` reste à false : l'application est une WebView, tout
+            // le code utile est du JavaScript déjà minifié par Vite. R8 n'aurait
+            // que le pont Capacitor à réduire, pour un risque d'obfuscation
+            // inutile sur les classes qu'il appelle par réflexion.
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (cles.containsKey('storeFile')) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }

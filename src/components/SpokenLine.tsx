@@ -123,7 +123,7 @@ export const SpokenLine: React.FC<SpokenLineProps> = ({
       noeuds.push(
         <span
           key={`r${i}`}
-          className={`redacted-block mx-1 font-bold text-xs${actif ? ' mot-lu' : ''}`}
+          className={`redacted-block mx-1${actif ? ' mot-lu' : ''}`}
           title="[ACCRÉDITATION NIVEAU 5 REQUISE - DONNÉE SOUS SÉQUESTRE RAISA]"
         >
           ██████

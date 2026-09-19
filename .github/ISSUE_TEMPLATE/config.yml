@@ -1,0 +1,10 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📖 Un dossier SCP est incorrect sur le wiki
+    url: https://fondationscp.wikidot.com
+    about: >-
+      Cette application ne fait que lire le wiki. Une erreur dans le texte
+      lui-même se corrige là-bas, pas ici.
+  - name: 🧭 Comprendre l'architecture avant de contribuer
+    url: https://github.com/atari643/scp-audio-roleplay/blob/main/CONTRIBUTING.md
+    about: La séparation en trois espaces, l'audit de fidélité, les règles de prononciation.

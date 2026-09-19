@@ -62,11 +62,11 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
   if (status.totalSegments === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-red-950/40 border border-red-800/40 flex items-center justify-center text-red-500 mb-4 animate-pulse">
+        <div className="w-16 h-16 rounded-2xl bg-surface-3/40 border border-accent-texte/40 flex items-center justify-center text-texte-attenue mb-4">
           <Radio className="w-8 h-8" />
         </div>
-        <h3 className="text-base font-bold font-mono text-white mb-1">AUCUN FLUX AUDIO ACTIF</h3>
-        <p className="text-xs font-mono text-slate-400 max-w-xs mb-6">
+        <h3 className="text-base font-bold font-mono text-texte mb-1">AUCUN FLUX AUDIO ACTIF</h3>
+        <p className="text-xs font-mono text-texte-attenue max-w-xs mb-6">
           Sélectionnez un dossier SCP dans les archives pour charger la transcription vocale multi-personnages.
         </p>
         <button
@@ -74,9 +74,9 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
             sfx.playTerminalBeep();
             onOpenVoiceStudio();
           }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-mono text-cyan-400 hover:text-white"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-1 border border-bordure text-xs font-mono text-role-agent hover:text-texte"
         >
-          <Sparkles className="w-4 h-4 text-cyan-400" />
+          <Sparkles className="w-4 h-4 text-role-agent" />
           <span>Configurer le Voice Studio Neural</span>
         </button>
       </div>
@@ -84,25 +84,25 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-950 px-4 py-3 pb-24 overflow-y-auto">
+    <div className="flex-1 flex flex-col bg-fond px-4 py-3 pb-24 overflow-y-auto">
       {/* Sheet Top Bar */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div className="flex items-center justify-between pb-3 border-b border-bordure">
         <div className="flex items-center gap-2">
           {onClose && (
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 hover:text-white"
+              className="p-1.5 rounded-lg bg-surface-1 border border-bordure text-texte-attenue hover:text-texte"
               title="Réduire"
             >
               <ChevronDown className="w-5 h-5" />
             </button>
           )}
           <div>
-            <div className="text-[10px] font-mono text-red-400 uppercase tracking-widest font-bold">
+            <div className="text-xs font-mono text-accent-texte uppercase tracking-widest font-bold">
               SCiPNET TACTICAL AUDIO
             </div>
-            <div className="text-xs font-mono text-slate-300">
-              SEGMENT {status.currentSegmentIndex + 1} / {status.totalSegments}
+            <div className="text-xs font-mono text-texte-second">
+              SEGMENT <span className="text-systeme tabular-nums">{status.currentSegmentIndex + 1}</span> / <span className="tabular-nums">{status.totalSegments}</span>
             </div>
           </div>
         </div>
@@ -113,17 +113,17 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
               sfx.playTerminalBeep();
               onOpenVoiceStudio();
             }}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-950/80 border border-red-800 text-[11px] font-mono text-red-300 hover:text-white active:scale-95 transition-all"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-3/80 border border-accent-texte text-xs font-mono text-accent-texte hover:text-texte active:scale-95 transition-all"
           >
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <Sparkles className="w-3.5 h-3.5 text-role-agent" />
             <span>Voix IA</span>
           </button>
           <button
             onClick={() => setShowSegmentList(!showSegmentList)}
             className={`p-1.5 rounded-lg border text-xs font-mono transition-all ${
               showSegmentList
-                ? 'bg-red-900/60 border-red-600 text-white'
-                : 'bg-slate-900 border-slate-700 text-slate-400'
+                ? 'bg-surface-3/60 border-accent-texte text-texte'
+                : 'bg-surface-1 border-bordure text-texte-attenue'
             }`}
             title="Liste des segments"
           >
@@ -135,7 +135,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
       {/* Segment List Drawer or Main Player */}
       {showSegmentList ? (
         <div className="flex-1 py-3 overflow-y-auto space-y-1.5">
-          <div className="text-xs font-mono text-slate-400 mb-2 font-semibold">
+          <div className="text-xs font-mono text-texte-attenue mb-2 font-semibold">
             INDEX DES DIALOGUES ({segments.length})
           </div>
           {segments.map((seg, idx) => (
@@ -148,14 +148,14 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
               }}
               className={`w-full text-left p-2.5 rounded-lg border transition-all flex items-start gap-2.5 text-xs font-mono ${
                 idx === status.currentSegmentIndex
-                  ? 'bg-red-950/60 border-red-600 text-white shadow-md'
-                  : 'bg-slate-900/50 border-slate-800 text-slate-400 hover:text-slate-200'
+                  ? 'bg-surface-3/60 border-accent-texte text-texte shadow-md'
+                  : 'bg-surface-1/50 border-bordure text-texte-attenue hover:text-texte'
               }`}
             >
-              <span className="font-bold text-red-400 shrink-0">#{idx + 1}</span>
+              <span className="font-bold text-accent-texte shrink-0">#{idx + 1}</span>
               <div className="min-w-0 flex-1">
-                <div className="font-semibold text-slate-200 truncate">{seg.speaker}</div>
-                <p className="text-[11px] text-slate-400 line-clamp-2">{seg.text}</p>
+                <div className="font-semibold text-texte truncate">{seg.speaker}</div>
+                <p className="text-xs text-texte-attenue line-clamp-2">{seg.text}</p>
               </div>
             </button>
           ))}
@@ -163,25 +163,18 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
       ) : (
         <div className="flex-1 flex flex-col justify-between py-2 gap-3">
           {/* Tactical Audio Radar / Visualizer */}
-          <div className="relative rounded-2xl bg-gradient-to-b from-red-950/30 to-slate-900/80 border border-red-900/40 p-4 flex flex-col items-center justify-center overflow-hidden shadow-inner my-1">
+          <div className="relative rounded-2xl bg-gradient-to-b from-surface-3/30 to-surface-2/80 border border-accent-texte/40 p-4 flex flex-col items-center justify-center overflow-hidden shadow-inner my-1">
             {/* Animated Pulse Waves */}
-            {status.isPlaying && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <span className="w-32 h-32 rounded-full border border-red-500/20 animate-ping"></span>
-                <span className="w-48 h-48 rounded-full border border-cyan-500/10 animate-ping [animation-delay:400ms]"></span>
-              </div>
-            )}
-
-            <div className="relative z-10 w-16 h-16 rounded-full bg-slate-950 border-2 border-red-600/80 flex items-center justify-center text-red-400 shadow-xl mb-3">
+            <div className="relative z-10 w-16 h-16 rounded-full bg-fond border-2 border-accent-texte/80 flex items-center justify-center text-accent-texte shadow-xl mb-3">
               <User className="w-8 h-8" />
             </div>
 
             <div className="relative z-10 text-center">
-              <div className="text-base font-bold font-mono text-white tracking-wide">
+              <div className="text-base font-bold font-mono text-texte tracking-wide">
                 {status.currentSpeaker}
               </div>
-              <div className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full bg-red-950/80 border border-red-800/80 text-[10px] font-mono text-red-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              <div className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full bg-surface-3/80 border border-accent-texte/80 text-xs font-mono text-accent-texte">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent-texte"></span>
                 <span className="uppercase">{status.currentRole}</span>
               </div>
             </div>
@@ -192,7 +185,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                 <div
                   key={i}
                   className={`w-1 rounded-full transition-all duration-200 ${
-                    status.isPlaying ? 'bg-red-500 animate-pulse' : 'bg-slate-700'
+                    status.isPlaying ? 'bg-accent-texte animate-pulse' : 'bg-surface-3'
                   }`}
                   style={{ 
                     height: status.isPlaying ? `${h}%` : '20%',
@@ -204,12 +197,12 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
           </div>
 
           {/* Spoken Text Dialogue Card */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-3 shadow-md">
-            <div className="text-[10px] font-mono text-slate-500 mb-1 flex items-center justify-between">
+          <div className="bg-surface-1/90 border border-bordure rounded-xl p-3 shadow-md">
+            <div className="text-xs font-mono text-texte-attenue mb-1 flex items-center justify-between">
               <span>TRANSCRIPTION EN DIRECT</span>
-              <span className="text-cyan-400">DIFFUSION ACTIVE</span>
+              <span className="text-role-agent">DIFFUSION ACTIVE</span>
             </div>
-            <p className="text-xs font-sans text-slate-200 leading-relaxed italic line-clamp-4">
+            <p className="text-xs font-sans text-texte leading-relaxed italic line-clamp-4">
               « {currentTextPreview || 'En attente de transmission...'} »
             </p>
           </div>
@@ -230,12 +223,12 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                     onSeek(val);
                   }
                 }}
-                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-red-600 focus:outline-none"
+                className="w-full h-2 bg-surface-2 rounded-lg appearance-none cursor-pointer accent-accent-texte focus:outline-none"
               />
             </div>
-            <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
-              <span>{formatTime(status.currentTime)}</span>
-              <span>{formatTime(status.duration)}</span>
+            <div className="flex items-center justify-between text-xs font-mono text-texte-attenue">
+              <span className="text-systeme tabular-nums">{formatTime(status.currentTime)}</span>
+              <span className="tabular-nums">{formatTime(status.duration)}</span>
             </div>
           </div>
 
@@ -247,7 +240,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                 sfx.playTerminalBeep();
                 onSeekTime(Math.max(0, status.currentTime - 10));
               }}
-              className="p-3 rounded-full bg-slate-900 border border-slate-800 text-slate-400 hover:text-white active:scale-95"
+              className="p-3 rounded-full bg-surface-1 border border-bordure text-texte-attenue hover:text-texte active:scale-95"
               title="-10 secondes"
             >
               <RotateCcw className="w-5 h-5" />
@@ -260,7 +253,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                 onPrevious();
               }}
               disabled={status.currentSegmentIndex <= 0}
-              className="p-3 rounded-full bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 active:scale-95"
+              className="p-3 rounded-full bg-surface-1 border border-bordure text-texte-second hover:text-texte disabled:opacity-30 active:scale-95"
               title="Segment précédent"
             >
               <SkipBack className="w-6 h-6" />
@@ -276,7 +269,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                   onPlay();
                 }
               }}
-              className="p-5 rounded-full bg-red-600 hover:bg-red-500 text-white shadow-[0_0_25px_rgba(220,38,38,0.5)] active:scale-95 transition-all"
+              className="p-5 rounded-full bg-accent hover:bg-accent-texte text-texte shadow-[0_0_25px_rgba(220,38,38,0.5)] active:scale-95 transition-all"
               title={status.isPlaying ? "Pause" : "Lecture"}
             >
               {status.isPlaying ? (
@@ -293,7 +286,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                 onNext();
               }}
               disabled={status.currentSegmentIndex >= status.totalSegments - 1}
-              className="p-3 rounded-full bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 active:scale-95"
+              className="p-3 rounded-full bg-surface-1 border border-bordure text-texte-second hover:text-texte disabled:opacity-30 active:scale-95"
               title="Segment suivant"
             >
               <SkipForward className="w-6 h-6" />
@@ -305,7 +298,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                 sfx.playTerminalBeep();
                 onSeekTime(Math.min(status.duration, status.currentTime + 10));
               }}
-              className="p-3 rounded-full bg-slate-900 border border-slate-800 text-slate-400 hover:text-white active:scale-95"
+              className="p-3 rounded-full bg-surface-1 border border-bordure text-texte-attenue hover:text-texte active:scale-95"
               title="+10 secondes"
             >
               <RotateCw className="w-5 h-5" />
@@ -315,8 +308,8 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
           {/* Quick Settings Bar: Speed & Ambience & Mute */}
           <div className="grid grid-cols-2 gap-2 pt-1">
             {/* Speed Pills */}
-            <div className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl p-1.5">
-              <span className="text-[10px] font-mono text-slate-400 pl-1 font-bold">VITESSE</span>
+            <div className="flex items-center justify-between bg-surface-1 border border-bordure rounded-xl p-1.5">
+              <span className="text-xs font-mono text-texte-attenue pl-1 font-bold">VITESSE</span>
               <div className="flex gap-1">
                 {speeds.map((spd) => (
                   <button
@@ -325,10 +318,10 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                       sfx.playTerminalBeep();
                       onSpeedChange(spd);
                     }}
-                    className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
+                    className={`px-2 py-0.5 rounded text-xs font-mono transition-all ${
                       status.globalSpeed === spd
-                        ? 'bg-red-600 text-white font-bold'
-                        : 'text-slate-400 hover:text-white'
+                        ? 'bg-accent text-texte font-bold'
+                        : 'text-texte-attenue hover:text-texte'
                     }`}
                   >
                     {spd}x
@@ -338,21 +331,21 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
             </div>
 
             {/* Ambience & Mute Controls */}
-            <div className="flex items-center justify-around bg-slate-900 border border-slate-800 rounded-xl p-1.5">
+            <div className="flex items-center justify-around bg-surface-1 border border-bordure rounded-xl p-1.5">
               {/* Containment Ambience toggle */}
               <button
                 onClick={() => {
                   sfx.playTerminalBeep();
                   onToggleAmbience();
                 }}
-                className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-mono transition-all ${
+                className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-mono transition-all ${
                   ambienceActive
-                    ? 'bg-emerald-950 border border-emerald-700 text-emerald-300 font-bold'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-surface-3 border border-classe-safe text-classe-safe font-bold'
+                    : 'text-texte-attenue hover:text-texte'
                 }`}
                 title="Bruit blanc de confinement"
               >
-                <Radio className={`w-3 h-3 ${ambienceActive ? 'animate-pulse text-emerald-400' : ''}`} />
+                <Radio className={`w-3 h-3 ${ambienceActive ? 'text-classe-safe' : ''}`} />
                 <span>AMBIANCE</span>
               </button>
 
@@ -363,7 +356,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                   onToggleMute();
                 }}
                 className={`p-1.5 rounded text-xs transition-all ${
-                  status.isMuted ? 'text-red-400 bg-red-950/60' : 'text-slate-400 hover:text-white'
+                  status.isMuted ? 'text-accent-texte bg-surface-3/60' : 'text-texte-attenue hover:text-texte'
                 }`}
                 title="Sourdine"
               >

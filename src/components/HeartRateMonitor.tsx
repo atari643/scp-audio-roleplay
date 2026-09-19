@@ -10,11 +10,11 @@ interface HeartRateMonitorProps {
 }
 
 const ROLE_BPM: Record<CharacterRole, { base: number; max: number; color: string }> = {
-  narrator:   { base: 62,  max: 68,  color: '#06b6d4' },
-  researcher: { base: 72,  max: 85,  color: '#10b981' },
-  anomaly:    { base: 110, max: 145, color: '#ef4444' },
-  classD:     { base: 90,  max: 115, color: '#f59e0b' },
-  agent:      { base: 78,  max: 95,  color: '#06b6d4' },
+  narrator:   { base: 62,  max: 68,  color: 'var(--role-narrateur)' },
+  researcher: { base: 72,  max: 85,  color: 'var(--role-chercheur)' },
+  anomaly:    { base: 110, max: 145, color: 'var(--role-anomalie)' },
+  classD:     { base: 90,  max: 115, color: 'var(--role-classed)' },
+  agent:      { base: 78,  max: 95,  color: 'var(--role-agent)' },
   commander:  { base: 65,  max: 78,  color: '#a855f7' },
   intercom:   { base: 60,  max: 65,  color: '#94a3b8' },
 };
@@ -90,9 +90,9 @@ export const HeartRateMonitor: React.FC<HeartRateMonitorProps> = ({
 
   if (compact) {
     return (
-      <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/60 border border-slate-800 text-[10px] font-mono select-none ${className || ''}`}>
+      <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/60 border border-bordure text-xs font-mono select-none ${className || ''}`}>
         <Activity
-          className={`w-3 h-3 shrink-0 ${isCritical ? 'animate-bpm-pulse text-red-500' : ''}`}
+          className={`w-3 h-3 shrink-0 ${isCritical ? 'animate-bpm-pulse text-accent-texte' : ''}`}
           style={{ color: roleDef.color }}
         />
         <span
@@ -101,7 +101,7 @@ export const HeartRateMonitor: React.FC<HeartRateMonitorProps> = ({
         >
           {bpmInt}
         </span>
-        <span className="text-[8px] text-slate-500">BPM</span>
+        <span className="text-[8px] text-texte-attenue">BPM</span>
       </div>
     );
   }
@@ -131,7 +131,7 @@ export const HeartRateMonitor: React.FC<HeartRateMonitorProps> = ({
         >
           {bpmInt}
         </div>
-        <div className="text-[8px] font-mono text-slate-600">BPM</div>
+        <div className="text-[8px] font-mono text-texte-attenue">BPM</div>
       </div>
     </div>
   );

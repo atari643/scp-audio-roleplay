@@ -1,0 +1,83 @@
+name: "🔊 Problème de lecture audio"
+description: "Une voix, une prononciation, une pause ou un passage lu de travers."
+title: "[Audio] "
+labels: ["audio", "à trier"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci ! Les champs ci-dessous permettent presque toujours de reproduire
+        le problème du premier coup.
+
+  - type: input
+    id: dossier
+    attributes:
+      label: Numéro du dossier
+      description: "Le SCP concerné, tel qu'il s'affiche."
+      placeholder: "SCP-173, SCP-5618, SCP-608-FR…"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: langue
+    attributes:
+      label: Branche linguistique
+      options:
+        - Français
+        - Anglais
+        - Allemand
+        - Espagnol
+        - Italien
+        - Japonais
+        - Coréen
+        - Polonais
+        - Russe
+        - Chinois
+    validations:
+      required: true
+
+  - type: dropdown
+    id: nature
+    attributes:
+      label: Nature du problème
+      options:
+        - Un mot est mal prononcé
+        - Un passage n'est pas lu du tout
+        - Un passage est lu deux fois
+        - La mauvaise voix parle
+        - La lecture s'arrête ou plante
+        - Le suivi du mot à l'écran est décalé
+        - Autre
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Ce que vous entendez, et ce que vous attendiez
+      placeholder: |
+        Entendu : « S C P tiret six cent huit tiret F R »
+        Attendu : « S C P six cent huit F R »
+    validations:
+      required: true
+
+  - type: input
+    id: voix
+    attributes:
+      label: Voix et rôle concernés
+      description: "Si vous le savez — le badge du locuteur l'indique à l'écran."
+      placeholder: "Rémy (narrateur), Vivienne (intercom)…"
+
+  - type: dropdown
+    id: plateforme
+    attributes:
+      label: Plateforme
+      options:
+        - Chrome (ordinateur)
+        - Edge (ordinateur)
+        - Firefox (ordinateur)
+        - Safari (ordinateur)
+        - Navigateur mobile
+        - Application Android
+    validations:
+      required: true

@@ -1,3 +1,16 @@
+# ---------------------------------------------------------------------------
+# Secrets — ce dépôt est PUBLIC. Rien de ce qui suit ne doit jamais être poussé.
+#
+# `.env*` et non `.env` : un `.env.local` ou un `.env.production` créé plus tard
+# serait passé entre les mailles de l'ancienne règle.
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.exemple
+*.jks
+*.keystore
+keystore.properties
+
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
 scripts/.build/
@@ -5,12 +18,12 @@ scripts/.audit-cache/
 scripts/.probe-cache/
 scripts/audit-*.json
 dist-server/
-.env
 
 # Dépendances et produits de build
 node_modules/
 dist/
 tsconfig.tsbuildinfo
+.vercel/
 
 # Sorties audio de travail (régénérables : probe-speech.mjs, echantillons)
 tmp/
@@ -26,6 +39,9 @@ android/.idea/
 android/local.properties
 android/app/src/main/assets/public/
 android/capacitor-cordova-android-plugins/build/
+
+# Outillage personnel de la machine de développement, sans rapport avec l'app
+bascule/
 
 # Réglages locaux de l'agent (permissions propres à la machine)
 .claude/settings.local.json

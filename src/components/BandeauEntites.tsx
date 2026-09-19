@@ -28,14 +28,27 @@ const ICONES: Record<CategorieEntite, React.ComponentType<{ className?: string }
   commandement: Database
 };
 
+// Une teinte par catégorie, tirée des jetons existants — aucune couleur inventée.
+//
+// DEUX informations se superposent ici, et il ne faut jamais les confondre :
+//
+//   la TEINTE dit la catégorie (département, chercheur, faction, site, FIM) ;
+//   le TRAIT dit la certitude — plein pour un lien écrit par la communauté
+//   (tag, annuaire, origine), pointillé et atténué pour une simple mention
+//   repérée dans le texte.
+//
+// La seconde est un invariant du projet : elle empêche la liste de passer pour un
+// inventaire factuel qu'elle n'est pas. Le retour de la couleur ne doit pas
+// l'effacer, d'où le choix de porter la catégorie par la teinte et la certitude
+// par le trait : deux canaux distincts, jamais le même.
 const COULEURS: Record<CategorieEntite, string> = {
-  departement: 'border-purple-700/60 bg-purple-950/40 text-purple-300 hover:border-purple-500',
-  chercheur: 'border-cyan-700/60 bg-cyan-950/40 text-cyan-300 hover:border-cyan-500',
-  faction: 'border-amber-700/60 bg-amber-950/40 text-amber-300 hover:border-amber-500',
-  site: 'border-emerald-700/60 bg-emerald-950/40 text-emerald-300 hover:border-emerald-500',
-  zone: 'border-lime-700/60 bg-lime-950/40 text-lime-300 hover:border-lime-500',
-  fim: 'border-red-700/60 bg-red-950/40 text-red-300 hover:border-red-500',
-  commandement: 'border-slate-600/60 bg-slate-800/40 text-slate-300 hover:border-slate-400'
+  departement: 'text-classe-thaumiel border-classe-thaumiel/45 bg-classe-thaumiel/10 hover:bg-classe-thaumiel/20',
+  chercheur: 'text-systeme border-systeme/45 bg-systeme/10 hover:bg-systeme/20',
+  faction: 'text-classe-euclid border-classe-euclid/45 bg-classe-euclid/10 hover:bg-classe-euclid/20',
+  site: 'text-classe-safe border-classe-safe/45 bg-classe-safe/10 hover:bg-classe-safe/20',
+  zone: 'text-classe-safe border-classe-safe/45 bg-classe-safe/10 hover:bg-classe-safe/20',
+  fim: 'text-accent-texte border-accent-texte/45 bg-accent-texte/10 hover:bg-accent-texte/20',
+  commandement: 'text-texte-second border-bordure bg-surface-2 hover:bg-surface-3'
 };
 
 const EXPLICATION: Record<Certitude, string> = {
@@ -75,12 +88,12 @@ export const BandeauEntites: React.FC<BandeauEntitesProps> = ({ slug, languageCo
   const caches = rattachements.length - visibles.length;
 
   return (
-    <div className="mt-3 pt-3 border-t border-scp-border/60">
+    <div className="mt-4 pt-3 border-t border-bordure-faible">
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500">
+        <span className="text-xs font-mono uppercase tracking-wider text-texte-attenue">
           Rattachements
         </span>
-        <span className="text-[10px] font-mono text-slate-600">
+        <span className="text-xs font-mono text-texte-attenue">
           {confirmes.length} confirmé{confirmes.length > 1 ? 's' : ''}
           {mentions.length > 0 && ` · ${mentions.length} mention${mentions.length > 1 ? 's' : ''}`}
         </span>
@@ -97,15 +110,15 @@ export const BandeauEntites: React.FC<BandeauEntitesProps> = ({ slug, languageCo
               onClick={() => onOuvrirEntite?.(entite.id)}
               disabled={!onOuvrirEntite}
               title={`${nomEntite(entite, languageCode)} — ${EXPLICATION[certitude]}`}
-              className={`flex items-center gap-1.5 text-[11px] font-mono px-2 py-1 rounded border transition-colors min-h-[32px] ${
+              className={`flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-sm border transition-colors min-h-[44px] sm:min-h-[32px] ${
                 COULEURS[entite.categorie]
-              } ${estMention ? 'opacity-60 border-dashed' : ''} ${
+              } ${estMention ? 'opacity-65 border-dashed' : ''} ${
                 onOuvrirEntite ? 'cursor-pointer' : 'cursor-default'
               }`}
             >
               <Icone className="w-3 h-3 shrink-0" />
               <span className="truncate max-w-[190px]">{nomEntite(entite, languageCode)}</span>
-              {estMention && <span className="text-[9px] opacity-70">?</span>}
+              {estMention && <span className="text-xs opacity-70">?</span>}
             </button>
           );
         })}
@@ -114,7 +127,7 @@ export const BandeauEntites: React.FC<BandeauEntitesProps> = ({ slug, languageCo
           <button
             type="button"
             onClick={() => setToutAfficher(true)}
-            className="text-[11px] font-mono px-2 py-1 rounded border border-slate-700 text-slate-400 hover:text-slate-200 min-h-[32px]"
+            className="text-xs font-mono px-2.5 py-1 rounded-sm border border-bordure text-texte-attenue hover:text-texte min-h-[44px] sm:min-h-[32px]"
           >
             +{caches}
           </button>

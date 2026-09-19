@@ -22,8 +22,21 @@ export interface BadgesEcouteProps {
   className?: string;
 }
 
-const CLASSE_PASTILLE =
-  'inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[10px] leading-none';
+// Ces pastilles répondent à la question « qu'est-ce que je vais écouter, et
+// combien de temps ». Chacune porte sa teinte, mais toutes sont tirées du même
+// jeu de jetons que le reste de l'application — aucune couleur inventée ici.
+//
+//   durée, solo   neutre      le cas ordinaire, une métadonnée pure
+//   théâtre       système     plusieurs voix : une propriété technique du dossier
+//   patrimoine    euclid      signal rare, doré
+//   pépite        système     signal rare, froid
+//   note négative accent      la seule alerte de la série
+const SOCLE_PASTILLE =
+  'inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 font-mono text-xs leading-none';
+
+const CLASSE_PASTILLE = `${SOCLE_PASTILLE} border-bordure bg-surface-1 text-texte-attenue`;
+const PASTILLE_SYSTEME = `${SOCLE_PASTILLE} border-systeme/45 bg-systeme/10 text-systeme`;
+const PASTILLE_PATRIMOINE = `${SOCLE_PASTILLE} border-classe-euclid/45 bg-classe-euclid/10 text-classe-euclid`;
 
 export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
   meta,
@@ -38,21 +51,21 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
     <div className={`flex flex-wrap items-center gap-1.5 ${className}`}>
       {meta && (
         <span
-          className={`${CLASSE_PASTILLE} bg-slate-800/80 text-slate-300 border border-slate-700`}
+          className={CLASSE_PASTILLE}
           title={
             meta.dureeApproximative
               ? 'Dossier paginé : seule la première page est mesurée, la durée réelle est supérieure.'
               : 'Durée d’écoute estimée à 150 mots/minute.'
           }
         >
-          <Clock className="w-3 h-3 text-slate-400" />
+          <Clock className="w-3 h-3" />
           {meta.duree}
         </span>
       )}
 
       {meta && meta.ecoute === 'theatre' && (
         <span
-          className={`${CLASSE_PASTILLE} bg-purple-950/70 text-purple-300 border border-purple-800/70`}
+          className={PASTILLE_SYSTEME}
           title={`${meta.voix} voix distinctes, ${meta.partDialogue} % de dialogue`}
         >
           <Drama className="w-3 h-3" />
@@ -62,7 +75,7 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
 
       {meta && meta.ecoute === 'solo' && (
         <span
-          className={`${CLASSE_PASTILLE} bg-slate-800/60 text-slate-400 border border-slate-700/70`}
+          className={CLASSE_PASTILLE}
           title="Lecture narrée, presque sans dialogue"
         >
           <Mic className="w-3 h-3" />
@@ -72,7 +85,7 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
 
       {meta?.notoriete === 'patrimoine' && (
         <span
-          className={`${CLASSE_PASTILLE} bg-amber-950/70 text-amber-300 border border-amber-800/70`}
+          className={PASTILLE_PATRIMOINE}
           title="Parmi les mieux notés et les plus lus de son année"
         >
           <Landmark className="w-3 h-3" />
@@ -82,7 +95,7 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
 
       {meta?.notoriete === 'pepite' && (
         <span
-          className={`${CLASSE_PASTILLE} bg-cyan-950/70 text-cyan-300 border border-cyan-800/70`}
+          className={PASTILLE_SYSTEME}
           title="Excellent pour sa génération, mais resté sous les radars"
         >
           <Gem className="w-3 h-3" />
@@ -92,9 +105,7 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
 
       {rating !== undefined && (
         <span
-          className={`${CLASSE_PASTILLE} ${
-            rating >= 0 ? 'text-slate-400' : 'text-red-400'
-          }`}
+          className={`${CLASSE_PASTILLE} ${rating < 0 ? '!text-accent-texte' : ''}`}
           title="Note de la communauté Wikidot"
         >
           <Star className="w-3 h-3" />

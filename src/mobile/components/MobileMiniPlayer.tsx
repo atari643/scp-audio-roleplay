@@ -29,15 +29,19 @@ export const MobileMiniPlayer: React.FC<MobileMiniPlayerProps> = ({
     : 0;
 
   return (
-    <div 
-      className="fixed bottom-[53px] left-0 right-0 z-30 px-2 pb-1"
+    <div
+      className="fixed left-0 right-0 z-30 px-2 pb-1"
+      /* 53 px = hauteur de `MobileBottomNav`, à laquelle celle-ci ajoute le retrait de la
+         barre de gestes. Sans le même ajout ici, le mini-lecteur passe DERRIÈRE la barre
+         de navigation sur tous les téléphones sans bouton physique. */
+      style={{ bottom: 'calc(53px + env(safe-area-inset-bottom, 0px))' }}
       onClick={onExpand}
     >
-      <div className="bg-slate-900/95 border border-red-900/60 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden cursor-pointer hover:border-red-700/80 transition-all">
+      <div className="bg-surface-1/95 border border-accent-texte/60 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden cursor-pointer hover:border-accent-texte/80 transition-all">
         {/* Continuous Slim Progress Bar */}
-        <div className="w-full bg-slate-800 h-1">
+        <div className="w-full bg-surface-2 h-1">
           <div 
-            className="bg-red-600 h-full transition-all duration-300"
+            className="bg-accent h-full transition-all duration-300"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -45,17 +49,17 @@ export const MobileMiniPlayer: React.FC<MobileMiniPlayerProps> = ({
         <div className="px-3 py-2 flex items-center justify-between gap-3">
           {/* Speaker Avatar & Info */}
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
-            <div className="w-8 h-8 rounded-lg bg-red-950/90 border border-red-800/80 flex items-center justify-center shrink-0 text-red-400">
+            <div className="w-8 h-8 rounded-lg bg-surface-3/90 border border-accent-texte/80 flex items-center justify-center shrink-0 text-accent-texte">
               <User className="w-4 h-4" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-white truncate">
-                <span className="text-red-400 truncate">{status.currentSpeaker}</span>
-                <span className="text-[10px] text-slate-400 shrink-0 font-normal">
-                  ({status.currentSegmentIndex + 1}/{status.totalSegments})
+              <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-texte truncate">
+                <span className="text-accent-texte truncate">{status.currentSpeaker}</span>
+                <span className="text-xs text-texte-attenue shrink-0 font-normal">
+                  (<span className="text-systeme tabular-nums">{status.currentSegmentIndex + 1}</span>/<span className="tabular-nums">{status.totalSegments}</span>)
                 </span>
               </div>
-              <p className="text-[11px] font-sans text-slate-300 truncate leading-tight">
+              <p className="text-xs font-sans text-texte-second truncate leading-tight">
                 {currentTextPreview || 'Diffusion audio SCiPNET...'}
               </p>
             </div>
@@ -73,7 +77,7 @@ export const MobileMiniPlayer: React.FC<MobileMiniPlayerProps> = ({
                   onPlay();
                 }
               }}
-              className="p-2 rounded-lg bg-red-600 hover:bg-red-500 active:scale-95 text-white transition-all shadow-md"
+              className="p-2 rounded-lg bg-accent hover:bg-accent-texte active:scale-95 text-texte transition-all shadow-md"
               title={status.isPlaying ? "Pause" : "Lecture"}
             >
               {status.isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
@@ -86,7 +90,7 @@ export const MobileMiniPlayer: React.FC<MobileMiniPlayerProps> = ({
                 onNext();
               }}
               disabled={status.currentSegmentIndex >= status.totalSegments - 1}
-              className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white disabled:opacity-30 active:scale-95 transition-all"
+              className="p-2 rounded-lg bg-surface-2 text-texte-second hover:text-texte disabled:opacity-30 active:scale-95 transition-all"
               title="Segment suivant"
             >
               <SkipForward className="w-4 h-4" />
@@ -95,7 +99,7 @@ export const MobileMiniPlayer: React.FC<MobileMiniPlayerProps> = ({
             {/* Expand Indicator */}
             <button
               onClick={onExpand}
-              className="p-1.5 text-slate-400 hover:text-white"
+              className="p-1.5 text-texte-attenue hover:text-texte"
               title="Agrandir le lecteur"
             >
               <ChevronUp className="w-4 h-4" />
