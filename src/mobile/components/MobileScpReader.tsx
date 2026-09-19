@@ -6,6 +6,7 @@ import { WikiLink } from '../../services/linkExtractor';
 import { SpokenLine } from '../../components/SpokenLine';
 import { ReadingQueue } from '../../components/ReadingQueue';
 import { BandeauEntites } from '../../components/BandeauEntites';
+import { CreditsDossier } from '../../components/CreditsDossier';
 import {
   habillageClasse,
   styleBadgeClasse,
@@ -262,6 +263,14 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
           );
         })}
       </div>
+
+      {/* Crédits et licence — obligation CC BY-SA 3.0, cf. NOTICE-SCP.md */}
+      <CreditsDossier
+        attributions={scp.attributions}
+        url={scp.url}
+        titre={scp.title}
+        className="mt-5"
+      />
     </div>
   );
 };

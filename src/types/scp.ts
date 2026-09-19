@@ -135,4 +135,25 @@ export interface ScpItemDetail extends ScpItemSummary {
   source?: string;
   translations?: Array<{ url: string; language?: string }>;
   authors?: string[];
+  /**
+   * Qui a écrit le dossier, et à quel titre.
+   *
+   * Ce n'est pas un ornement : la licence CC BY-SA 3.0 du wiki impose de citer
+   * le titre, la source, l'auteur et la licence — la règle « TSAL ». Un lien
+   * vers la page d'origine couvre les trois premiers, pas l'auteur. Crom le
+   * connaît, on le demande donc et on l'affiche.
+   *
+   * Pour une traduction, la liste contient le traducteur ET l'auteur de
+   * l'original, que la licence oblige à créditer tout autant.
+   */
+  attributions?: AttributionScp[];
+}
+
+/** Une personne créditée sur un dossier, telle que Crom la renvoie. */
+export interface AttributionScp {
+  /** AUTHOR, SUBMITTER, TRANSLATOR, REWRITE, CONTRIBUTOR, MAINTAINER. */
+  type: string;
+  nom: string;
+  /** Renseigné quand la personne est créditée sur l'original traduit. */
+  surOriginal?: boolean;
 }

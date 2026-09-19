@@ -11,6 +11,7 @@ import {
   Crosshair
 } from 'lucide-react';
 import { ScpItemDetail } from '../types/scp';
+import { CreditsDossier } from './CreditsDossier';
 import { CharacterRole, SpeechSegment } from '../types/audioRoleplay';
 import { speechEngine } from '../services/speechEngine';
 import { sfx } from '../services/sfxService';
@@ -448,6 +449,14 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
           </pre>
         </div>
       )}
+
+      {/* Crédits et licence — obligation CC BY-SA 3.0, cf. NOTICE-SCP.md */}
+      <CreditsDossier
+        attributions={scp.attributions}
+        url={scp.url}
+        titre={scp.title}
+        className="mt-6 max-w-lecture"
+      />
     </div>
   );
 };

@@ -24,6 +24,11 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
   contribution, code de conduite, gabarits d'issue, intégration continue.
 - Lien « Source » vers la page d'origine du wiki dans le lecteur mobile — il
   n'existait que sur ordinateur, alors que la licence CC BY-SA l'impose.
+- Pavé de crédits au bas de chaque dossier, dans les deux lecteurs : auteur,
+  traducteur, titre, source et licence. Les crédits viennent des `attributions`
+  de Crom, et l'auteur de l'original est cité en plus du traducteur sur une
+  page traduite. La licence CC BY-SA 3.0 exige les quatre (règle « TSAL ») ;
+  l'application n'en affichait aucun.
 
 ### Modifié
 

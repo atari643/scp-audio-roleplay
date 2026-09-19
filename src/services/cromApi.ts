@@ -1,4 +1,4 @@
-import { LanguageBranch, ObjectClass, ScpItemDetail, ScpItemSummary, SUPPORTED_LANGUAGES } from '../types/scp';
+import { AttributionScp, LanguageBranch, ObjectClass, ScpItemDetail, ScpItemSummary, SUPPORTED_LANGUAGES } from '../types/scp';
 import { getSeriesById } from '../data/seriesData';
 import { ICONIC_SCPS } from './scpDataApi';
 
@@ -140,6 +140,97 @@ const SELECTION_LISTE = `
     thumbnailUrl
   }
 `;
+
+/**
+ * Sélection commune aux deux requêtes de détail.
+ *
+ * `attributions` et `translationOf` sont là pour la licence, pas pour le décor :
+ * le wiki SCP est en CC BY-SA 3.0, qui impose de citer l'auteur — le lien vers
+ * la page source ne suffit pas. Sur une traduction, c'est l'auteur de
+ * l'ORIGINAL qu'il faut créditer en plus du traducteur, d'où le second niveau.
+ *
+ * Le service facture par page et non par champ : ces deux champs ne coûtent
+ * rien en quota.
+ */
+const SELECTION_DETAIL = `
+  url
+  alternateTitles {
+    title
+  }
+  translations {
+    url
+  }
+  attributions {
+    type
+    user { name }
+  }
+  translationOf {
+    url
+    attributions {
+      type
+      user { name }
+    }
+  }
+  wikidotInfo {
+    title
+    rating
+    tags
+    textContent
+    source
+    thumbnailUrl
+    createdAt
+  }
+`;
+
+interface NoeudAttribution {
+  type: string;
+  user?: { name?: string } | null;
+}
+
+interface NoeudDetail {
+  url: string;
+  alternateTitles?: Array<{ title: string }>;
+  translations?: Array<{ url: string }>;
+  attributions?: NoeudAttribution[] | null;
+  translationOf?: { url: string; attributions?: NoeudAttribution[] | null } | null;
+  wikidotInfo?: {
+    title: string;
+    rating?: number;
+    tags?: string[];
+    textContent?: string;
+    source?: string;
+    thumbnailUrl?: string;
+    createdAt?: string;
+  };
+}
+
+/**
+ * Rassemble les crédits d'un dossier : ceux de la page, puis ceux de l'original
+ * quand c'est une traduction.
+ *
+ * Les doublons sont écartés sur le couple (nom, rôle) — une même personne peut
+ * être créditée des deux côtés sans qu'il faille l'écrire deux fois.
+ */
+function versAttributions(page: NoeudDetail): AttributionScp[] {
+  const vues = new Set<string>();
+  const credits: AttributionScp[] = [];
+
+  const ajouter = (noeuds: NoeudAttribution[] | null | undefined, surOriginal: boolean) => {
+    for (const noeud of noeuds || []) {
+      const nom = noeud?.user?.name?.trim();
+      if (!nom) continue;
+      const cle = `${nom}|${noeud.type}`;
+      if (vues.has(cle)) continue;
+      vues.add(cle);
+      credits.push(surOriginal ? { type: noeud.type, nom, surOriginal } : { type: noeud.type, nom });
+    }
+  };
+
+  ajouter(page.attributions, false);
+  ajouter(page.translationOf?.attributions, true);
+
+  return credits;
+}
 
 interface NoeudListe {
   url: string;
@@ -602,41 +693,13 @@ export const cromApi = {
     const detailQuery = `
       query GetScpDetail($url: URL!) {
         page(url: $url) {
-          url
-          alternateTitles {
-            title
-          }
-          translations {
-            url
-          }
-          wikidotInfo {
-            title
-            rating
-            tags
-            textContent
-            source
-            thumbnailUrl
-            createdAt
-          }
+${SELECTION_DETAIL}
         }
       }
     `;
 
     interface DetailResponse {
-      page?: {
-        url: string;
-        alternateTitles?: Array<{ title: string }>;
-        translations?: Array<{ url: string }>;
-        wikidotInfo?: {
-          title: string;
-          rating?: number;
-          tags?: string[];
-          textContent?: string;
-          source?: string;
-          thumbnailUrl?: string;
-          createdAt?: string;
-        };
-      };
+      page?: NoeudDetail;
     }
 
     try {
@@ -676,7 +739,8 @@ export const cromApi = {
         textContent: wiki.textContent,
         source: wiki.source,
         createdAt: wiki.createdAt,
-        translations: page.translations?.map(t => ({ url: t.url }))
+        translations: page.translations?.map(t => ({ url: t.url })),
+        attributions: versAttributions(page)
       };
     } catch (err) {
       console.error(`Erreur chargement SCP ${slug}:`, err);
@@ -837,41 +901,13 @@ export const cromApi = {
     const detailQuery = `
       query GetScpByUrl($url: URL!) {
         page(url: $url) {
-          url
-          alternateTitles {
-            title
-          }
-          translations {
-            url
-          }
-          wikidotInfo {
-            title
-            rating
-            tags
-            textContent
-            source
-            thumbnailUrl
-            createdAt
-          }
+${SELECTION_DETAIL}
         }
       }
     `;
 
     interface DetailResponse {
-      page?: {
-        url: string;
-        alternateTitles?: Array<{ title: string }>;
-        translations?: Array<{ url: string }>;
-        wikidotInfo?: {
-          title: string;
-          rating?: number;
-          tags?: string[];
-          textContent?: string;
-          source?: string;
-          thumbnailUrl?: string;
-          createdAt?: string;
-        };
-      };
+      page?: NoeudDetail;
     }
 
     try {
@@ -897,7 +933,8 @@ export const cromApi = {
         textContent: wiki.textContent,
         source: wiki.source,
         createdAt: wiki.createdAt,
-        translations: page.translations?.map(t => ({ url: t.url }))
+        translations: page.translations?.map(t => ({ url: t.url })),
+        attributions: versAttributions(page)
       };
     } catch (err) {
       console.error(`Erreur fetchScpDetailByUrl:`, err);
