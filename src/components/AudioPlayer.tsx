@@ -389,7 +389,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
           {/* Ambiance du Site-19 */}
           <button
             onClick={onToggleAmbience}
-            title={ambienceActive ? 'Couper le fond sonore du Site-19' : 'Activer le fond sonore du Site-19'}
+            title={t(ambienceActive ? 'ambiance.couper' : 'ambiance.activer')}
             aria-pressed={ambienceActive}
             className={`inline-flex items-center gap-1.5 h-8 px-2 rounded-sm border transition-colors ${FOCUS} ${
               ambienceActive

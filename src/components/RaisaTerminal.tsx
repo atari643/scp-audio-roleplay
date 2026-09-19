@@ -42,9 +42,9 @@ export const RaisaTerminal: React.FC<RaisaTerminalProps> = ({
   const t = useT();
   const [collapsed, setCollapsed] = useState(true);
   const [logs, setLogs] = useState<LogEntry[]>([
-    makeLog('success', 'RAISA_NODE', 'Connexion établie — SCiPNET Secure Terminal opérationnel.'),
-    makeLog('info',    'CROM_API',  'Synchronisation archive Crom v1.2 — OK.'),
-    makeLog('warn',    'MEMETIC',   'Dérive mémétique mesurée : 0.00% — Sujet stable.'),
+    makeLog('success', 'RAISA_NODE', t('log.connexion')),
+    makeLog('info',    'CROM_API',  t('log.synchro')),
+    makeLog('warn',    'MEMETIC',   t('log.derive')),
   ]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -72,20 +72,20 @@ export const RaisaTerminal: React.FC<RaisaTerminalProps> = ({
 
   useEffect(() => {
     if (!activeScpNumber) return;
-    addLog('info', 'DOSSIER_REQ', 'Extraction ' + activeScpNumber.toUpperCase() + ' autorisée — Chargement.');
+    addLog('info', 'DOSSIER_REQ', t('log.extraction', { dossier: activeScpNumber.toUpperCase() }));
     if (activeObjectClass === 'Keter' || activeObjectClass === 'Apollyon') {
       addLog('alert', 'SECURITY',
-        'DANGER — Anomalie ' + activeObjectClass + ' — Protocoles de confinement renforcés.');
+        t('log.danger', { classe: activeObjectClass }));
     }
   }, [activeScpNumber, activeObjectClass, addLog]);
 
   useEffect(() => {
     const msgs: [LogLevel, string, string][] = [
-      ['info',    'SITE19_CTRL', 'Vérification systèmes confinement — Secteurs OK.'],
-      ['warn',    'MEMETIC',     'Dérive mémétique dans les limites normales.'],
-      ['info',    'RAISA_NODE',  'Ping SCiPNET : 4ms — Stable.'],
-      ['info',    'CROM_API',    'Cache archive synchronisé.'],
-      ['success', 'NEURAL_TTS',  'Profils vocaux opérationnels.'],
+      ['info',    'SITE19_CTRL', t('log.secteurs')],
+      ['warn',    'MEMETIC',     t('log.deriveNormale')],
+      ['info',    'RAISA_NODE',  t('log.ping')],
+      ['info',    'CROM_API',    t('log.cache')],
+      ['success', 'NEURAL_TTS',  t('log.profils')],
     ];
     const interval = setInterval(() => {
       const [lvl, mod, msg] = msgs[Math.floor(Math.random() * msgs.length)];

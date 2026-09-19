@@ -10,6 +10,7 @@ import {
 } from '../../components/classification';
 import type { MetaDossier } from '../../services/corpusFilters';
 import { sfx } from '../../services/sfxService';
+import { useT } from '../../i18n';
 
 interface MobileScpCardProps {
   item: ScpItemSummary;
@@ -35,6 +36,7 @@ export const MobileScpCard: React.FC<MobileScpCardProps> = ({
   onSelect,
   onToggleFavorite
 }) => {
+  const t = useT();
   const habillage = habillageClasse(item.objectClass);
 
   return (
@@ -70,7 +72,7 @@ export const MobileScpCard: React.FC<MobileScpCardProps> = ({
             onToggleFavorite(item);
           }}
           aria-pressed={isFavorite}
-          title={isFavorite ? 'Retirer des dossiers classés' : 'Classer ce dossier'}
+          title={isFavorite ? t('favoris.retirer') : t('favoris.classerInfo')}
           className={`shrink-0 -m-2 w-11 h-11 flex items-center justify-center rounded-sm transition-colors ${
             isFavorite ? 'text-classe-euclid' : 'text-texte-attenue active:text-texte'
           }`}

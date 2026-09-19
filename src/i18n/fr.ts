@@ -306,6 +306,78 @@ export const FR = {
   'intercom.keter': 'Rappel : les interactions non autorisées avec des anomalies de classe Keter sont passibles de sanction.',
   'intercom.protocoles': 'Personnel de confinement, veuillez vérifier les protocoles de sécurité du secteur.',
 
+  // --- Certitudes d'un rattachement -----------------------------------------
+  'certitude.tag': 'Le dossier porte le tag de cette entité sur le wiki.',
+  'certitude.annuaire': "L'annuaire de la Fondation cite ce dossier sous cette entité.",
+  'certitude.origine': "Hérité de l'article original dont ce dossier est la traduction.",
+  'certitude.mention': 'Le texte nomme cette entité, sans que le wiki le déclare.',
+
+  // --- Bascule d'affichage --------------------------------------------------
+  'bascule.vueMobile': 'Vue mobile — basculer vers la vue bureau',
+  'bascule.vueBureau': 'Vue bureau — basculer vers la vue mobile',
+  'bascule.versBureau': 'Basculer vers la vue bureau',
+  'bascule.versMobile': 'Basculer vers la vue mobile',
+
+  // --- Accréditations -------------------------------------------------------
+  'accred.n1': 'Accès général',
+  'accred.n2': 'Dossiers restreints',
+  'accred.n3': 'Anomalies actives',
+  'accred.n4': 'Tous dossiers SCP',
+  'accred.n5': 'Autorité absolue',
+
+  // --- Journal du terminal RAISA --------------------------------------------
+  'log.connexion': 'Connexion établie — terminal sécurisé SCiPNET opérationnel.',
+  'log.synchro': 'Synchronisation de l\'archive Crom v1.2 — OK.',
+  'log.derive': 'Dérive mémétique mesurée : 0,00 % — sujet stable.',
+  'log.extraction': 'Extraction {dossier} autorisée — chargement.',
+  'log.danger': 'DANGER — anomalie {classe} — protocoles de confinement renforcés.',
+  'log.secteurs': 'Vérification des systèmes de confinement — secteurs OK.',
+  'log.deriveNormale': 'Dérive mémétique dans les limites normales.',
+  'log.ping': 'Ping SCiPNET : 4 ms — stable.',
+  'log.cache': 'Cache de l\'archive synchronisé.',
+  'log.profils': 'Profils vocaux opérationnels.',
+
+  // --- Favoris (carte et lecteur) -------------------------------------------
+  'favoris.retirer': 'Retirer des dossiers classés',
+  'favoris.classer': 'Ce dossier',
+  'favoris.classerInfo': 'Classer ce dossier',
+  'favoris.classe': 'Classé',
+  'favoris.titre': 'Dossiers classés',
+  'file.retirer': 'Retirer {libelle} de la file',
+  'file.miseDeCote': '{genre} · {cible} — clic : mettre de côté',
+
+  // --- Filtres rapides ------------------------------------------------------
+  'filtre.departements': 'Départements',
+  'filtre.departementsInfo': 'Départements de la Fondation',
+  'filtre.factionsInfo': "Groupes d'intérêt et factions paranormales",
+  'filtre.neutralise': 'NEUTRALISÉ',
+  'classe.tous': 'TOUS',
+  'classe.safe': 'SÛR',
+  'classe.euclid': 'EUCLIDE',
+  'classe.keter': 'KETER',
+  'classe.thaumiel': 'THAUMIEL',
+  'classe.apollyon': 'APOLLYON',
+
+  // --- Explorateur, suite ---------------------------------------------------
+  'explorateur.repertoire': 'Répertoire des entités · CL-5',
+  'explorateur.elements': '{n} ÉLÉMENT(S)',
+  'explorateur.dirigePar': ' — dirigé par : {nom}',
+
+  // --- Fond sonore ----------------------------------------------------------
+  'ambiance.couper': 'Couper le fond sonore du Site-19',
+  'ambiance.activer': 'Activer le fond sonore du Site-19',
+
+  // --- Navigation mobile ----------------------------------------------------
+  'nav.dossier': 'Dossier',
+  'nav.audio': 'Audio',
+  'nav.reglages': 'Réglages',
+  'nav.ecoute': 'Écoute',
+  'menu.desactiverSons': 'Désactiver les effets sonores',
+  'bio.autorisation': 'AUTORISATION ACCORDÉE // NIVEAU 4',
+  'bio.maintenezPouce': 'MAINTENEZ LE POUCE POUR DÉVERROUILLER',
+  'general.dossierIntrouvable': 'Dossier introuvable dans les archives.',
+  'general.aucunDossierOuvert': "Aucun dossier SCP n'est actuellement ouvert.",
+
   // --- Écran de confinement d'erreur ---------------------------------------
   'erreur.banniere': "Confinement de l'erreur",
   'erreur.titre': "L'interface a cessé de répondre.",

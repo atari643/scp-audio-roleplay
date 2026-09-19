@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Shield, ChevronDown, ChevronUp } from 'lucide-react';
-import { useT } from '../i18n';
+import { CleTraduction, useT } from '../i18n';
 
 const CLEARANCE_LEVELS = [
-  { level: 1, label: 'NIVEAU 1', color: 'var(--classe-safe)', description: 'Accès général' },
-  { level: 2, label: 'NIVEAU 2', color: 'var(--role-agent)', description: 'Dossiers restreints' },
-  { level: 3, label: 'NIVEAU 3', color: 'var(--classe-euclid)', description: 'Anomalies actives' },
-  { level: 4, label: 'NIVEAU 4 / RESTREINT', color: 'var(--accent-texte)', description: 'Tous dossiers SCP' },
-  { level: 5, label: 'O5-X', color: 'var(--classe-thaumiel)', description: 'Autorité absolue' },
+  { level: 1, label: 'NIVEAU 1', color: 'var(--classe-safe)', description: 'accred.n1' as CleTraduction },
+  { level: 2, label: 'NIVEAU 2', color: 'var(--role-agent)', description: 'accred.n2' as CleTraduction },
+  { level: 3, label: 'NIVEAU 3', color: 'var(--classe-euclid)', description: 'accred.n3' as CleTraduction },
+  { level: 4, label: 'NIVEAU 4 / RESTREINT', color: 'var(--accent-texte)', description: 'accred.n4' as CleTraduction },
+  { level: 5, label: 'O5-X', color: 'var(--classe-thaumiel)', description: 'accred.n5' as CleTraduction },
 ];
 
 interface AgentBadgeProps {

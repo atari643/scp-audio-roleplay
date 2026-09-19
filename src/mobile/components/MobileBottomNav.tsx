@@ -1,7 +1,7 @@
 import React from 'react';
 import { BookOpen, FileText, Headphones, Database, Sliders } from 'lucide-react';
 import { sfx } from '../../services/sfxService';
-import { useT } from '../../i18n';
+import { CleTraduction, useT } from '../../i18n';
 
 export type MobileTab = 'catalog' | 'reader' | 'audio' | 'scipnet' | 'settings';
 
@@ -21,10 +21,10 @@ interface Onglet {
 
 const ONGLETS: Onglet[] = [
   { cle: 'catalog', libelle: 'Archives', icone: BookOpen },
-  { cle: 'reader', libelle: 'Dossier', icone: FileText },
-  { cle: 'audio', libelle: 'Audio', icone: Headphones },
+  { cle: 'reader', libelle: 'nav.dossier' as CleTraduction, icone: FileText },
+  { cle: 'audio', libelle: 'nav.audio' as CleTraduction, icone: Headphones },
   { cle: 'scipnet', libelle: 'SCiPNET', icone: Database },
-  { cle: 'settings', libelle: 'Réglages', icone: Sliders }
+  { cle: 'settings', libelle: 'nav.reglages' as CleTraduction, icone: Sliders }
 ];
 
 /**
@@ -82,7 +82,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 
               <Icone className="w-5 h-5" />
               <span className="font-mono text-xs tracking-tight">
-                {cle === 'audio' && isPlaying ? 'Écoute' : libelle}
+                {cle === 'audio' && isPlaying ? t('nav.ecoute') : t(libelle as CleTraduction)}
               </span>
 
               {/* Pastille d'écoute : présente, immobile. */}

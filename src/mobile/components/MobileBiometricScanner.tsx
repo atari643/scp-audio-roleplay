@@ -134,10 +134,10 @@ export const MobileBiometricScanner: React.FC<MobileBiometricScannerProps> = ({
         <div className="mt-6 text-center">
           <p className="text-xs font-mono text-texte-second font-semibold">
             {isGranted
-              ? 'AUTORISATION ACCORDÉE // NIVEAU 4'
+              ? t('bio.autorisation')
               : isScanning
               ? `SCAN EN COURS... ${progress}%`
-              : 'MAINTENEZ LE POUCE POUR DÉVERROUILLER'}
+              : t('bio.maintenezPouce')}
           </p>
           <p className="text-xs font-mono text-texte-attenue mt-1">
             Protocole de sécurité RAISA / Empreinte SHA-256

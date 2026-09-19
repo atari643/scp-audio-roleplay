@@ -25,7 +25,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
     <FenetreScipnet
       isOpen={isOpen}
       onClose={onClose}
-      titre={`Dossiers classés (${favorites.length})`}
+      titre={`${t('favoris.titre')} (${favorites.length})`}
       classification="Archive personnelle"
       icone={<Bookmark className="w-4 h-4" />}
       largeur="max-w-lg"

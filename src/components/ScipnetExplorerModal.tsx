@@ -243,7 +243,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       titre="Explorateur SCiPNET"
-      classification="Répertoire des entités · CL-5"
+      classification={t('explorateur.repertoire')}
       icone={<FolderOpen className="w-4 h-4" />}
       largeur="max-w-6xl"
       hauteur="pleine"
@@ -479,7 +479,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
               <span className="text-xs text-texte-attenue font-mono shrink-0">
                 {currentSelection.type === 'entity' ? currentSelection.entity.code
                   : currentSelection.type === 'series' ? currentSelection.series.name
-                  : `${getRightPaneEntities().length} ÉLÉMENT(S)`}
+                  : `${t('explorateur.elements', { n: String(getRightPaneEntities().length) })}`}
               </span>
             </div>
 
@@ -511,7 +511,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
 
                         <p className="text-xs text-texte-attenue mb-2">
                           {currentSelection.entity.title}
-                          {currentSelection.entity.director && ` — Dirigé par : ${currentSelection.entity.director}`}
+                          {currentSelection.entity.director && `${t('explorateur.dirigePar', { nom: currentSelection.entity.director })}`}
                         </p>
 
                         {currentSelection.entity.motto && (

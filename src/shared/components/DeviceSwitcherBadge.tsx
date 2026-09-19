@@ -81,10 +81,10 @@ export const DeviceSwitcherBadge: React.FC<DeviceSwitcherBadgeProps> = ({
         onBlur={() => setDeploye(false)}
         title={
           isMobile
-            ? 'Vue mobile — basculer vers la vue bureau'
-            : 'Vue bureau — basculer vers la vue mobile'
+            ? t('bascule.vueMobile')
+            : t('bascule.vueBureau')
         }
-        aria-label={isMobile ? 'Basculer vers la vue bureau' : 'Basculer vers la vue mobile'}
+        aria-label={t(isMobile ? 'bascule.versBureau' : 'bascule.versMobile')}
         className={`h-11 min-w-11 flex items-center justify-center gap-1.5 rounded-full bg-fond/90 border ${bordure} ${couleur} backdrop-blur-md shadow-2xl px-3 font-mono text-xs font-bold tracking-technique transition-all hover:border-current focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-texte`}
       >
         <Icone className="w-4 h-4 shrink-0" />

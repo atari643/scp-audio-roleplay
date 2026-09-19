@@ -148,7 +148,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
               sfx.playTerminalBeep();
               onToggleFavorite();
             }}
-            title={isFavorite ? 'Retirer des dossiers classés' : 'Classer ce dossier'}
+            title={isFavorite ? t('favoris.retirer') : t('favoris.classerInfo')}
             aria-pressed={isFavorite}
             className={
               isFavorite

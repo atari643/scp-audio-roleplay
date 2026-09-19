@@ -475,8 +475,8 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
                     <BookOpen className="w-8 h-8 text-texte-attenue mx-auto mb-2" />
                     <p className="text-xs font-mono text-texte-second mb-3">
                       {activeSlug
-                        ? 'Dossier introuvable dans les archives.'
-                        : "Aucun dossier SCP n'est actuellement ouvert."}
+                        ? t('general.dossierIntrouvable')
+                        : t('general.aucunDossierOuvert')}
                     </p>
                     <button
                       onClick={() => setActiveTab('catalog')}

@@ -81,7 +81,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
               ? 'bg-surface-1 border-bordure text-classe-safe' 
               : 'bg-surface-1/60 border-bordure text-texte-attenue'
           }`}
-          title={sfxEnabled ? "Désactiver effets sonores" : "Activer effets sonores"}
+          title={t(sfxEnabled ? 'menu.desactiverSons' : 'menu.effetsSonores')}
           aria-label={t('menu.effetsSonores')}
         >
           {sfxEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}

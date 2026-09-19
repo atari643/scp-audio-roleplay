@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Building2, User, Radio, Shield, ShieldAlert, Layers, Database } from 'lucide-react';
 import { CategorieEntite, Certitude } from '../types/entities';
 import { chargerEntites, entitesDuDossier, nomEntite, Rattachement } from '../services/entityService';
+import { CleTraduction, useT } from '../i18n';
 
 /**
  * Les entités auxquelles un dossier est rattaché, sous son en-tête.
@@ -51,11 +52,11 @@ const COULEURS: Record<CategorieEntite, string> = {
   commandement: 'text-texte-second border-bordure bg-surface-2 hover:bg-surface-3'
 };
 
-const EXPLICATION: Record<Certitude, string> = {
-  tag: 'Le dossier porte le tag de cette entité sur le wiki.',
-  annuaire: "L'annuaire de la Fondation cite ce dossier sous cette entité.",
-  origine: "Hérité de l'article original dont ce dossier est la traduction.",
-  mention: 'Le texte nomme cette entité, sans que le wiki le déclare.'
+const EXPLICATION: Record<Certitude, CleTraduction> = {
+  tag: 'certitude.tag',
+  annuaire: 'certitude.annuaire',
+  origine: 'certitude.origine',
+  mention: 'certitude.mention'
 };
 
 interface BandeauEntitesProps {

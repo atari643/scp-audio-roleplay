@@ -4,7 +4,7 @@ import { ObjectClass } from '../../types/scp';
 import { sfx } from '../../services/sfxService';
 import { ScpSeriesInfo } from '../../data/seriesData';
 import { prefetchScpSeries } from '../../services/queryClient';
-import { useT } from '../../i18n';
+import { CleTraduction, useT } from '../../i18n';
 
 interface MobileSearchFiltersProps {
   onSearch: (query: string) => void;
@@ -25,14 +25,14 @@ interface MobileSearchFiltersProps {
   entiteFiltreNom?: string | null;
 }
 
-const CLASSES: Array<{ label: string; value: ObjectClass | 'ALL'; color: string }> = [
-  { label: 'TOUS', value: 'ALL', color: 'border-bordure text-texte-second' },
-  { label: 'SÛR', value: 'Safe', color: 'border-classe-safe text-classe-safe' },
-  { label: 'EUCLIDE', value: 'Euclid', color: 'border-classe-euclid text-classe-euclid' },
-  { label: 'KETER', value: 'Keter', color: 'border-accent-texte text-accent-texte' },
-  { label: 'THAUMIEL', value: 'Thaumiel', color: 'border-classe-thaumiel text-classe-thaumiel' },
-  { label: 'APOLLYON', value: 'Apollyon', color: 'border-accent-texte text-accent-texte' },
-  { label: 'NEUTRALISÉ', value: 'Neutralized', color: 'border-bordure-forte text-texte-attenue' }
+const CLASSES: Array<{ cle: CleTraduction; value: ObjectClass | 'ALL'; color: string }> = [
+  { cle: 'classe.tous', value: 'ALL', color: 'border-bordure text-texte-second' },
+  { cle: 'classe.safe', value: 'Safe', color: 'border-classe-safe text-classe-safe' },
+  { cle: 'classe.euclid', value: 'Euclid', color: 'border-classe-euclid text-classe-euclid' },
+  { cle: 'classe.keter', value: 'Keter', color: 'border-accent-texte text-accent-texte' },
+  { cle: 'classe.thaumiel', value: 'Thaumiel', color: 'border-classe-thaumiel text-classe-thaumiel' },
+  { cle: 'classe.apollyon', value: 'Apollyon', color: 'border-accent-texte text-accent-texte' },
+  { cle: 'filtre.neutralise', value: 'Neutralized', color: 'border-bordure-forte text-texte-attenue' }
 ];
 
 export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
@@ -139,7 +139,7 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
                   : `bg-surface-1/80 ${cls.color} opacity-80 hover:opacity-100`
               }`}
             >
-              {cls.label}
+              {t(cls.cle)}
             </button>
           );
         })}

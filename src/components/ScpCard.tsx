@@ -11,6 +11,7 @@ import {
   styleRegleClasse
 } from './classification';
 import type { MetaDossier } from '../services/corpusFilters';
+import { useT } from '../i18n';
 
 interface ScpCardProps {
   item: ScpItemSummary;
@@ -40,6 +41,7 @@ export const ScpCard: React.FC<ScpCardProps> = ({
   onSelect,
   onToggleFavorite
 }) => {
+  const t = useT();
   const habillage = habillageClasse(item.objectClass);
 
   const precharger = () => {
@@ -74,7 +76,7 @@ export const ScpCard: React.FC<ScpCardProps> = ({
               e.stopPropagation();
               onToggleFavorite(item, e);
             }}
-            title={isFavorite ? 'Retirer des dossiers classés' : 'Classer ce dossier'}
+            title={isFavorite ? t('favoris.retirer') : t('favoris.classerInfo')}
             aria-pressed={isFavorite}
             className={`shrink-0 w-7 h-7 flex items-center justify-center rounded-sm border transition-colors ${
               isFavorite

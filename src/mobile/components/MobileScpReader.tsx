@@ -119,7 +119,7 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
               onToggleFavorite();
             }}
             aria-pressed={isFavorite}
-            title={isFavorite ? 'Retirer des dossiers classés' : 'Classer ce dossier'}
+            title={isFavorite ? t('favoris.retirer') : t('favoris.classerInfo')}
             className={`w-10 h-10 flex items-center justify-center rounded-sm border ${
               isFavorite
                 ? 'border-classe-euclid text-classe-euclid'

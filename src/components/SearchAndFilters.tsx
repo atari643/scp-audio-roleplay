@@ -24,7 +24,7 @@ import {
 import { SCP_SERIES, ScpSeriesInfo } from '../data/seriesData';
 import { prefetchScpSeries } from '../services/queryClient';
 import { styleBadgeClasse } from './classification';
-import { useT } from '../i18n';
+import { CleTraduction, useT } from '../i18n';
 
 interface SearchAndFiltersProps {
   onSearch: (query: string) => void;
@@ -75,8 +75,8 @@ const CATEGORIES: Array<{
 }> = [
   {
     cle: 'departments',
-    libelle: 'Départements',
-    titre: 'Départements de la Fondation',
+    libelle: 'filtre.departements' as CleTraduction,
+    titre: 'filtre.departementsInfo',
     icone: Building2,
     entites: SCP_DEPARTMENTS
   },
@@ -90,7 +90,7 @@ const CATEGORIES: Array<{
   {
     cle: 'goi',
     libelle: 'Factions',
-    titre: "Groupes d'intérêt et factions paranormales",
+    titre: 'filtre.factionsInfo',
     icone: Radio,
     entites: SCP_GOI
   },

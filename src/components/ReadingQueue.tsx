@@ -64,7 +64,7 @@ export const ReadingQueue: React.FC<ReadingQueueProps> = ({ queue, onOpen, onRem
                 onClick={() => onRemove(link.target)}
                 className="px-3 border-t border-bordure/60 text-texte-attenue hover:text-accent-texte shrink-0"
                 style={{ minWidth: 44 }}
-                aria-label={`Retirer ${link.label} de la file`}
+                aria-label={t('file.retirer', { libelle: link.label })}
               >
                 <X className="w-3.5 h-3.5 mx-auto" />
               </button>
