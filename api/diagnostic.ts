@@ -11,13 +11,20 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
  * À supprimer une fois le relais opérationnel.
  */
 export default async function handler(_req: IncomingMessage, res: ServerResponse): Promise<void> {
-  let importRelatif = 'non testé';
-  try {
-    const mod = await import('../server/ttsHandler');
-    importRelatif = typeof mod.handleTtsRequest === 'function' ? 'ok' : 'chargé mais vide';
-  } catch (err) {
-    importRelatif = `ÉCHEC : ${err instanceof Error ? err.message : String(err)}`;
-  }
+  const essayer = async (charger: () => Promise<{ handleTtsRequest?: unknown }>) => {
+    try {
+      const mod = await charger();
+      return typeof mod.handleTtsRequest === 'function' ? 'ok' : 'chargé mais vide';
+    } catch (err) {
+      return `ÉCHEC : ${err instanceof Error ? err.message : String(err)}`;
+    }
+  };
+
+  // Les deux formes, pour trancher : sans extension (ce que le relais faisait, et qui
+  // n'existe pas en ESM) et avec « .js » (la forme ESM correcte, que esbuild, Vite et
+  // tsc résolvent vers le .ts voisin).
+  const sansExtension = await essayer(() => import('../server/ttsHandler'));
+  const avecExtension = await essayer(() => import('../server/ttsHandler.js'));
 
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
@@ -29,7 +36,8 @@ export default async function handler(_req: IncomingMessage, res: ServerResponse
         websocketGlobal: typeof (globalThis as { WebSocket?: unknown }).WebSocket,
         cryptoSubtle: typeof globalThis.crypto?.subtle,
         vercelUrl: process.env.VERCEL_URL ?? null,
-        importRelatif
+        sansExtension,
+        avecExtension
       },
       null,
       2

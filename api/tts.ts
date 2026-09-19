@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { handleTtsRequest } from '../server/ttsHandler';
+import { handleTtsRequest } from '../server/ttsHandler.js';
 
 /**
  * `/api/tts` en fonction serverless (Vercel, Netlify Functions, runtime Node).

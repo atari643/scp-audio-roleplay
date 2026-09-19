@@ -18,7 +18,11 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { synthesize } from '../src/services/edgeTts';
+// Extension explicite : une fonction serverless est compilée en ESM, où un import
+// relatif sans extension n'existe pas — le relais plantait au chargement avec
+// « Cannot find module '/var/task/server/ttsHandler' ». esbuild, Vite et tsc
+// résolvent « .js » vers le « .ts » voisin, donc rien ne change en local.
+import { synthesize } from '../src/services/edgeTts.js';
 
 /**
  * Remet le signe d'un paramètre de prosodie.
