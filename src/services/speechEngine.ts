@@ -1273,7 +1273,15 @@ class SpeechEngine {
   }
 
   private fallbackSystemSpeech(index: number, segment: SpeechSegment, token: number = this.playToken): void {
-    if (!this.synth) return;
+    // Dernier recours indisponible : le moteur neural a déjà échoué et il n'y a pas
+    // de `speechSynthesis` derrière (WebView restreinte, contexte non sécurisé).
+    // Sortir en silence laissait l'interface figée sur « en lecture » pendant que
+    // plus rien ne parlait ; un arrêt propre émet un statut, donc l'UI le montre.
+    if (!this.synth) {
+      console.warn('[speechEngine] Aucune synthèse disponible : ni neurale, ni système.');
+      this.stop();
+      return;
+    }
     if (token !== this.playToken) return;
 
     const utterance = new SpeechSynthesisUtterance(this.speechTextFor(segment));

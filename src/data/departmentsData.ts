@@ -22,6 +22,15 @@ export interface ScpEntity {
   motto?: string;
   description: string;
   lore: string;
+  /**
+   * Page du wiki d'où le texte affiché a été repris, quand c'en est un.
+   *
+   * Posé par `versScpEntity()` **uniquement** si l'entité a un `resume` tiré d'un
+   * annuaire : ce texte est repris verbatim et reste sous CC BY-SA 3.0, donc la
+   * licence exige qu'on le crédite. Absent sur les entités du calque éditorial,
+   * dont le texte est rédigé ici et n'a rien à créditer.
+   */
+  sourceWiki?: string;
   queryKeywords: string[];
   iconicScps: string[];
   color: string;

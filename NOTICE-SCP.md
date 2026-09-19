@@ -5,9 +5,15 @@
 > communautaire et reste publié sous **CC BY-SA 3.0** — c'est l'objet de cette
 > page.
 
-Cette application **ne contient aucun dossier SCP**. Elle les récupère à la
-demande sur le wiki communautaire de la Fondation SCP, via l'API publique
+Cette application **ne contient le texte d'aucun dossier SCP**. Elle les récupère
+à la demande sur le wiki communautaire de la Fondation SCP, via l'API publique
 [Crom](https://api.crom.avn.sh/graphql), et les met en voix.
+
+Elle embarque en revanche, dans son répertoire d'entités
+(`src/data/entities.json`), **418 résumés courts repris des annuaires du wiki** —
+départements, sites, factions, personnel. Ce sont les seuls textes du wiki
+présents dans ce dépôt ; ils sont crédités et liés à leur page d'origine partout
+où ils s'affichent (voir le tableau ci-dessous).
 
 ## Licence du contenu
 
@@ -29,15 +35,21 @@ un pavé de crédits au bas de chaque dossier, dans les deux lecteurs :
 | **Source** | Lien vers la page d'origine, dans le pavé de crédits et dans le bouton « Source » de la barre d'outils. |
 | **Auteur** | Les crédits sont demandés à Crom (`attributions`) et affichés avec leur rôle : auteur, traducteur, réécriture… Pour une traduction, **l'auteur de l'original est cité en plus du traducteur**, comme la licence l'exige. Si Crom ne connaît pas les crédits d'une page, l'application le dit et renvoie à la page d'origine plutôt que de laisser croire qu'il n'y a pas d'auteur. |
 | **Licence** | Nommée et liée dans le pavé de crédits de chaque dossier, ainsi que sur cette page. |
+| **Répertoire d'entités** | Les résumés d'annuaires embarqués dans le dépôt portent, dans les deux vues, le nom de l'entité, un lien vers la page d'annuaire dont ils sont tirés et la licence. Une page d'annuaire est une œuvre collective sans auteur nominatif unique : le lien renvoie à la page et à son historique, qui font foi. |
 | **Indication des modifications** | L'application ne modifie pas le texte. Elle le découpe en répliques, attribue une voix à chaque personnage et normalise certaines formes **pour la prononciation uniquement** (« SCP-173 » lu « SCP cent soixante-treize ») : le texte affiché à l'écran reste celui du wiki. |
 
 ### Et la clause « partage dans les mêmes conditions » ?
 
 CC BY-SA impose qu'une **œuvre dérivée** soit republiée sous la même licence.
-Ce dépôt ne contient ni ne redistribue aucun texte SCP : le code est un lecteur,
-écrit indépendamment, et il est publié sous [licence MIT](LICENSE). La lecture
-audio d'un dossier est produite à la demande sur l'appareil de l'utilisateur et
-n'est stockée nulle part ailleurs que dans son propre navigateur.
+Le code de ce dépôt est un lecteur, écrit indépendamment de tout texte SCP, et il
+est publié sous [licence MIT](LICENSE). La lecture audio d'un dossier est produite
+à la demande sur l'appareil de l'utilisateur et n'est stockée nulle part ailleurs
+que dans son propre navigateur.
+
+Les résumés d'annuaires de `src/data/entities.json` sont, eux, du contenu du wiki
+redistribué : **ils restent sous CC BY-SA 3.0**, et la licence MIT ne s'y étend
+pas. Ils sont fournis avec leur source et leur licence, comme le veut la clause
+d'attribution ; qui les réutilise le fait sous CC BY-SA 3.0.
 
 Si vous réutilisez une capture, un enregistrement ou un extrait de dossier
 produit avec cette application, **c'est CC BY-SA 3.0 qui s'applique à ce que

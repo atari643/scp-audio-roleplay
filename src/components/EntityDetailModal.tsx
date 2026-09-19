@@ -14,6 +14,7 @@ import { ScpEntity } from '../data/departmentsData';
 import { EntityIllustration } from './illustrations/ScpIllustrations';
 import { sfx } from '../services/sfxService';
 import { FenetreScipnet } from './FenetreScipnet';
+import { MentionSourceWiki } from './MentionSourceWiki';
 
 interface EntityDetailModalProps {
   entity: ScpEntity | null;
@@ -254,6 +255,20 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
                 <span>MOTS-CLÉS DE RECHERCHE : </span>
                 <span className="text-texte-attenue italic">{entity.queryKeywords.join(', ')}</span>
               </div>
+
+              {/*
+                Les deux blocs ci-dessus reprennent le résumé de l'annuaire du wiki mot
+                pour mot. CC BY-SA 3.0 en exige la source : elle est dans les données
+                (`Entite.pages`) depuis le début, elle n'était simplement pas affichée.
+              */}
+              {entity.sourceWiki && (
+                <MentionSourceWiki
+                  url={entity.sourceWiki}
+                  titre={entity.name}
+                  intro="Résumé repris de"
+                  className="pt-2 border-t border-bordure-faible font-sans"
+                />
+              )}
             </div>
           </div>
         </div>

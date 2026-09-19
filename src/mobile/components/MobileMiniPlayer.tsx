@@ -58,6 +58,16 @@ export const MobileMiniPlayer: React.FC<MobileMiniPlayerProps> = ({
                 <span className="text-xs text-texte-attenue shrink-0 font-normal">
                   (<span className="text-systeme tabular-nums">{status.currentSegmentIndex + 1}</span>/<span className="tabular-nums">{status.totalSegments}</span>)
                 </span>
+                {/* Même signalement que dans la feuille plein écran, réduit à ce que
+                    la barre peut porter. Le détail et le bouton sont au-dessus. */}
+                {status.voixDegradee && (
+                  <span
+                    className="shrink-0 rounded-sm border border-bordure px-1 font-normal text-texte-attenue"
+                    title="Voix du navigateur : le moteur neural n'est pas joignable. Ouvrez le lecteur pour réessayer."
+                  >
+                    SECOURS
+                  </span>
+                )}
               </div>
               <p className="text-xs font-sans text-texte-second truncate leading-tight">
                 {currentTextPreview || 'Diffusion audio SCiPNET...'}

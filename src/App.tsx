@@ -3,6 +3,7 @@ import { useScpApp } from './shared/hooks/useScpApp';
 import { useDeviceMode } from './shared/hooks/useDeviceMode';
 import { DeviceSwitcherBadge } from './shared/components/DeviceSwitcherBadge';
 import { EcranAttente } from './shared/components/EcranAttente';
+import { LimiteErreur } from './shared/components/LimiteErreur';
 
 /**
  * Aiguilleur racine : route vers `DesktopApp` ou `MobileApp` selon la détection
@@ -38,14 +39,23 @@ export const App: React.FC = () => {
         lecteurVisible={app.playerStatus.totalSegments > 0}
       />
 
-      {/* Vue dédiée, chargée à la demande */}
-      <Suspense fallback={<EcranAttente />}>
-        {isMobile ? (
-          <MobileApp app={app} toggleMode={toggleMode} setDeviceMode={setDeviceMode} />
-        ) : (
-          <DesktopApp app={app} />
-        )}
-      </Suspense>
+      {/*
+        Vue dédiée, chargée à la demande.
+
+        La limite est DANS l'aiguilleur et non seulement à la racine : un `import()`
+        de chunk qui échoue traverse `<Suspense>`, qui ne rattrape que l'attente. La
+        placer ici garde la bascule desktop ⇄ mobile utilisable même quand la vue,
+        elle, n'a pas pu se charger.
+      */}
+      <LimiteErreur contexte={isMobile ? "l'interface mobile" : "l'interface bureau"}>
+        <Suspense fallback={<EcranAttente />}>
+          {isMobile ? (
+            <MobileApp app={app} toggleMode={toggleMode} setDeviceMode={setDeviceMode} />
+          ) : (
+            <DesktopApp app={app} />
+          )}
+        </Suspense>
+      </LimiteErreur>
     </>
   );
 };

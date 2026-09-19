@@ -2,6 +2,18 @@ import type { CapacitorConfig } from '@capacitor/cli';
 import { EDGE_USER_AGENT } from './src/services/edgeTts';
 
 /**
+ * Construit-on le paquet destiné au Play Store ?
+ *
+ * `npm_lifecycle_event` est posée par npm avec le nom du script en cours, sur toutes
+ * les plateformes — c'est pourquoi `android:release` appelle `cap sync` lui-même au
+ * lieu de passer par `cap:sync` : sinon la variable vaudrait `cap:sync` et on ne
+ * saurait plus distinguer une release d'un build de debug. `NODE_ENV` reste accepté
+ * pour qui construit à la main.
+ */
+const versLePlayStore =
+  process.env.NODE_ENV === 'production' || process.env.npm_lifecycle_event === 'android:release';
+
+/**
  * Empaquetage Android de l'app (vue mobile) via Capacitor.
  *
  * `webDir` pointe sur la sortie de `vite build`. Le middleware `/api/tts` de
@@ -27,8 +39,16 @@ const config: CapacitorConfig = {
   appName: 'SCP Audio',
   webDir: 'dist',
   android: {
-    // Laisse `chrome://inspect` s'attacher à la WebView pour lire la console.
-    webContentsDebuggingEnabled: true,
+    /**
+     * Laisse `chrome://inspect` s'attacher à la WebView pour lire la console.
+     *
+     * Conditionné, parce que ce réglage partait tel quel dans l'AAB du Play Store :
+     * n'importe qui pouvait alors inspecter l'application publiée. Seul
+     * `npm run android:release` le coupe ; tout le reste — dont
+     * `npm run android:debug` — garde l'inspection, qui est le seul moyen de lire
+     * la console d'un téléphone.
+     */
+    webContentsDebuggingEnabled: !versLePlayStore,
     // Voir plus haut : c'est ce qui rend les voix neurales possibles sur téléphone.
     overrideUserAgent: EDGE_USER_AGENT
   },

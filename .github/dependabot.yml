@@ -1,0 +1,29 @@
+# Mises à jour de dépendances.
+#
+# Ce fichier existe surtout pour une raison : sans lui, Dependabot échouait en
+# boucle sur l'avis `uuid` (GHSA, sévérité moyenne — contrôle de bornes manquant
+# sur `v3/v5/v6` quand un `buf` est fourni). La chaîne est
+# `@capacitor/cli` → `xcode` → `uuid@^7`, et le seul chemin de correction que npm
+# trouve rétrograderait `@capacitor/cli` de 8.5.1 à 8.4.3. Le bot refuse, signale
+# une erreur, et le dépôt public affiche un run rouge permanent pour un risque
+# nul : `@capacitor/cli` est une dépendance de développement, elle ne part ni dans
+# le paquet web, ni dans l'APK. L'ignorer est un choix, pas un oubli — à revoir
+# quand `@capacitor/cli` embarquera un `xcode` à jour.
+
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: uuid
+        versions: ['<9']
+
+  # Les actions des trois workflows (CI, miroir Pages, APK Android) : une action
+  # épinglée qui vieillit finit par tourner sur un runner qui ne la supporte plus.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

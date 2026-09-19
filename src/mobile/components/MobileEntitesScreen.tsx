@@ -7,9 +7,11 @@ import {
   compterDossiers,
   dossiersDeLEntite,
   entitesParCategorie,
-  nomEntite
+  nomEntite,
+  pageSourceEntite
 } from '../../services/entityService';
 import { sfx } from '../../services/sfxService';
+import { MentionSourceWiki } from '../../components/MentionSourceWiki';
 
 /**
  * Le répertoire de la Fondation, pensé pour le pouce.
@@ -80,6 +82,7 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
     const dossiers = dossiersDeLEntite(entiteOuverte.id, languageCode);
     const { confirmes, mentions } = compterDossiers(entiteOuverte.id, languageCode);
     const Icone = ICONES[entiteOuverte.categorie];
+    const pageSource = pageSourceEntite(entiteOuverte, languageCode);
 
     return (
       <div className="px-3 pb-28">
@@ -108,7 +111,22 @@ export const MobileEntitesScreen: React.FC<MobileEntitesScreenProps> = ({
           </div>
 
           {entiteOuverte.resume && (
-            <p className="mt-2.5 text-xs text-texte-second leading-relaxed break-words">{entiteOuverte.resume}</p>
+            <>
+              <p className="mt-2.5 text-xs text-texte-second leading-relaxed break-words">{entiteOuverte.resume}</p>
+              {/*
+                Ce résumé est repris mot pour mot de l'annuaire du wiki, donc sous
+                CC BY-SA 3.0 : la source est obligatoire, et `pages` la porte déjà
+                par branche. Même mention que sur ordinateur, même composant.
+              */}
+              {pageSource && (
+                <MentionSourceWiki
+                  url={pageSource}
+                  titre={nomEntite(entiteOuverte, languageCode)}
+                  intro="Résumé repris de"
+                  className="mt-2 break-words"
+                />
+              )}
+            </>
           )}
 
           <p className="mt-2.5 text-xs font-mono text-texte-attenue">

@@ -115,6 +115,19 @@ export function nomEntite(entite: Entite, langue: string): string {
   );
 }
 
+/**
+ * La page du wiki à citer pour une entité.
+ *
+ * Le résumé d'une entité est repris mot pour mot de l'annuaire : CC BY-SA 3.0 en
+ * exige la source, et c'est ce que renvoie cette fonction. Même repli que
+ * `nomEntite()` — la langue affichée, puis l'anglais qui est la seule branche
+ * présente partout, puis n'importe quelle branche connue. `undefined` quand le
+ * répertoire n'a aucune page : il n'y a alors rien d'honnête à afficher.
+ */
+export function pageSourceEntite(entite: Entite, langue: string): string | undefined {
+  return entite.pages[langue] ?? entite.pages.en ?? Object.values(entite.pages)[0];
+}
+
 export function entiteParId(id: string): Entite | undefined {
   return parId.get(id);
 }

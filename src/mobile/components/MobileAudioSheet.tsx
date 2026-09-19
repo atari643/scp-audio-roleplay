@@ -177,6 +177,25 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
                 <span className="w-1.5 h-1.5 rounded-full bg-accent-texte"></span>
                 <span className="uppercase">{status.currentRole}</span>
               </div>
+
+              {/*
+                Le signalement du mode dégradé n'existait que sur ordinateur, alors
+                que le téléphone est justement là où le repli se déclenche (WebView,
+                réseau instable). Sans lui, l'auditeur entend sept personnages avec
+                des voix système sans savoir pourquoi. Cliquable : le studio des voix
+                est l'endroit où l'on réessaie.
+              */}
+              {status.voixDegradee && (
+                <button
+                  onClick={() => {
+                    sfx.playTerminalBeep();
+                    onOpenVoiceStudio();
+                  }}
+                  className="mt-2 min-h-[44px] px-3 rounded-lg border border-bordure bg-surface-1/80 font-mono text-xs text-texte-attenue active:bg-surface-2"
+                >
+                  VOIX DE SECOURS — appuyez pour réessayer
+                </button>
+              )}
             </div>
 
             {/* Audio waveform simulator */}

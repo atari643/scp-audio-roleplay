@@ -13,7 +13,7 @@
  */
 
 import { CategorieEntite, Entite } from '../types/entities';
-import { nomEntite } from '../services/entityService';
+import { nomEntite, pageSourceEntite } from '../services/entityService';
 import { ALL_ENTITIES, EntityCategory, ScpEntity } from './departmentsData';
 
 /** Le calque éditorial, indexé par l'entité du wiki à laquelle il se rapporte. */
@@ -136,6 +136,12 @@ export function versScpEntity(entite: Entite, langue: string, dossiers: string[]
     // page que la communauté maintient. On garde le texte éditorial en repli.
     description: entite.resume ?? editorial?.description ?? nom,
     lore: editorial?.lore ?? entite.resume ?? '',
+    // Le résumé étant repris mot pour mot de l'annuaire, la licence CC BY-SA 3.0
+    // impose d'en citer la source. `pages` la porte déjà, par branche : on prend
+    // celle de la langue affichée, à défaut l'anglaise, qui est la seule présente
+    // partout. Sans résumé, rien à créditer — le texte vient alors du calque
+    // éditorial, écrit ici.
+    sourceWiki: entite.resume ? pageSourceEntite(entite, langue) : undefined,
     queryKeywords: Object.values(entite.tags).flat(),
     // C'est LE changement : la liste vient de l'index, plus de la saisie manuelle.
     iconicScps: dossiers,

@@ -11,6 +11,31 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>SCP Foundation - Archive Audio Roleplay</title>
 
+    <!--
+      Aperçu des liens partagés. Sans ces balises, l'adresse collée dans une
+      conversation n'est qu'une URL nue : ni titre, ni image, ni description.
+      L'image est l'icône 512, la seule du projet qui reste lisible en vignette.
+      Elle est référencée en relatif pour valoir aussi bien sur le déploiement
+      Vercel que sur le miroir Pages, servi sous un sous-chemin. Pas d'`og:url` :
+      une URL en dur y désignerait toujours le même des deux hébergements.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SCP Audio Roleplay" />
+    <meta property="og:title" content="SCP Audio Roleplay" />
+    <meta
+      property="og:description"
+      content="Les dossiers de la Fondation SCP, lus à voix haute — avec une voix par personnage."
+    />
+    <meta property="og:image" content="./icones/icone-512.png" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="SCP Audio Roleplay" />
+    <meta
+      name="twitter:description"
+      content="Les dossiers de la Fondation SCP, lus à voix haute — avec une voix par personnage."
+    />
+    <meta name="twitter:image" content="./icones/icone-512.png" />
+
     <!-- Le manifeste existait mais n'était lié nulle part : sans cette ligne, aucun
          navigateur ne le lit et l'application n'est pas installable. -->
     <link rel="manifest" href="./manifest.json" />

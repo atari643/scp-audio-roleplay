@@ -7,6 +7,24 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
 
 ### Ajouté
 
+- Attribution du répertoire d'entités. Le dépôt embarque **418 résumés repris
+  verbatim des annuaires du wiki**, affichés jusqu'ici sans source ni licence —
+  et `NOTICE-SCP.md` affirmait même que rien de tel n'y figurait. Chaque fiche
+  d'entité porte maintenant, dans les deux vues, un lien vers sa page d'origine
+  et la mention CC BY-SA 3.0. La source était déjà dans les données
+  (`Entite.pages`), elle n'était simplement jamais affichée. Vérifié : 418 sur
+  418 sont crédités, dans les dix branches, avec repli sur l'anglais quand la
+  branche affichée n'a pas la page. La notice a été corrigée en conséquence.
+- Filet d'erreur (`LimiteErreur`). Une exception de rendu vidait le DOM : page
+  blanche, sans message. Le cas le plus probable était un `import()` de chunk en
+  échec — onglet resté ouvert pendant un redéploiement — qui traverse
+  `<Suspense>`, lequel ne rattrape que l'attente. L'écran de confinement propose
+  désormais de relancer l'archive.
+- Signalement du repli vocal sur téléphone. Le badge « VOIX DE SECOURS »
+  n'existait que sur ordinateur, alors que le mobile est précisément la cible où
+  le repli se déclenche : on y entendait sept personnages en voix système sans
+  savoir pourquoi. La feuille audio affiche un bouton qui ouvre le studio des
+  voix, le mini-lecteur une pastille « SECOURS ».
 - Relais de synthèse verrouillé : `api/tts.ts` n'accepte que les origines du projet
   et refuse en `403` **avant** de synthétiser, plafonne les textes à 3 000
   caractères et fait mettre les réponses en cache par le réseau de diffusion. Sans
@@ -45,6 +63,27 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
   l'application n'en affichait aucun.
 
 ### Modifié
+
+- Le débogage de la WebView Android (`chrome://inspect`) ne part plus dans le
+  paquet destiné au Play Store : `npm run android:release` le coupe, tout le
+  reste — dont `npm run android:debug` — le garde, puisque c'est le seul moyen de
+  lire la console d'un téléphone.
+- `ARCHITECTURE.md` décrivait un `src/desktop/components/` qui n'existe pas,
+  plaçait la bascule d'affichage dans le mauvais coin de l'écran et s'adressait à
+  des assistants IA plutôt qu'aux contributeurs — le dépôt est public depuis.
+
+### Retiré
+
+- `clsx` et `tailwind-merge`, aucune des deux n'étant importée nulle part.
+  (`@capacitor/core` reste : c'est une dépendance pair exigée par
+  `@capacitor/android`.)
+
+### Sécurité
+
+- `.github/dependabot.yml` : l'avis `uuid` remonte de `@capacitor/cli` → `xcode`,
+  dépendance de développement absente du paquet web comme de l'APK, et son seul
+  chemin de correction rétrograderait `@capacitor/cli`. Il est explicitement
+  ignoré plutôt que de laisser le bot échouer en boucle sur un dépôt public.
 
 - La détection d'appareil écoute `matchMedia` au lieu de mesurer la largeur à
   chaque `resize` : la barre d'URL d'un téléphone ne re-rend plus l'application

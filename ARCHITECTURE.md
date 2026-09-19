@@ -1,15 +1,18 @@
 # 🏛️ Architecture du Projet SCP Audio Roleplay (Desktop & Mobile)
 
-> **CONSIGNE POUR LES ASSISTANTS IA (GEMINI & CLAUDE) :**
+> **La contrainte structurante du projet.**
 > Cette application est intentionnellement et strictement scindée en **deux espaces de travail distincts** :
 > 1. **Version Bureau (Desktop)** : localisée dans `src/desktop/`
 > 2. **Version Mobile (Smartphone)** : localisée dans `src/mobile/`
 > 3. **Logique Partagée (Shared)** : localisée dans `src/shared/`, `src/services/`, `src/types/`
 >
 > ⚠️ **Règle d'or pour toute modification future :**
-> - Si l'utilisateur demande une modification pour **Ordinateur / Desktop**, modifiez **UNIQUEMENT** `src/desktop/`.
-> - Si l'utilisateur demande une modification pour **Mobile / Smartphone**, modifiez **UNIQUEMENT** `src/mobile/`.
-> - Ne touchez à `src/shared/` ou `src/services/` que si l'ajout concerne une logique métier commune aux deux plateformes (moteur audio, requêtes API CROM, favoris, etc.).
+> - Une modification qui vise **l'ordinateur** ne touche que `src/desktop/`.
+> - Une modification qui vise **le téléphone** ne touche que `src/mobile/`.
+> - `src/shared/` et `src/services/` n'accueillent que la logique métier commune aux
+>   deux plateformes (moteur audio, requêtes API CROM, favoris, persistance).
+> - `src/components/` est partagé par les deux vues : ce qu'on y change se voit
+>   **des deux côtés**, à vérifier avant de conclure.
 
 ---
 
@@ -19,8 +22,8 @@
 scp-app/
 ├── src/
 │   ├── desktop/                      # 🖥️ ESPACE BUREAU (DÉDIÉ DESKTOP)
-│   │   ├── DesktopApp.tsx            # Composant racine de la vue Bureau
-│   │   └── components/               # Composants spécifiques à l'expérience Bureau
+│   │   └── DesktopApp.tsx            # Composant racine de la vue Bureau — seul fichier
+│   │                                 #   à ce jour ; un `components/` s'y crée au besoin
 │   │
 │   ├── mobile/                       # 📱 ESPACE MOBILE (DÉDIÉ SMARTPHONE)
 │   │   ├── MobileApp.tsx             # Composant racine de la vue Mobile
@@ -41,7 +44,9 @@ scp-app/
 │   │   │   ├── useScpApp.ts          # État global partagé (API CROM, TTS, Favoris, etc.)
 │   │   │   └── useDeviceMode.ts      # Détection d'appareil & gestion de la bascule
 │   │   └── components/
-│   │       └── DeviceSwitcherBadge.tsx # Badge tactique permettant de basculer Bureau ⇄ Mobile
+│   │       ├── DeviceSwitcherBadge.tsx # Pastille permettant de basculer Bureau ⇄ Mobile
+│   │       ├── EcranAttente.tsx        # Attente pendant le chargement de la vue (lazy)
+│   │       └── LimiteErreur.tsx        # Filet : évite la page blanche si le rendu casse
 │   │
 │   ├── components/                   # Modales et composants graphiques partagés
 │   │   ├── VoiceStudioModal.tsx      # Studio de personnalisation des voix Edge Neural
@@ -49,6 +54,8 @@ scp-app/
 │   │   ├── ScipnetExplorerModal.tsx  # Explorateur SCiPNET style rétro
 │   │   ├── EntityDetailModal.tsx     # Dossier détaillé des entités de départements
 │   │   ├── BandeauEntites.tsx        # Rattachements d'un dossier (site, FIM, GdI, personnel)
+│   │   ├── CreditsDossier.tsx        # Pavé TSAL d'un dossier : auteur, source, licence
+│   │   ├── MentionSourceWiki.tsx     # La ligne « page d'origine, sous CC BY-SA 3.0 »
 │   │   ├── RaisaTerminal.tsx         # Terminal RAISA dockable
 │   │   ├── BootSequence.tsx          # Séquence de démarrage BIOS rétro
 │   │   └── MemeticWarning.tsx        # Écran d'inoculation mémétique
@@ -99,15 +106,22 @@ scp-app/
    - Si la largeur d'écran est `>= 768px` : l'application charge automatiquement `<DesktopApp />`.
 
 2. **Bascule manuelle (`DeviceSwitcherBadge`)** :
-   - Un bouton flottant discret en haut à droite `[SWITCH ⇄]` permet de forcer la vue Bureau sur mobile ou la vue Mobile sur un grand écran pour faciliter le test et le débogage.
-   - Le choix est sauvegardé dans le `localStorage` sous la clé `scp_device_mode`.
+   - Une pastille flottante **en bas à droite** force la vue Bureau sur un téléphone, ou la vue Mobile sur un grand écran. Elle occupait le coin haut-droit — la place la plus visible de l'écran pour un réglage qu'on touche une fois — et se soulève maintenant au-dessus du lecteur quand il est ouvert.
+   - Le choix est sauvegardé via `storageService` sous la clé `scp_device_mode`.
+
+3. **Filet d'erreur (`LimiteErreur`)** :
+   - Les deux vues sont chargées en `lazy()`. Un `import()` de chunk qui échoue —
+     typiquement un onglet resté ouvert pendant un redéploiement — traverse
+     `<Suspense>`, qui ne rattrape que l'attente. `LimiteErreur` entoure donc l'arbre
+     dans `main.tsx` **et** l'aiguillage dans `App.tsx`, faute de quoi l'utilisateur
+     n'obtient qu'une page blanche.
 
 ---
 
-## 🛠️ Instructions de maintenance pour Gemini et Claude
+## 🛠️ Où écrire quoi
 
 ### Pour ajouter une fonctionnalité sur Desktop :
-- Ouvrir `src/desktop/DesktopApp.tsx` ou créer des sous-composants dans `src/desktop/components/`.
+- Ouvrir `src/desktop/DesktopApp.tsx`, ou créer un `src/desktop/components/` si le fichier devient trop gros (il n'existe pas encore).
 - Vérifier que l'affichage sur grand écran reste optimal.
 
 ### Pour ajouter une fonctionnalité sur Mobile :
@@ -120,4 +134,14 @@ scp-app/
 
 ### Pour modifier le moteur audio ou les données :
 - Modifier `src/shared/hooks/useScpApp.ts` ou les fichiers dans `src/services/`.
-- Les deux versions (Desktop et Mobile) bénéficieront automatiquement de l'amélioration sans régression visuelle !
+- Les deux vues en bénéficient d'un coup : préférez toujours une correction ici à un
+  patch dupliqué dans `desktop/` puis `mobile/`.
+
+### Avant de dire que c'est fini :
+- `npm run build` (`tsc -b` en mode `strict`) est **le seul filet** : il n'y a ni tests,
+  ni ESLint, ni Prettier.
+- `npm run audit` après toute modification qui approche `scriptParser.ts` ou
+  `cromApi.ts` — il sort en code ≠ 0 sur une duplication ou un défaut de parsing.
+- Les pièges déjà payés une fois sont consignés dans [`CLAUDE.md`](CLAUDE.md) :
+  filtrage par User-Agent d'Edge TTS, pagination des dossiers, notes de bas de page,
+  URLs `http://` de Crom. Les lire évite d'en repayer un.

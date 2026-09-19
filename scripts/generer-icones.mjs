@@ -182,6 +182,152 @@ function dessiner(largeur, hauteur = largeur, { fond = false, echelle = 1 } = {}
   return pixels;
 }
 
+// --- Bannières --------------------------------------------------------------
+//
+// Deux images larges manquaient : l'aperçu social de GitHub (ce qu'affiche un
+// lien collé dans une conversation — sans lui, l'adresse reste nue) et la
+// bannière de la fiche Play Store, qui était le seul visuel encore à produire à
+// la main. Même contrainte que le reste du fichier : aucune dépendance, donc pas
+// de moteur de rendu — et sans moteur de rendu, pas de police. Les lettres sont
+// donc tracées en segments droits, ce qui tombe bien : un alphabet au pochoir est
+// exactement le registre visuel de la Fondation.
+
+/**
+ * L'alphabet, réduit aux huit lettres de « SCP AUDIO ».
+ *
+ * Chaque lettre vit dans une boîte de 6 × 10, décrite par des segments. Les
+ * courbes sont volontairement carrées (le `D` garde deux biseaux, sans quoi il ne
+ * se distinguerait pas d'un `O`).
+ */
+const POCHOIR = {
+  S: [[0, 0, 6, 0], [0, 0, 0, 5], [0, 5, 6, 5], [6, 5, 6, 10], [0, 10, 6, 10]],
+  C: [[6, 0, 0, 0], [0, 0, 0, 10], [0, 10, 6, 10]],
+  P: [[0, 10, 0, 0], [0, 0, 6, 0], [6, 0, 6, 5], [6, 5, 0, 5]],
+  A: [[0, 10, 0, 0], [0, 0, 6, 0], [6, 0, 6, 10], [0, 5, 6, 5]],
+  U: [[0, 0, 0, 10], [0, 10, 6, 10], [6, 10, 6, 0]],
+  D: [[0, 0, 4, 0], [4, 0, 6, 2], [6, 2, 6, 8], [6, 8, 4, 10], [4, 10, 0, 10], [0, 0, 0, 10]],
+  I: [[3, 0, 3, 10], [1, 0, 5, 0], [1, 10, 5, 10]],
+  O: [[0, 0, 6, 0], [6, 0, 6, 10], [6, 10, 0, 10], [0, 10, 0, 0]]
+};
+
+const MOT = 'SCP AUDIO';
+
+/** Largeur du mot, dans l'unité « une lettre fait 6 de large ». */
+function largeurDuMot(ecart, espaceMot) {
+  let total = 0;
+  for (const c of MOT) total += (c === ' ' ? espaceMot : 6 + ecart);
+  return total - ecart;
+}
+
+/**
+ * Une bannière : fond sombre, sceau à gauche, « SCP AUDIO » au pochoir à droite,
+ * souligné d'un trait rouge.
+ *
+ * @param largeur  largeur en pixels.
+ * @param hauteur  hauteur en pixels.
+ */
+function dessinerBanniere(largeur, hauteur) {
+  const pixels = Buffer.alloc(largeur * hauteur * 4);
+
+  // Le sceau occupe la colonne de gauche, le texte le reste. Tout est dérivé de
+  // la hauteur pour que les deux formats gardent les mêmes proportions.
+  const diametre = hauteur * 0.62;
+  const sceauX = hauteur * 0.5;
+  const sceauY = hauteur * 0.5;
+
+  const ecart = 3.2; // en unités de la boîte 6 × 10
+  const espaceMot = 5.4;
+
+  // La taille des lettres se déduit de la place restante, jamais de la hauteur :
+  // les deux formats n'ont pas le même rapport, et un mot calibré sur la hauteur
+  // sortait du cadre en 1280 × 640.
+  const texteX = hauteur * 0.9;
+  const largeurDispo = largeur - texteX - hauteur * 0.12;
+  const unite = largeurDispo / largeurDuMot(ecart, espaceMot);
+
+  const hauteurLettre = unite * 10;
+  const trait = unite * 1.05;
+  const texteLargeur = largeurDispo;
+
+  const souligneEpaisseur = Math.max(2, unite * 0.9);
+  // Le bloc « mot + soulignement » est centré en entier, sinon il paraît haut.
+  const blocHauteur = hauteurLettre + unite * 3 + souligneEpaisseur;
+  const texteY = (hauteur - blocHauteur) / 2;
+  const souligneY = texteY + hauteurLettre + unite * 3;
+
+  const pas = 1 / SUR_ECHANTILLON;
+
+  for (let y = 0; y < hauteur; y++) {
+    for (let x = 0; x < largeur; x++) {
+      let r = 0, g = 0, b = 0, n = 0;
+
+      for (let sy = 0; sy < SUR_ECHANTILLON; sy++) {
+        for (let sx = 0; sx < SUR_ECHANTILLON; sx++) {
+          const px = x + (sx + 0.5) * pas;
+          const py = y + (sy + 0.5) * pas;
+          let c = FOND;
+
+          // 1. Le sceau, ramené dans son repère 0-100.
+          const u = ((px - sceauX) / diametre) * 100 + 50;
+          const v = ((py - sceauY) / diametre) * 100 + 50;
+          const duSceau = couleurEn(u, v, false);
+          if (duSceau[3] !== 0) c = duSceau;
+
+          // 2. Le mot, lettre après lettre.
+          if (px >= texteX - trait && px <= texteX + texteLargeur + trait) {
+            let curseur = texteX;
+            for (const lettre of MOT) {
+              if (lettre === ' ') {
+                curseur += espaceMot * unite;
+                continue;
+              }
+              const boite = 6 * unite;
+              if (px >= curseur - trait && px <= curseur + boite + trait) {
+                for (const [ax, ay, bx, by] of POCHOIR[lettre]) {
+                  const d = distanceSegment(
+                    px, py,
+                    curseur + ax * unite, texteY + ay * unite,
+                    curseur + bx * unite, texteY + by * unite
+                  );
+                  if (d <= trait / 2) { c = CLAIR; break; }
+                }
+              }
+              curseur += boite + ecart * unite;
+            }
+          }
+
+          // 3. Le soulignement.
+          if (
+            py >= souligneY && py <= souligneY + souligneEpaisseur &&
+            px >= texteX && px <= texteX + texteLargeur
+          ) {
+            c = ROUGE;
+          }
+
+          r += c[0]; g += c[1]; b += c[2]; n++;
+        }
+      }
+
+      const i = (y * largeur + x) * 4;
+      pixels[i] = Math.round(r / n);
+      pixels[i + 1] = Math.round(g / n);
+      pixels[i + 2] = Math.round(b / n);
+      pixels[i + 3] = 255;
+    }
+  }
+
+  return pixels;
+}
+
+const BANNIERES = [
+  // Aperçu social GitHub : 1280 × 640 est la taille que la documentation
+  // recommande pour un rendu net, et le fichier doit rester sous 1 Mo.
+  ['public/icones/banniere-sociale.png', 1280, 640],
+  // Fiche Play Store : la « bannière de mise en avant » y est imposée à
+  // 1024 × 500, sans alpha.
+  ['public/icones/play-banniere-1024x500.png', 1024, 500]
+];
+
 // --- Ce qu'on produit -------------------------------------------------------
 
 const CIBLES = [
@@ -249,4 +395,10 @@ for (const [dossier, largeur, hauteur] of DEMARRAGES) {
   console.log(`${relatif.padEnd(62)} ${largeur}×${hauteur}  ${(octets / 1024).toFixed(1)} Ko`);
 }
 
-console.log('\nIcônes et écrans de démarrage régénérés depuis le sceau de public/favicon.svg.');
+for (const [relatif, largeur, hauteur] of BANNIERES) {
+  const pixels = dessinerBanniere(largeur, hauteur);
+  const octets = ecrirePng(resolve(RACINE, relatif), largeur, hauteur, pixels);
+  console.log(`${relatif.padEnd(62)} ${largeur}×${hauteur}  ${(octets / 1024).toFixed(1)} Ko`);
+}
+
+console.log('\nIcônes, écrans de démarrage et bannières régénérés depuis le sceau de public/favicon.svg.');

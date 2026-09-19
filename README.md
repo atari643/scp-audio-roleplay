@@ -6,6 +6,10 @@
 
 **Les dossiers de la Fondation SCP, lus à voix haute — avec une voix par personnage.**
 
+### ▶︎ [Ouvrir l'application](https://scp-audio-roleplay.vercel.app)
+
+*Rien à installer, rien à créer : un dossier s'ouvre et se met à parler.*
+
 [![CI](https://github.com/atari643/scp-audio-roleplay/actions/workflows/ci.yml/badge.svg)](https://github.com/atari643/scp-audio-roleplay/actions/workflows/ci.yml)
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-informational)](LICENSE)
 [![Contenu CC BY-SA 3.0](https://img.shields.io/badge/contenu-CC%20BY--SA%203.0-lightgrey)](NOTICE-SCP.md)
@@ -24,6 +28,24 @@ Classe-D crie, l'intercom du Site-19 coupe la parole à tout le monde.
 
 Elle ne stocke aucun dossier : elle interroge le wiki SCP en direct, dans dix
 branches linguistiques, et met le résultat en voix.
+
+## Ce que ça donne à l'oreille
+
+Un extrait d'entretien, tel que l'application le découpe et le distribue — chaque
+ligne sort d'une voix différente, et le badge du locuteur suit à l'écran :
+
+| Voix | Ce qu'on entend |
+|---|---|
+| **Narrateur** (Rémy) | « Objet SCP cent soixante-treize. Classe : Euclide. » |
+| **Intercom du Site-19** (Vivienne) | « Procédure de confinement en cours. Personnel non essentiel, évacuez. » |
+| **Chercheur** | « Le sujet est animé et extrêmement hostile… » |
+| **Classe-D** | « Vous voulez que j'entre **là-dedans** ? » |
+| **Terminal** | *bip* « Accès refusé. Accréditation ██ requise. » *bip* |
+
+Le caviardage n'est pas lu : il devient un **bip de censure**, placé à la
+milliseconde exacte où le texte est noirci. Les notes de bas de page sont dites
+**à l'endroit de leur appel**, pas reléguées à la fin, et annoncées « Note : »
+pour qu'on les distingue du paragraphe.
 
 ## Ce qu'elle fait
 

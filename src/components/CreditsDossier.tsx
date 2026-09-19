@@ -1,6 +1,6 @@
 import React from 'react';
-import { ExternalLink } from 'lucide-react';
 import { AttributionScp } from '../types/scp';
+import { MentionSourceWiki } from './MentionSourceWiki';
 
 /**
  * Le pavé de crédits d'un dossier.
@@ -70,28 +70,11 @@ export const CreditsDossier: React.FC<CreditsDossierProps> = ({
         </p>
       )}
 
-      <p className="mt-2 pt-2 border-t border-bordure-faible text-xs text-texte-attenue leading-relaxed">
-        « {titre} » —{' '}
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:text-texte"
-        >
-          page d'origine sur le wiki
-          <ExternalLink className="inline w-3 h-3 ml-0.5 align-[-1px]" aria-hidden="true" />
-        </a>
-        , publiée sous licence{' '}
-        <a
-          href="https://creativecommons.org/licenses/by-sa/3.0/deed.fr"
-          target="_blank"
-          rel="noopener noreferrer license"
-          className="underline underline-offset-2 hover:text-texte"
-        >
-          CC BY-SA 3.0
-        </a>
-        .
-      </p>
+      <MentionSourceWiki
+        url={url}
+        titre={titre}
+        className="mt-2 pt-2 border-t border-bordure-faible"
+      />
     </section>
   );
 };
