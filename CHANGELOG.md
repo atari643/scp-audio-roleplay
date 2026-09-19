@@ -5,6 +5,11 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.1.0] — 2026-09-19
+
+Première version publiée sur le web : l'application tourne sur Vercel, le miroir
+GitHub Pages l'accompagne, et le dépôt est ouvert.
+
 ### Ajouté
 
 - Attribution du répertoire d'entités. Le dépôt embarque **418 résumés repris

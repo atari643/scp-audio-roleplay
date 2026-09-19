@@ -1,7 +1,7 @@
 {
   "name": "scp-audio-roleplay-app",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Lecteur audio roleplay multi-voix des dossiers de la Fondation SCP — React 19 + Vite, voix neurales Edge TTS, portage Android Capacitor",
   "license": "MIT",
   "author": "atari643",
