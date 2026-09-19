@@ -10,12 +10,16 @@
 # le paquet web, ni dans l'APK. L'ignorer est un choix, pas un oubli — à revoir
 # quand `@capacitor/cli` embarquera un `xcode` à jour.
 
-# Deux réglages viennent du premier essai, qui a ouvert neuf demandes de tirage
-# d'un coup : les mises à jour sont **groupées** en une seule demande, et les
-# montées de version **majeures** sont écartées. Un projet sans tests — ici
-# `tsc -b` est le seul filet — ne peut pas absorber une rupture d'API à l'aveugle
-# depuis une demande automatique ; ces montées-là se font à la main, en regardant
-# le journal des modifications.
+# Le premier essai a ouvert neuf demandes de tirage d'un coup. Le bruit se règle
+# par **groupement**, pas par `ignore` :
+#
+#   une condition `ignore` s'applique AUSSI aux mises à jour de sécurité.
+#
+# Écarter toutes les majeures, comme je l'avais d'abord écrit, revenait donc à ne
+# jamais être prévenu d'une faille dont le correctif n'existe que dans une version
+# majeure — exactement l'inverse du but. Les majeures arrivent maintenant dans
+# leur propre demande, séparée : on les voit venir, on les lit, et le journal des
+# modifications décide. Deux demandes au lieu de neuf, sans angle mort.
 
 version: 2
 updates:
@@ -23,20 +27,25 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 4
     groups:
       mineures:
         patterns: ['*']
         update-types: [minor, patch]
+      majeures:
+        patterns: ['*']
+        update-types: [major]
     ignore:
+      # Le SEUL `ignore` du fichier, et il est assumé : l'avis vise `uuid`, tiré
+      # par `@capacitor/cli` → `xcode`. Dépendance de développement, absente du
+      # paquet web comme de l'APK, et son unique chemin de correction
+      # rétrograderait `@capacitor/cli`. À retirer dès que `xcode` embarquera un
+      # `uuid` à jour — c'est une dette, pas une décision définitive.
       - dependency-name: uuid
         versions: ['<9']
-      - dependency-name: '*'
-        update-types: [version-update:semver-major]
 
   # Les actions des trois workflows (CI, miroir Pages, APK Android) : une action
   # épinglée qui vieillit finit par tourner sur un runner qui ne la supporte plus.
-  # Groupées aussi, et sans les majeures, pour la même raison.
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -45,7 +54,3 @@ updates:
     groups:
       actions:
         patterns: ['*']
-        update-types: [minor, patch]
-    ignore:
-      - dependency-name: '*'
-        update-types: [version-update:semver-major]

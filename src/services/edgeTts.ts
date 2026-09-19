@@ -234,11 +234,59 @@ function splitForService(text: string): string[] {
   return morceaux.filter(Boolean);
 }
 
+/**
+ * Voix de repli quand le nom fourni n'a pas la forme d'un nom de voix.
+ *
+ * Volontairement la même que celle du point d'accès (`server/ttsHandler.ts`) : les
+ * deux couches se comportent pareil, par construction.
+ */
+const VOIX_PAR_DEFAUT = 'fr-FR-RemyMultilingualNeural';
+
+/**
+ * Le nom d'une voix, réduit à ce qu'un nom de voix peut contenir.
+ *
+ * `buildSsml` interpole cette valeur dans un attribut XML entre apostrophes. Le
+ * texte, lui, passe par `escapeXml` — mais la voix ne le faisait pas, et une
+ * apostrophe suffisait à sortir de l'attribut pour injecter des blocs `<voice>`
+ * entiers. Sur le relais public, où seul `text` est plafonné, cela revenait à
+ * faire synthétiser un texte de longueur arbitraire logé dans `voice`, aux frais
+ * du quota : exactement ce que le plafond de `api/tts.ts` existe pour empêcher.
+ *
+ * Le catalogue va de `en-US-AvaNeural` à `de-DE-SeraphinaMultilingualNeural`,
+ * 33 caractères au plus long. Lettres, chiffres et tirets couvrent donc tout, et
+ * excluent apostrophe, chevrons et espace — toute évasion d'attribut.
+ *
+ * On replie plutôt qu'on ne lève : cette fonction sert aussi la synthèse directe
+ * depuis le navigateur (Edge, WebView Android), où une exception couperait la
+ * lecture au lieu de la dégrader. Le refus franc, lui, est le travail du point
+ * d'accès, qui répond `400`.
+ */
+function voixSure(voice: string | undefined): string {
+  return voice && /^[A-Za-z0-9-]{1,64}$/.test(voice) ? voice : VOIX_PAR_DEFAUT;
+}
+
+/**
+ * Une valeur de prosodie, ou son défaut.
+ *
+ * Même raison que `voixSure` : ces trois-là sont eux aussi posés dans des
+ * attributs. Le point d'accès les valide déjà, mais pas les appels directs au
+ * module — Edge et la WebView Android joignent le service sans passer par lui.
+ * Valider ici ferme la construction du SSML pour **tous** les appelants, présents
+ * et à venir.
+ */
+function prosodieSure(valeur: string | undefined, motif: RegExp, defaut: string): string {
+  return valeur && motif.test(valeur) ? valeur : defaut;
+}
+
 function buildSsml(text: string, o: SynthesisOptions): string {
+  const pitch = prosodieSure(o.pitch, /^[+-]\d{1,3}Hz$/, '+0Hz');
+  const rate = prosodieSure(o.rate, /^[+-]\d{1,3}%$/, '+0%');
+  const volume = prosodieSure(o.volume, /^[+-]\d{1,3}%$/, '+0%');
+
   return (
     "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'>" +
-    `<voice name='${o.voice}'>` +
-    `<prosody pitch='${o.pitch || '+0Hz'}' rate='${o.rate || '+0%'}' volume='${o.volume || '+0%'}'>` +
+    `<voice name='${voixSure(o.voice)}'>` +
+    `<prosody pitch='${pitch}' rate='${rate}' volume='${volume}'>` +
     escapeXml(removeIncompatibleCharacters(text)) +
     '</prosody></voice></speak>'
   );

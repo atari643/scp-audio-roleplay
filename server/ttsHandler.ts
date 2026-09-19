@@ -100,6 +100,17 @@ export async function handleTtsRequest(
     return;
   }
 
+  // La voix est posée dans un attribut du SSML. Sans ce contrôle, une apostrophe en
+  // sortait et permettait d'injecter des blocs `<voice>` entiers — et comme seul
+  // `text` est plafonné, on pouvait loger dans `voice` un texte de longueur
+  // arbitraire à synthétiser, aux frais du quota. `edgeTts.buildSsml()` replie
+  // silencieusement sur la voix par défaut ; ici on refuse, parce que c'est cette
+  // couche-là qui protège le quota et qu'une requête forgée n'a pas à être servie.
+  if (!/^[A-Za-z0-9-]{1,64}$/.test(voice)) {
+    refuser(400, 'Invalid voice name');
+    return;
+  }
+
   const rate = normalizeSign(query.get('rate') || '+0%');
   const pitch = normalizeSign(query.get('pitch') || '+0Hz');
   const volume = normalizeSign(query.get('volume') || '+0%');
