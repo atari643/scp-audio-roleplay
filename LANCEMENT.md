@@ -99,46 +99,50 @@ modérateur coûte plus qu'il ne rapporte.
 
 ### Reddit — r/SCP (anglais)
 
-> **I made a site that reads SCP files out loud, with a different voice for each
-> character**
+> **I made a site that reads SCP articles out loud, with a different voice for
+> each character**
 
-> Not one flat robot voice for the whole thing. The narrator reads the file, the
+> Not one flat TTS voice for the whole thing. The narrator reads the file, the
 > researcher gives the containment procedure, the anomaly answers in the
 > interview, the D-class panics, the Site-19 intercom cuts everyone off.
 >
-> Redacted blocks aren't read — they become a censor beep, on the exact
-> millisecond the text goes black. Footnotes are spoken where they're marked, not
-> dumped at the end.
+> Two things I cared about:
 >
-> Nothing to install, no account, free. Files are pulled live from the wiki.
+> - **Redacted blocks aren't read.** They turn into a censor beep, on the exact
+>   millisecond the text goes black.
+> - **Footnotes are spoken where they're marked**, not dumped at the end.
 >
-> Start here: https://scp-audio-roleplay.vercel.app/?lang=en
-> Or jump straight into 173: https://scp-audio-roleplay.vercel.app/?scp=scp-173&lang=en
+> Free, no account, nothing to install. Articles are pulled live from the wiki.
+>
+> → https://scp-audio-roleplay.vercel.app/?lang=en
+> → Straight into 173: https://scp-audio-roleplay.vercel.app/?scp=scp-173&lang=en
 >
 > Fan project, not official, no money in it. Content stays CC BY-SA 3.0 and every
-> file credits its author.
+> article credits its author.
 >
-> If a file reads badly, tell me which number — that's usually enough to fix it.
+> If one reads badly, tell me the number — that's usually enough to fix it.
 
 ### Reddit / Discord — communauté francophone
 
 > **J'ai fait un site qui lit les dossiers SCP à voix haute, une voix par
 > personnage**
 
-> Pas une voix de robot qui débite tout d'un bloc. Le narrateur pose le dossier,
-> le chercheur donne la procédure de confinement, l'anomalie répond dans
+> Pas une voix de synthèse qui débite tout d'un bloc. Le narrateur pose le
+> dossier, le chercheur donne la procédure de confinement, l'anomalie répond dans
 > l'entretien, le Classe-D panique, l'intercom du Site-19 coupe la parole à tout
 > le monde.
 >
-> Les blocs caviardés ne sont pas lus : ils deviennent un bip, placé exactement
-> là où le texte est noirci. Les notes de bas de page sont dites à leur place, pas
-> entassées à la fin.
+> Deux détails auxquels j'ai tenu :
 >
-> Rien à installer, pas de compte, gratuit. Les dossiers sont lus en direct depuis
+> - **Les blocs caviardés ne sont pas lus.** Ils deviennent un bip, placé
+>   exactement là où le texte est noirci.
+> - **Les notes de bas de page sont dites à leur place**, pas entassées à la fin.
+>
+> Gratuit, sans compte, rien à installer. Les dossiers sont lus en direct depuis
 > le wiki.
 >
-> C'est ici : https://scp-audio-roleplay.vercel.app
-> Ou directement SCP-173 : https://scp-audio-roleplay.vercel.app/?scp=scp-173
+> → https://scp-audio-roleplay.vercel.app
+> → Directement SCP-173 : https://scp-audio-roleplay.vercel.app/?scp=scp-173
 >
 > Projet de fan, non officiel, sans revenu. Le contenu reste CC BY-SA 3.0 et
 > chaque dossier affiche son auteur et son traducteur.
