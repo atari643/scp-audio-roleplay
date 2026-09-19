@@ -12,6 +12,7 @@ import { chargerEntites, dossiersDeLEntite, entiteParId } from '../../services/e
 import { scpDataApi } from '../../services/scpDataApi';
 import { parseScpDossier } from '../../services/scriptParser';
 import { WikiLink } from '../../services/linkExtractor';
+import { ecrireEtatPartage, lireEtatPartage } from '../../services/lienPartage';
 import { speechEngine } from '../../services/speechEngine';
 import { storageService } from '../../services/storageService';
 import {
@@ -48,7 +49,13 @@ export function useScpApp() {
     };
   }, []);
 
-  const [currentLanguage, setCurrentLanguage] = useState<LanguageBranch>(SUPPORTED_LANGUAGES[0]);
+  // Ce que l'adresse demandait à l'ouverture. Lu une seule fois : l'état fait foi
+  // ensuite, et c'est lui qui réécrit l'adresse (voir l'effet plus bas).
+  const [etatInitialPartage] = useState(lireEtatPartage);
+
+  const [currentLanguage, setCurrentLanguage] = useState<LanguageBranch>(
+    etatInitialPartage.langue ?? SUPPORTED_LANGUAGES[0]
+  );
   const [selectedClass, setSelectedClass] = useState<ObjectClass | 'ALL'>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSeries, setSelectedSeries] = useState<string | null>(null);
@@ -63,7 +70,11 @@ export function useScpApp() {
     setSelectedSeries(seriesId);
     setSelectedSubRange(null);
   }, []);
-  const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  // Un lien partagé ouvre le dossier directement, sans passer par le scanner
+  // biométrique : celui-ci met en scène un choix que le visiteur a déjà fait en
+  // cliquant sur le lien, et le lui imposer ferait tomber sur un écran d'attente
+  // au lieu du dossier promis.
+  const [activeSlug, setActiveSlug] = useState<string | null>(etatInitialPartage.slug);
 
   // Audio speech & player state
   const [activeSegments, setActiveSegments] = useState<SpeechSegment[]>([]);
@@ -97,8 +108,15 @@ export function useScpApp() {
   const [crtEnabled, setCrtEnabled] = useState<boolean>(true);
 
   // Roleplay immersion state
-  const [bootDone, setBootDone] = useState<boolean>(false);
-  const [memeticDone, setMemeticDone] = useState<boolean>(false);
+  // Arrivée par un lien vers un dossier précis : la séquence de démarrage et
+  // l'inoculation mémétique sont sautées. Elles durent une dizaine de secondes —
+  // c'est une mise en scène qui vaut pour qui découvre l'archive, mais quelqu'un
+  // qui a cliqué sur « écoute SCP-173 » attend SCP-173, pas un écran de
+  // chargement. Un lien qui ne porte que la langue garde la séquence : là, le
+  // visiteur arrive bien sur l'accueil.
+  const arriveParLien = etatInitialPartage.slug !== null;
+  const [bootDone, setBootDone] = useState<boolean>(arriveParLien);
+  const [memeticDone, setMemeticDone] = useState<boolean>(arriveParLien);
   const [showBiometric, setShowBiometric] = useState<boolean>(false);
   const [pendingSlug, setPendingSlug] = useState<string | null>(null);
   const [showStamp, setShowStamp] = useState<boolean>(false);
@@ -227,6 +245,14 @@ export function useScpApp() {
   useEffect(() => {
     speechEngine.setLanguage(currentLanguage.code);
   }, [currentLanguage]);
+
+  // L'adresse suit l'état, pour qu'elle soit copiable à tout instant sans bouton
+  // « partager » à maintenir. La langue en fait partie : un lien posté dans une
+  // communauté anglophone doit ouvrir la branche anglaise, pas le catalogue
+  // français.
+  useEffect(() => {
+    ecrireEtatPartage(activeSlug, currentLanguage);
+  }, [activeSlug, currentLanguage]);
 
   // L'index de la branche est chargé à la demande (morceau séparé, ~69 Ko gzip en FR).
   // Toutes les branches n'en ont pas : sans index, les filtres d'écoute restent inertes
