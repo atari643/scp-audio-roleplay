@@ -180,6 +180,10 @@ Avant d'ouvrir une pull request, lisez [CONTRIBUTING.md](CONTRIBUTING.md) : le
 projet n'a ni tests ni ESLint, `npm run build` est le seul filet, et quelques
 règles précises évitent de réintroduire des bugs déjà corrigés.
 
+Une **question**, une idée, un dossier qui se lit mal sans que ce soit un bug ?
+Les [Discussions](https://github.com/atari643/scp-audio-roleplay/discussions) sont
+ouvertes.
+
 ## Licence et attribution
 
 Le **code** est sous [licence MIT](LICENSE).
