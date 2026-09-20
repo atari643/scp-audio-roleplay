@@ -1,4 +1,4 @@
-import { LanguageBranch, SUPPORTED_LANGUAGES } from '../types/scp';
+import { LanguageBranch, SUPPORTED_LANGUAGES, LANGUE_PAR_DEFAUT } from '../types/scp';
 
 /**
  * Les liens partageables : `?scp=scp-173&lang=en`.
@@ -73,7 +73,7 @@ export function ecrireEtatPartage(slug: string | null, langue: LanguageBranch): 
 
   // La langue n'est écrite que si elle n'est pas celle par défaut : un lien vers
   // un dossier français n'a pas besoin de le préciser, et l'adresse reste courte.
-  if (langue.code === SUPPORTED_LANGUAGES[0].code) params.delete('lang');
+  if (langue.code === LANGUE_PAR_DEFAUT.code) params.delete('lang');
   else params.set('lang', langue.code);
 
   const requete = params.toString();

@@ -87,7 +87,7 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
           onClick={handleFinish}
           className="text-xs font-mono text-texte-attenue hover:text-accent-texte border border-bordure-faible hover:border-accent-texte/60 bg-black px-3 py-1 rounded transition-colors"
         >
-          [ PASSER L'INOCULATION ]
+          {t('memetique.passer')}
         </button>
       </div>
 
@@ -142,11 +142,10 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
         {/* Text and Protocol Notice */}
         <div className="w-full">
           <h2 className="text-texte font-mono font-bold text-base sm:text-lg tracking-wider mb-2">
-            PROTOCOLE DE SÉCURITÉ BERRYMAN-LANGFORD
+            {t('memetique.protocole')}
           </h2>
           <p className="text-texte-attenue font-mono text-xs leading-relaxed mb-6 max-w-md mx-auto">
-            La consultation des dossiers classifiés de la Fondation requiert une inoculation
-            mémétique certifiée. Tout personnel non vacciné subira un arrêt cardiaque réflexe.
+            {t('memetique.consultation')}
           </p>
 
           {/* Phase 1: Initializing */}
@@ -163,7 +162,7 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
               <div className="flex items-center justify-between text-xs font-mono mb-2">
                 <span className="text-classe-euclid flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-classe-euclid animate-ping" />
-                  ANALYSE DU RYTHME CÉRÉBRAL
+                  {t('memetique.rythme')}
                 </span>
                 <span className="text-texte-attenue">ONDES THÊTA : {telemetryVal}</span>
               </div>
@@ -190,13 +189,13 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
           {phase === 'confirmed' && (
             <div className="p-4 rounded-xl bg-surface-3/60 border border-classe-safe/80 text-center animate-fade-scale shadow-2xl">
               <div className="text-classe-safe font-mono font-bold text-sm sm:text-base flex items-center justify-center gap-2 mb-1">
-                <span>✓ INOCULATION MÉMÉTIQUE VALIDÉE</span>
+                <span>{t('memetique.validee')}</span>
               </div>
               <div className="text-xs font-mono text-classe-safe">
-                STATUT : IMMUNISÉ // AUTORISATION ACCORDÉE PAR RAISA
+                {t('memetique.statut')}
               </div>
               <div className="text-xs font-mono text-texte-attenue mt-2">
-                Ouverture sécurisée du terminal SCiPNET...
+                {t('memetique.ouverture')}
               </div>
             </div>
           )}
@@ -204,7 +203,7 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
 
         {/* Subtle Footer Telemetry */}
         <div className="mt-8 text-xs font-mono text-texte-attenue tracking-widest">
-          SÉCURITÉ SITE-19 // RAISA WATCHDOG ID : #941-MEM-BERRYMAN
+          {t('memetique.securite')}
         </div>
       </div>
     </div>

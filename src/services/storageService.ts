@@ -1,5 +1,5 @@
 import { CharacterRole, VoiceProfile } from '../types/audioRoleplay';
-import { ScpItemSummary } from '../types/scp';
+import { ScpItemSummary, SUPPORTED_LANGUAGES } from '../types/scp';
 import { WikiLink } from './linkExtractor';
 
 const FAVORITES_KEY = 'scp_audio_favorites_v1';
@@ -7,6 +7,7 @@ const VOICE_PROFILES_KEY = 'scp_voice_profiles_v1';
 const RECENT_HISTORY_KEY = 'scp_recent_history_v1';
 const READING_QUEUE_KEY = 'scp_reading_queue_v1';
 const DEVICE_MODE_KEY = 'scp_device_mode';
+const LANGUE_KEY = 'scp_langue_v1';
 
 /** Vue choisie : automatique selon la largeur, ou forcée par l'utilisateur. */
 export type DeviceMode = 'auto' | 'desktop' | 'mobile';
@@ -104,6 +105,33 @@ export const storageService = {
   saveDeviceMode(mode: DeviceMode): void {
     try {
       localStorage.setItem(DEVICE_MODE_KEY, mode);
+    } catch {}
+  },
+
+  /**
+   * La branche choisie à la visite précédente, si elle existe encore.
+   *
+   * Renvoie `null` plutôt qu'une langue par défaut : c'est à l'appelant de
+   * trancher, parce que l'ordre de priorité lui appartient — un `?lang=` dans
+   * l'adresse doit primer sur ce qui est mémorisé, sinon un lien partagé
+   * s'ouvrirait dans la langue du visiteur au lieu de celle du lien.
+   *
+   * Le code est confronté aux branches connues : une valeur écrite par une
+   * version antérieure, ou trafiquée à la main, ne doit pas ouvrir une branche
+   * qui n'existe pas.
+   */
+  getLangue(): string | null {
+    try {
+      const code = localStorage.getItem(LANGUE_KEY);
+      return code && SUPPORTED_LANGUAGES.some(l => l.code === code) ? code : null;
+    } catch {
+      return null;
+    }
+  },
+
+  saveLangue(code: string): void {
+    try {
+      localStorage.setItem(LANGUE_KEY, code);
     } catch {}
   },
 

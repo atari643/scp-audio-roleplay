@@ -71,7 +71,7 @@ export const MobileBiometricScanner: React.FC<MobileBiometricScannerProps> = ({
           <span>{t('rp.verificationBio')}</span>
         </div>
         <h2 className="text-lg font-bold font-mono text-texte tracking-wider">
-          ACCÈS AU DOSSIER
+          {t('bio.accesDossier')}
         </h2>
         <p className="text-xs font-mono text-accent-texte mt-1">
           {scpTitle}
@@ -140,7 +140,7 @@ export const MobileBiometricScanner: React.FC<MobileBiometricScannerProps> = ({
               : t('bio.maintenezPouce')}
           </p>
           <p className="text-xs font-mono text-texte-attenue mt-1">
-            Protocole de sécurité RAISA / Empreinte SHA-256
+            {t('bio.protocole')}
           </p>
         </div>
       </div>

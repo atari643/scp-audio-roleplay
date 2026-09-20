@@ -149,7 +149,7 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
           {/* Section: Ambiance & Affichage */}
           <div className="mt-6 pt-4 border-t border-bordure">
             <div className="text-xs font-mono text-texte-attenue font-bold uppercase mb-2.5">
-              SYSTÈME & IMMERSION
+              {t('menu.systeme')}
             </div>
 
             <div className="grid grid-cols-2 gap-2">

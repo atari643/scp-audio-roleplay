@@ -293,11 +293,10 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
               <div className="px-3.5 py-3">
                 <p className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-technique text-texte-attenue mb-1.5">
                   <Radio className="w-3.5 h-3.5" aria-hidden="true" />
-                  Terminal Site-19 · lecture audio
+                  {t('accueil.terminal')}
                 </p>
                 <p className="font-serif text-sm text-texte-second leading-relaxed">
-                  Accès direct aux transcriptions audio multi-voix : narrateur, chercheurs,
-                  officiers FIM et sujets Classe-D.
+                  {t('accueil.presentationMobile')}
                 </p>
               </div>
             </section>
@@ -340,7 +339,7 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
                   }}
                   className="mt-2 text-xs font-mono text-accent-texte underline"
                 >
-                  Réinitialiser les filtres
+                  {t('accueil.reinitialiser')}
                 </button>
               </div>
             ) : (
@@ -460,7 +459,7 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
                         onClick={readInEnglish}
                         className="px-4 py-2.5 rounded-xl bg-surface-3/80 border border-classe-euclid/70 text-xs font-mono text-classe-euclid"
                       >
-                        Lire la version anglaise
+                        {t('accueil.lireAnglais')}
                       </button>
                       <button
                         onClick={() => setActiveTab('catalog')}
@@ -482,7 +481,7 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
                       onClick={() => setActiveTab('catalog')}
                       className="px-4 py-2 rounded-xl bg-surface-3 border border-accent-texte text-xs font-mono text-accent-texte"
                     >
-                      Ouvrir les archives
+                      {t('accueil.ouvrirArchives')}
                     </button>
                   </>
                 )}

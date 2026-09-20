@@ -75,7 +75,7 @@ export const ReadingQueue: React.FC<ReadingQueueProps> = ({ queue, onOpen, onRem
             onClick={onClear}
             className="w-full py-2 text-xs font-mono uppercase tracking-wider text-texte-attenue hover:text-texte-second border-t border-bordure/60"
           >
-            Vider la file
+            {t('file.vider')}
           </button>
         </div>
       )}

@@ -47,8 +47,8 @@ interface SearchAndFiltersProps {
   onSelectSubRange?: (subRangeId: string | null) => void;
 }
 
-const CLASSES: Array<{ label: string; value: ObjectClass | 'ALL' }> = [
-  { label: 'Tous', value: 'ALL' },
+const CLASSES: Array<{ label: string; cleLabel?: CleTraduction; value: ObjectClass | 'ALL' }> = [
+  { label: 'ALL', cleLabel: 'filtre.tous', value: 'ALL' },
   { label: 'Safe', value: 'Safe' },
   { label: 'Euclid', value: 'Euclid' },
   { label: 'Keter', value: 'Keter' },
@@ -183,7 +183,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
       {entiteFiltreNom && (
         <div className="flex items-center justify-between gap-2 px-3 py-2 rounded bg-surface-2 border-l-[3px] border border-bordure border-l-accent-texte font-mono text-xs">
           <span className="text-texte-second truncate">
-            Dossiers rattachés à <strong className="text-texte font-semibold">{entiteFiltreNom}</strong>
+            {t('filtre.rattachesA')} <strong className="text-texte font-semibold">{entiteFiltreNom}</strong>
           </span>
           <button
             onClick={() => {
@@ -329,7 +329,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
           }}
           className={`${PASTILLE} ${!activeQuery && !selectedSeries ? PASTILLE_ACTIVE : PASTILLE_REPOS}`}
         >
-          Tout le registre
+          {t('filtre.toutRegistre')}
         </button>
 
         {(availableSeries ?? SCP_SERIES).map((ser) => {
@@ -411,7 +411,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 isSelected && !estTous ? styleBadgeClasse(cls.value as ObjectClass) : undefined
               }
             >
-              {cls.label}
+              {cls.cleLabel ? t(cls.cleLabel) : cls.label}
             </button>
           );
         })}

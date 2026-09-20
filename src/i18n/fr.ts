@@ -344,7 +344,7 @@ export const FR = {
   'favoris.classe': 'Classé',
   'favoris.titre': 'Dossiers classés',
   'file.retirer': 'Retirer {libelle} de la file',
-  'file.miseDeCote': '{genre} · {cible} — clic : mettre de côté',
+  'file.miseDeCote': '{genre} · {cible} — clic : mettre de côté, Alt+clic : ouvrir',
 
   // --- Filtres rapides ------------------------------------------------------
   'filtre.departements': 'Départements',
@@ -377,6 +377,119 @@ export const FR = {
   'bio.maintenezPouce': 'MAINTENEZ LE POUCE POUR DÉVERROUILLER',
   'general.dossierIntrouvable': 'Dossier introuvable dans les archives.',
   'general.aucunDossierOuvert': "Aucun dossier SCP n'est actuellement ouvert.",
+
+  // --- Inoculation mémétique (seconde fenêtre d'introduction) ---------------
+  'memetique.protocole': 'PROTOCOLE DE SÉCURITÉ BERRYMAN-LANGFORD',
+  'memetique.consultation':
+    'La consultation des dossiers classifiés de la Fondation requiert une inoculation mémétique certifiée. Tout personnel non vacciné subira un arrêt cardiaque réflexe.',
+  'memetique.rythme': 'ANALYSE DU RYTHME CÉRÉBRAL',
+  'memetique.validee': '✓ INOCULATION MÉMÉTIQUE VALIDÉE',
+  'memetique.statut': 'STATUT : IMMUNISÉ // AUTORISATION ACCORDÉE PAR RAISA',
+  'memetique.ouverture': 'Ouverture sécurisée du terminal SCiPNET…',
+  'memetique.securite': 'SÉCURITÉ SITE-19 // RAISA WATCHDOG ID : #941-MEM-BERRYMAN',
+  'memetique.passer': "[ PASSER L'INOCULATION ]",
+
+  // --- Accueil --------------------------------------------------------------
+  'accueil.centre': "Centre d'écoute des archives classifiées",
+  'accueil.presentation':
+    "Accès direct aux transcriptions audio et aux interrogatoires d'anomalies. Le système analyse la composition des dialogues et attribue une voix propre à chaque intervenant : narrateur, chercheurs, officiers FIM et sujets Classe-D.",
+  'accueil.presentationMobile':
+    'Accès direct aux transcriptions audio multi-voix : narrateur, chercheurs, officiers FIM et sujets Classe-D.',
+  'accueil.noeud': 'Nœud audio SCiPNET · Site-19',
+  'accueil.terminal': 'Terminal Site-19 · lecture audio',
+  'accueil.reinitialiser': 'Réinitialiser les filtres',
+  'accueil.ouvrirArchives': 'Ouvrir les archives',
+  'accueil.pasTraduite': 'Page pas encore traduite',
+  'accueil.lireAnglais': 'Lire la version anglaise',
+  'accueil.retourCatalogue': 'Retourner au catalogue',
+
+  // --- Fiche d'entité, suite ------------------------------------------------
+  'fiche.afficherLies': '[ AFFICHER LES DOSSIERS SCP LIÉS ]',
+  'fiche.sceau': "SCEAU D'AUTHENTICITÉ SCiPNET // ENREGISTRÉ",
+  'fiche.actif': 'ACTIF // CRYPTÉ',
+  'fiche.catDepartement': 'DÉPARTEMENT OFFICIEL DE LA FONDATION',
+  'fiche.catChercheur': 'DOSSIER DU PERSONNEL SCIENTIFIQUE // SITE-19',
+  'fiche.catFaction': "GROUPE D'INTÉRÊT (GdI) // RAPPORT DE RENSEIGNEMENT",
+  'fiche.catSite': 'INSTALLATION DE CONFINEMENT SÉCURISÉE',
+
+  // --- En-tête, suite -------------------------------------------------------
+  'entete.surveillance': 'Tout accès non autorisé est enregistré et traité par la RAISA',
+  'entete.desactiverCrt': 'Désactiver le filtre moniteur CRT',
+  'entete.activerCrt': 'Activer le filtre moniteur CRT',
+  'entete.couperSons': 'Couper les effets sonores',
+  'entete.activerSons': 'Activer les effets sonores',
+
+  // --- Divers ---------------------------------------------------------------
+  'explorateur.details': 'Détails',
+  'badge.paginee': 'Dossier paginé : seule la première page est mesurée, la durée réelle est supérieure.',
+  'badge.duree': 'Durée d’écoute estimée à 150 mots par minute.',
+  'lecteur.lireRaccourci': 'Démarrer la lecture [Espace]',
+  'lecteur.pauseRaccourci': 'Mettre en pause [Espace]',
+  'lecteur.couperSonRaccourci': 'Couper le son [M]',
+  'lecteur.retablirSonRaccourci': 'Rétablir le son [M]',
+
+  // --- Studio des voix, suite -----------------------------------------------
+  'studio.titre': 'Studio des voix',
+  'timbre.narrateur': 'Archiviste, clinique et solennel',
+  'timbre.chercheur': 'Scientifique, analytique',
+  'timbre.anomalie': 'Timbre sombre (−18 Hz)',
+  'timbre.classeD': 'Débit stressé (+10 %)',
+  'timbre.agent': 'Émetteur radio tactique',
+  'timbre.commandement': 'Autorité directe O5',
+  'timbre.intercom': 'Carillon et haut-parleur',
+  'prereglage.standard': 'Site-19 standard',
+  'prereglage.keter': 'Confinement Keter / Euclide',
+  'prereglage.o5': 'Interrogatoire O5 / médical',
+  'studio.sousTitre':
+    "Attribution d'une voix par personnage : archiviste, chercheurs, anomalie, Classe-D, agents et commandement.",
+  'studio.ecouteEnCours': 'Écoute en cours…',
+  'studio.tester': 'Tester la réplique',
+  'studio.confirmerPurge': 'Cliquer à nouveau pour confirmer la purge',
+  'studio.videCache': 'Vide le cache audio persistant de cet appareil',
+  'studio.testRole': 'Test de voix pour le rôle attribué.',
+  'studio.debitStresse': 'Débit stressé (+10 %)',
+  'studio.emetteurRadio': 'Émetteur radio tactique',
+  'studio.autoriteO5': 'Autorité directe O5',
+  'studio.equilibre': 'Équilibre officiel de la Fondation',
+  'studio.anomalieInquietante': 'Anomalie inquiétante et personnel sous tension',
+  'studio.interrogatoire': 'Interrogatoire O5 / médical',
+  'studio.voixFeminines': 'Voix féminines au commandement et à la recherche',
+
+  // --- Répliques de test, lues à voix haute ---------------------------------
+  'replique.narrateur':
+    "Objet : SCP-049. Classe d'objet : Euclide. Procédures de confinement spéciales : le sujet est maintenu dans une cellule humide standard.",
+  'replique.chercheur':
+    'Bonjour SCP-049. Veuillez vous asseoir. Nous aimerions comprendre la véritable nature de votre remède.',
+  'replique.anomalie':
+    'Ne vous moquez pas de moi, docteur ! Mon remède est le plus efficace contre la Pestilence.',
+  'replique.classeD':
+    "Attendez, pourquoi vous fermez la porte derrière moi ?! Qu'est-ce qu'il y a dans cette pièce ?",
+  'replique.agent':
+    "Équipe Bravo en position. Contact visuel confirmé sur l'entité anormale. Nous attendons vos ordres.",
+  'replique.commandement':
+    "Rapport validé par le Conseil O5. Autorisation d'expérimentation de classe C accordée.",
+  'replique.intercom':
+    "Début de l'enregistrement audio. Date : quatorze mars. Site dix-neuf.",
+
+  // --- Derniers libellés d'habillage ---------------------------------------
+  'boot.passer': '[ PASSER LA SÉQUENCE (ÉCHAP) ]',
+  'boot.console': 'SCiPNET DIRECT CONSOLE // NŒUD SÉCURISÉ SITE-19',
+  'bio.controle': "SCiPNET // CONTRÔLE D'ACCÈS BIOMÉTRIQUE",
+  'bio.accesDossier': 'ACCÈS AU DOSSIER',
+  'bio.protocole': 'Protocole de sécurité RAISA / empreinte SHA-256',
+  'filtre.serie': 'SÉRIE :',
+  'filtre.emblematiques': 'EMBLÉMATIQUES',
+  'filtre.toutRegistre': 'Tout le registre',
+  'filtre.tous': 'Tous',
+  'filtre.classerCourt': 'Classer',
+  'filtre.rattachesA': 'Dossiers rattachés à',
+  'badge.theatre': 'Théâtre · {voix} voix',
+  'badge.pepite': 'Pépite',
+  'log.connecte': '● CONNECTÉ',
+  'file.vider': 'Vider la file',
+  'file.page': 'Page',
+  'dossier.classifieCourt': 'Dossier classifié · Accréditation 4',
+  'menu.systeme': 'SYSTÈME & IMMERSION',
 
   // --- Écran de confinement d'erreur ---------------------------------------
   'erreur.banniere': "Confinement de l'erreur",

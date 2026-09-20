@@ -76,10 +76,10 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
   };
 
   const categoryLabels = {
-    department: 'DÉPARTEMENT OFFICIEL DE LA FONDATION',
-    researcher: 'DOSSIER DU PERSONNEL SCIENTIFIQUE // SITE-19',
-    goi: "GROUPE D'INTÉRÊT (GdI) // RAPPORT DE RENSEIGNEMENT",
-    site: 'INSTALLATION DE CONFINEMENT SÉCURISÉE'
+    department: t('fiche.catDepartement'),
+    researcher: t('fiche.catChercheur'),
+    goi: t('fiche.catFaction'),
+    site: t('fiche.catSite')
   };
 
   return (
@@ -145,7 +145,7 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
               className="bg-accent hover:bg-accent text-texte font-mono font-bold text-xs px-4 py-2.5 rounded-none win2k-btn-red flex items-center gap-2 shadow-lg transition-all"
             >
               <Search className="w-4 h-4" />
-              <span>[ AFFICHER LES DOSSIERS SCP LIÉS ]</span>
+              <span>{t('fiche.afficherLies')}</span>
             </button>
           </div>
 
@@ -162,7 +162,7 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
                 </div>
                 <div className="w-full mt-3 pt-2 border-t border-bordure text-center">
                   <span className="text-xs font-mono text-texte-attenue uppercase tracking-widest">
-                    SCEAU D'AUTHENTICITÉ SCiPNET // ENREGISTRÉ
+                    {t('fiche.sceau')}
                   </span>
                 </div>
               </div>
@@ -190,7 +190,7 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
                   <span className="text-texte-attenue">{t('fiche.statut')}</span>
                   <span className="text-classe-safe font-bold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-classe-safe inline-block" />
-                    ACTIF // CRYPTÉ
+                    {t('fiche.actif')}
                   </span>
                 </div>
 
@@ -269,7 +269,7 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
                 <MentionSourceWiki
                   url={entity.sourceWiki}
                   titre={entity.name}
-                  intro="Résumé repris de"
+                  intro={t('entites.resumeRepris')}
                   className="pt-2 border-t border-bordure-faible font-sans"
                 />
               )}

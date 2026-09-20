@@ -281,7 +281,7 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
                 <>
                   <Languages className="w-9 h-9 text-classe-euclid mx-auto mb-3" />
                   <p className="font-mono text-base text-texte font-semibold tracking-technique uppercase">
-                    Page pas encore traduite
+                    {t('accueil.pasTraduite')}
                   </p>
                   <p className="font-serif text-md text-texte-second mt-2 max-w-lecture mx-auto">
                     {activeSlug?.toUpperCase()} existe dans les archives anglophones mais n'a pas
@@ -295,13 +295,13 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
                       onClick={readInEnglish}
                       className="inline-flex items-center gap-1.5 h-9 px-4 rounded font-mono text-xs bg-accent hover:bg-accent-texte text-texte transition-colors"
                     >
-                      Lire la version anglaise
+                      {t('accueil.lireAnglais')}
                     </button>
                     <button
                       onClick={handleBackToCatalog}
                       className="font-mono text-xs text-texte-attenue hover:text-texte underline underline-offset-4"
                     >
-                      Retourner au catalogue
+                      {t('accueil.retourCatalogue')}
                     </button>
                   </div>
                 </>
@@ -309,13 +309,13 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
                 <>
                   <AlertTriangle className="w-9 h-9 text-accent-texte mx-auto mb-3" />
                   <p className="font-mono text-sm text-texte-second">
-                    Dossier introuvable dans les archives.
+                    {t('general.dossierIntrouvable')}
                   </p>
                   <button
                     onClick={handleBackToCatalog}
                     className="mt-4 font-mono text-xs text-texte-attenue hover:text-texte underline underline-offset-4"
                   >
-                    Retourner au catalogue
+                    {t('accueil.retourCatalogue')}
                   </button>
                 </>
               )}
@@ -336,20 +336,18 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
               <div className="px-4 sm:px-6 py-2 border-b border-bordure-faible flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-mono text-xs uppercase tracking-technique text-texte-attenue">
                 <span className="inline-flex items-center gap-1.5">
                   <Radio className="w-3.5 h-3.5" aria-hidden="true" />
-                  Nœud audio SCiPNET · Site-19
+                  {t('accueil.noeud')}
                 </span>
                 <span>{t('etat.diffusion')}</span>
               </div>
 
               <div className="px-4 sm:px-6 py-5">
                 <h2 className="font-mono text-xl font-bold text-texte tracking-tight mb-2">
-                  Centre d'écoute des archives classifiées
+                  {t('accueil.centre')}
                 </h2>
 
                 <p className="font-serif text-md text-texte-second max-w-lecture">
-                  Accès direct aux transcriptions audio et aux interrogatoires d'anomalies. Le
-                  système analyse la composition des dialogues et attribue une voix propre à
-                  chaque intervenant : narrateur, chercheurs, officiers FIM et sujets Classe-D.
+                  {t('accueil.presentation')}
                 </p>
 
                 <dl className="mt-5 pt-4 border-t border-bordure-faible flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs">
@@ -409,7 +407,7 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
                   }}
                   className="mt-3 font-mono text-xs text-texte-attenue hover:text-texte underline underline-offset-4"
                 >
-                  Réinitialiser les filtres
+                  {t('accueil.reinitialiser')}
                 </button>
               </div>
             ) : (

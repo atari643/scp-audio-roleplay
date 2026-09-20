@@ -248,7 +248,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
             <button
               onClick={() => (status.isPlaying ? onPause() : onPlay())}
-              title={status.isPlaying ? 'Mettre en pause [Espace]' : 'Démarrer la lecture [Espace]'}
+              title={t(status.isPlaying ? 'lecteur.pauseRaccourci' : 'lecteur.lireRaccourci')}
               aria-label={status.isPlaying ? t('lecteur.pause') : t('lecteur.lire')}
               className={`w-11 h-11 mx-1 rounded-sm flex items-center justify-center bg-accent hover:bg-accent-texte active:bg-accent-fort text-texte transition-colors ${FOCUS} ${
                 // Un liseré pendant la lecture : le seul bouton dont l'état doit
@@ -328,7 +328,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 sfx.playTerminalBeep();
                 onToggleMute?.();
               }}
-              title={status.isMuted ? 'Rétablir le son [M]' : 'Couper le son [M]'}
+              title={t(status.isMuted ? 'lecteur.retablirSonRaccourci' : 'lecteur.couperSonRaccourci')}
               aria-label={status.isMuted ? t('lecteur.retablirSon') : t('lecteur.couperSon')}
               aria-pressed={status.isMuted}
               className={`rounded-sm ${FOCUS} ${

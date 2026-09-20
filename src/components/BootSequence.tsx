@@ -127,7 +127,7 @@ export const BootSequence: React.FC<BootSequenceProps> = ({ onComplete }) => {
           onClick={handleFinish}
           className="text-xs font-mono text-texte-attenue hover:text-accent-texte border border-bordure hover:border-accent-texte/60 bg-black/60 px-3 py-1 rounded transition-colors"
         >
-          [ PASSER LA SÉQUENCE (ÉCHAP) ]
+          {t('boot.passer')}
         </button>
       </div>
 
@@ -139,7 +139,7 @@ export const BootSequence: React.FC<BootSequenceProps> = ({ onComplete }) => {
             <div className="w-2.5 h-2.5 rounded-full bg-classe-euclid/80" />
             <div className="w-2.5 h-2.5 rounded-full bg-classe-safe/80" />
             <span className="ml-2 text-xs text-texte-attenue tracking-widest font-semibold">
-              SCiPNET DIRECT CONSOLE // NOEUD SÉCURISÉ SITE-19
+              {t('boot.console')}
             </span>
           </div>
           <span className="text-xs text-accent-texte font-bold">CLEARANCE 4</span>

@@ -150,7 +150,7 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs font-mono">
           <span className="text-xs text-texte-attenue font-bold uppercase shrink-0 flex items-center gap-1 pl-0.5">
             <Library className="w-3 h-3 text-role-agent" />
-            SÉRIE :
+            {t('filtre.serie')}
           </span>
           <button
             onClick={() => {
@@ -163,7 +163,7 @@ export const MobileSearchFilters: React.FC<MobileSearchFiltersProps> = ({
                 : 'bg-surface-1/80 border-bordure text-texte-second opacity-80'
             }`}
           >
-            EMBLÉMATIQUES
+            {t('filtre.emblematiques')}
           </button>
           {availableSeries.map((series) => {
             const isSelected = selectedSeries === series.id;

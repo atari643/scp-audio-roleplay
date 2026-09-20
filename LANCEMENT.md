@@ -114,8 +114,8 @@ modérateur coûte plus qu'il ne rapporte.
 >
 > Free, no account, nothing to install. Articles are pulled live from the wiki.
 >
-> → https://scp-audio-roleplay.vercel.app/?lang=en
-> → Straight into 173: https://scp-audio-roleplay.vercel.app/?scp=scp-173&lang=en
+> → https://scp-audio-roleplay.vercel.app
+> → Straight into 173: https://scp-audio-roleplay.vercel.app/?scp=scp-173
 >
 > Fan project, not official, no money in it. Content stays CC BY-SA 3.0 and every
 > article credits its author.
@@ -141,8 +141,8 @@ modérateur coûte plus qu'il ne rapporte.
 > Gratuit, sans compte, rien à installer. Les dossiers sont lus en direct depuis
 > le wiki.
 >
-> → https://scp-audio-roleplay.vercel.app
-> → Directement SCP-173 : https://scp-audio-roleplay.vercel.app/?scp=scp-173
+> → https://scp-audio-roleplay.vercel.app/?lang=fr
+> → Directement SCP-173 : https://scp-audio-roleplay.vercel.app/?scp=scp-173&lang=fr
 >
 > Projet de fan, non officiel, sans revenu. Le contenu reste CC BY-SA 3.0 et
 > chaque dossier affiche son auteur et son traducteur.
@@ -178,17 +178,20 @@ anglophone qui tombe sur ce qu'il cherchait.
 
 | À partager | Lien |
 |---|---|
-| Accueil, français | `https://scp-audio-roleplay.vercel.app` |
-| Accueil, **anglais** | `https://scp-audio-roleplay.vercel.app/?lang=en` |
-| Un dossier précis, anglais | `…/?scp=scp-173&lang=en` |
-| Un dossier précis, français | `…/?scp=scp-173` |
+| Accueil, **anglais** (défaut) | `https://scp-audio-roleplay.vercel.app` |
+| Accueil, français | `https://scp-audio-roleplay.vercel.app/?lang=fr` |
+| Un dossier précis, anglais | `…/?scp=scp-173` |
+| Un dossier précis, français | `…/?scp=scp-173&lang=fr` |
 
 Un lien qui **vise un dossier** saute la séquence de démarrage et ouvre
 directement le dossier : c'est celui qu'il faut poster, parce que le visiteur
 entend l'application dans les deux secondes au lieu d'attendre dix.
 
-Vérifiez toujours la langue du lien avant de poster. C'est l'erreur la plus
-facile à commettre et la plus coûteuse.
+**L'anglais est la langue par défaut** : l'adresse nue ouvre l'application en
+anglais, interface comprise. C'est le français qui doit désormais se déclarer.
+La langue choisie est ensuite mémorisée, mais un `?lang=` dans le lien prime
+toujours sur elle — un lien partagé s'ouvre dans SA langue, pas dans celle du
+visiteur.
 
 ## 7. Ce qui manque encore au produit
 

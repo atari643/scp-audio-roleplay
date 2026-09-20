@@ -64,7 +64,7 @@ class SpeechEngine {
   private isPlaying: boolean = false;
   private isPaused: boolean = false;
   private globalSpeed: number = 1.0;
-  private languageCode: string = 'fr';
+  private languageCode: string = 'en';
   private engineMode: TtsEngineMode = 'neural';
   private voiceProfiles: Record<CharacterRole, VoiceProfile>;
   private aiVoiceAssignments: Record<CharacterRole, string>;
@@ -201,7 +201,7 @@ class SpeechEngine {
       }
     }
     this.voiceProfiles = storageService.getVoiceProfiles();
-    this.aiVoiceAssignments = { ...DEFAULT_AI_ROLES_FR };
+    this.aiVoiceAssignments = { ...DEFAULT_AI_ROLES_EN };
   }
 
   private loadSystemVoices(): void {

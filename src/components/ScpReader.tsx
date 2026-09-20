@@ -157,7 +157,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
             }
           >
             <Star className={`w-3.5 h-3.5 ${isFavorite ? 'fill-current' : ''}`} />
-            <span className="hidden sm:inline">{isFavorite ? 'Classé' : 'Classer'}</span>
+            <span className="hidden sm:inline">{t(isFavorite ? 'favoris.classe' : 'filtre.classerCourt')}</span>
           </button>
 
           <a

@@ -1,4 +1,4 @@
-import { AttributionScp, LanguageBranch, ObjectClass, ScpItemDetail, ScpItemSummary, SUPPORTED_LANGUAGES } from '../types/scp';
+import { AttributionScp, LanguageBranch, ObjectClass, ScpItemDetail, ScpItemSummary, SUPPORTED_LANGUAGES, LANGUE_PAR_DEFAUT } from '../types/scp';
 import { getSeriesById } from '../data/seriesData';
 import { ICONIC_SCPS } from './scpDataApi';
 
@@ -330,7 +330,7 @@ export function filtreScp(options: {
 
 export const cromApi = {
   getLanguage(code: string): LanguageBranch {
-    return SUPPORTED_LANGUAGES.find(l => l.code === code) || SUPPORTED_LANGUAGES[0];
+    return SUPPORTED_LANGUAGES.find(l => l.code === code) || LANGUE_PAR_DEFAUT;
   },
 
   /**

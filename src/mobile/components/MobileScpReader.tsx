@@ -160,7 +160,7 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
         />
 
         <div className="px-3 py-1.5 border-b border-bordure-faible font-mono text-xs uppercase tracking-technique text-texte-attenue">
-          Dossier classifié · Accréditation 4
+          {t('dossier.classifieCourt')}
         </div>
 
         <div className="p-3.5">

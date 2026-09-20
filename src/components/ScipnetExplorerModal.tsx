@@ -302,7 +302,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                 }}
                 className={`win2k-btn px-2 py-0.5 text-xs ${viewMode === 'list' ? 'bg-surface-2 text-texte font-bold' : 'text-texte-attenue'}`}
               >
-                Détails
+                {t('explorateur.details')}
               </button>
             </div>
           </div>

@@ -20,20 +20,20 @@ export interface LanguageBranch {
 
 export const SUPPORTED_LANGUAGES: LanguageBranch[] = [
   {
-    code: 'fr',
-    name: 'Français',
-    nativeName: 'Français',
-    flag: '🇫🇷',
-    baseUrl: 'http://fondationscp.wikidot.com',
-    locale: 'fr-FR'
-  },
-  {
     code: 'en',
     name: 'English',
     nativeName: 'English',
     flag: '🇬🇧',
     baseUrl: 'http://scp-wiki.wikidot.com',
     locale: 'en-US'
+  },
+  {
+    code: 'fr',
+    name: 'Français',
+    nativeName: 'Français',
+    flag: '🇫🇷',
+    baseUrl: 'http://fondationscp.wikidot.com',
+    locale: 'fr-FR'
   },
   {
     code: 'es',
@@ -100,6 +100,22 @@ export const SUPPORTED_LANGUAGES: LanguageBranch[] = [
     locale: 'ko-KR'
   }
 ];
+
+/**
+ * La branche ouverte quand rien d'autre ne la désigne.
+ *
+ * L'anglais : c'est la branche la plus fournie, celle des communautés où le
+ * projet est partagé, et un visiteur qui arrive sans préférence connue doit
+ * pouvoir lire. Le français reste la langue du code et du dictionnaire de
+ * référence — ce sont deux choses différentes.
+ *
+ * Constante explicite plutôt que `SUPPORTED_LANGUAGES[0]` : trois appelants
+ * dépendaient en silence de l'ordre du tableau, qui n'est qu'un ordre
+ * d'affichage.
+ */
+export const LANGUE_PAR_DEFAUT: LanguageBranch =
+  SUPPORTED_LANGUAGES.find(l => l.code === 'en') ?? SUPPORTED_LANGUAGES[0];
+
 
 export interface ScpItemSummary {
   url: string;

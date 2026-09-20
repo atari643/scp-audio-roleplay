@@ -294,7 +294,7 @@ export const ClefIllustration: React.FC<IllustrationProps> = ({ className = 'w-f
     <circle cx="100" cy="95" r="28" fill="#18181b" stroke="#ef4444" strokeWidth="1.5" strokeDasharray="4 2" />
     <rect x="75" y="85" width="50" height="20" fill="#000000" stroke="#ef4444" strokeWidth="1" />
     <text x="100" y="98" textAnchor="middle" fill="#ef4444" fontSize="7" fontFamily="monospace">
-      [VISAGE BROUILLÉ]
+      [FACE REDACTED]
     </text>
     <text x="100" y="165" textAnchor="middle" fill="#f87171" fontSize="8" fontFamily="monospace" fontWeight="bold">
       DR. ALTO CLEF // SCI-KETER
@@ -971,7 +971,7 @@ export const Area02Illustration: React.FC<IllustrationProps> = ({ className = 'w
     <rect x="95" y="112" width="10" height="8" fill="#f87171" />
     <line x1="50" y1="135" x2="150" y2="135" stroke="#ef4444" strokeWidth="2" strokeDasharray="6 3" />
     <text x="100" y="155" textAnchor="middle" fill="#fca5a5" fontSize="8" fontFamily="monospace" fontWeight="bold">
-      AREA-02 // SILO NUCLÉAIRE
+      AREA-02 // NUCLEAR SILO
     </text>
   </svg>
 );

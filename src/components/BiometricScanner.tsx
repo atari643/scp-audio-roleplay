@@ -84,7 +84,7 @@ export const BiometricScanner: React.FC<BiometricScannerProps> = ({ scpTitle, on
         <div className="p-4 border-b border-scp-border flex items-center justify-between">
           <div>
             <div className="text-xs font-mono text-classe-euclid tracking-widest font-semibold">
-              SCiPNET // CONTRÔLE D'ACCÈS BIOMÉTRIQUE
+              {t('bio.controle')}
             </div>
             <div className="text-sm font-mono text-texte font-bold truncate mt-0.5">{scpTitle}</div>
           </div>

@@ -87,7 +87,7 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
           <span className="text-bordure-forte hidden sm:inline" aria-hidden="true">|</span>
           <span className="hidden sm:inline text-texte-attenue truncate tracking-technique">
-            Tout accès non autorisé est enregistré et traité par la RAISA
+            {t('entete.surveillance')}
           </span>
           <span className="sm:hidden text-texte-attenue truncate">{t('entete.archive')}</span>
         </div>
@@ -193,7 +193,7 @@ export const Header: React.FC<HeaderProps> = ({
               sfx.playTerminalBeep();
               onToggleCrt();
             }}
-            title={crtEnabled ? 'Désactiver le filtre moniteur CRT' : 'Activer le filtre moniteur CRT'}
+            title={t(crtEnabled ? 'entete.desactiverCrt' : 'entete.activerCrt')}
             aria-pressed={crtEnabled}
             className={crtEnabled ? BOUTON_BARRE_ACTIF : BOUTON_BARRE}
           >
@@ -203,7 +203,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onToggleSfx}
-            title={sfxEnabled ? 'Couper les effets sonores' : 'Activer les effets sonores'}
+            title={t(sfxEnabled ? 'entete.couperSons' : 'entete.activerSons')}
             aria-pressed={sfxEnabled}
             className={`${sfxEnabled ? BOUTON_BARRE_ACTIF : BOUTON_BARRE} w-9 justify-center px-0`}
           >

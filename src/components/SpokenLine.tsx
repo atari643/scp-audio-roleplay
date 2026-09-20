@@ -141,7 +141,7 @@ export const SpokenLine: React.FC<SpokenLineProps> = ({
           title={
             link.kind === 'external'
               ? `Lien externe : ${link.url || link.target}`
-              : `${KIND_LABEL[link.kind] || 'Page'} · ${link.target} — clic : mettre de côté, Alt+clic : ouvrir`
+              : t('file.miseDeCote', { genre: KIND_LABEL[link.kind] || t('file.page'), cible: link.target })
           }
           onClick={e => {
             e.stopPropagation();

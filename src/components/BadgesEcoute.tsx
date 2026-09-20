@@ -56,8 +56,8 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
           className={CLASSE_PASTILLE}
           title={
             meta.dureeApproximative
-              ? 'Dossier paginé : seule la première page est mesurée, la durée réelle est supérieure.'
-              : 'Durée d’écoute estimée à 150 mots/minute.'
+              ? t('badge.paginee')
+              : t('badge.duree')
           }
         >
           <Clock className="w-3 h-3" />
@@ -71,7 +71,7 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
           title={`${meta.voix} voix distinctes, ${meta.partDialogue} % de dialogue`}
         >
           <Drama className="w-3 h-3" />
-          {compact ? `${meta.voix}` : `Théâtre · ${meta.voix} voix`}
+          {compact ? `${meta.voix}` : t('badge.theatre', { voix: String(meta.voix) })}
         </span>
       )}
 
@@ -101,7 +101,7 @@ export const BadgesEcoute: React.FC<BadgesEcouteProps> = ({
           title={t('badge.meconnu')}
         >
           <Gem className="w-3 h-3" />
-          {compact ? '' : 'Pépite'}
+          {compact ? '' : t('badge.pepite')}
         </span>
       )}
 

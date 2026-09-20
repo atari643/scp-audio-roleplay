@@ -6,7 +6,7 @@ import { DEFAULT_ROLE_PROFILES } from '../services/storageService';
 import { DEFAULT_AI_ROLES_FR, NEURAL_VOICES_BY_LANG, VOICE_LANGUAGE_STATS } from '../types/neuralVoices';
 import { sfx } from '../services/sfxService';
 import { FenetreScipnet } from './FenetreScipnet';
-import { useT } from '../i18n';
+import { CleTraduction, useT } from '../i18n';
 
 interface VoiceStudioModalProps {
   isOpen: boolean;
@@ -14,14 +14,22 @@ interface VoiceStudioModalProps {
   languageCode: string;
 }
 
-const SAMPLE_TEXTS: Record<CharacterRole, string> = {
-  narrator: "Objet : SCP-049. Classe d'objet : Euclide. Procédures de confinement spéciales en vigueur au Secteur de recherche 02.",
-  researcher: "Bonjour SCP-049. Veuillez vous asseoir. Nous aimerions comprendre la véritable nature de votre traitement.",
-  anomaly: "Ne vous moquez pas de moi, docteur ! Mon remède est le plus efficace contre le Fléau.",
-  classD: "Attendez, pourquoi vous fermez la porte derrière moi ?! Qu'est-ce qu'il y a là-dedans ?!",
-  agent: "Équipe Bravo en position. Contact visuel confirmé sur l'entité anormale. Périmètre sécurisé.",
-  commander: "Rapport validé par le Conseil O5. Autorisation d'expérimentation de classe 4 accordée.",
-  intercom: "Début de l'enregistrement audio. Date : quatorze mars. Site dix-neuf."
+/**
+ * Les répliques d'essai, par clé.
+ *
+ * On stocke la clé et non le texte : ce module est évalué une fois, avant que
+ * la langue ne soit connue, et surtout ces phrases sont **lues à voix haute**
+ * pour comparer les timbres — une voix anglaise lisant du français ne dit rien
+ * de ce qu'elle vaut.
+ */
+const REPLIQUES_ESSAI: Record<CharacterRole, CleTraduction> = {
+  narrator: 'replique.narrateur',
+  researcher: 'replique.chercheur',
+  anomaly: 'replique.anomalie',
+  classD: 'replique.classeD',
+  agent: 'replique.agent',
+  commander: 'replique.commandement',
+  intercom: 'replique.intercom'
 };
 
 /** Taille de cache lisible d'un coup d'œil (« 12,3 Mo », « 480 Ko »). */
@@ -30,27 +38,27 @@ const formatTailleOctets = (octets: number): string =>
     ? `${(octets / (1024 * 1024)).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} Mo`
     : `${Math.max(1, Math.round(octets / 1024))} Ko`;
 
-const ROLE_IMMERSION_TAGS: Record<CharacterRole, { tag: string; color: string }> = {
-  narrator: { tag: 'Archiviste, clinique et solennel', color: 'text-role-narrateur bg-surface-3/60 border-role-narrateur/60' },
-  researcher: { tag: 'Scientifique, analytique', color: 'text-classe-safe bg-surface-3/60 border-classe-safe/60' },
-  anomaly: { tag: 'Timbre sombre (−18 Hz)', color: 'text-accent-texte bg-surface-3/60 border-accent-texte/60' },
-  classD: { tag: 'Débit stressé (+10 %)', color: 'text-classe-euclid bg-surface-3/60 border-classe-euclid/60' },
-  agent: { tag: 'Émetteur radio tactique', color: 'text-role-agent bg-surface-3/60 border-role-agent/60' },
-  commander: { tag: 'Autorité directe O5', color: 'text-classe-thaumiel bg-surface-3/60 border-classe-thaumiel/60' },
-  intercom: { tag: 'Carillon et haut-parleur', color: 'text-texte-second bg-surface-2 border-bordure-forte' }
+const ROLE_IMMERSION_TAGS: Record<CharacterRole, { cle: CleTraduction; color: string }> = {
+  narrator: { cle: 'timbre.narrateur', color: 'text-role-narrateur bg-surface-3/60 border-role-narrateur/60' },
+  researcher: { cle: 'timbre.chercheur', color: 'text-classe-safe bg-surface-3/60 border-classe-safe/60' },
+  anomaly: { cle: 'timbre.anomalie', color: 'text-accent-texte bg-surface-3/60 border-accent-texte/60' },
+  classD: { cle: 'timbre.classeD', color: 'text-classe-euclid bg-surface-3/60 border-classe-euclid/60' },
+  agent: { cle: 'timbre.agent', color: 'text-role-agent bg-surface-3/60 border-role-agent/60' },
+  commander: { cle: 'timbre.commandement', color: 'text-classe-thaumiel bg-surface-3/60 border-classe-thaumiel/60' },
+  intercom: { cle: 'timbre.intercom', color: 'text-texte-second bg-surface-2 border-bordure-forte' }
 };
 
 const SCP_PRESETS = [
   {
     id: 'site-19',
-    name: 'Site-19 Standard',
-    desc: 'Équilibre officiel de la Fondation',
+    nomCle: 'prereglage.standard' as CleTraduction,
+    descCle: 'studio.equilibre' as CleTraduction,
     assignments: DEFAULT_AI_ROLES_FR
   },
   {
     id: 'keter-tension',
-    name: 'Confinement Keter / Euclid',
-    desc: 'Anomalie inquiétante et personnel sous tension',
+    nomCle: 'prereglage.keter' as CleTraduction,
+    descCle: 'studio.anomalieInquietante' as CleTraduction,
     assignments: {
       narrator: 'fr-FR-RemyMultilingualNeural',
       researcher: 'en-US-BrianMultilingualNeural',
@@ -63,8 +71,8 @@ const SCP_PRESETS = [
   },
   {
     id: 'investigation-o5',
-    name: 'Interrogatoire O5 / Médical',
-    desc: 'Voix féminines au commandement et à la recherche',
+    nomCle: 'prereglage.o5' as CleTraduction,
+    descCle: 'studio.voixFeminines' as CleTraduction,
     assignments: {
       narrator: 'fr-FR-RemyMultilingualNeural',
       researcher: 'en-US-AvaMultilingualNeural',
@@ -161,7 +169,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
   const handleTestVoice = async () => {
     sfx.playTerminalBeep();
     setIsPlayingPreview(true);
-    const text = SAMPLE_TEXTS[activeTab] || "Test de voix pour le rôle attribué.";
+    const text = t(REPLIQUES_ESSAI[activeTab] ?? 'studio.testRole');
     await speechEngine.previewVoice(activeTab, text);
     setTimeout(() => setIsPlayingPreview(false), 3000);
   };
@@ -195,7 +203,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
     <FenetreScipnet
       isOpen={isOpen}
       onClose={onClose}
-      titre="Studio des voix"
+      titre={t('studio.titre')}
       classification={`${stats.totalVoices} voix · ${stats.langName}`}
       icone={<Sparkles className="w-4 h-4" />}
       largeur="max-w-3xl"
@@ -203,7 +211,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
       <div className="flex flex-col">
         <div className="px-4 sm:px-5 py-3 border-b border-bordure-faible flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <p className="font-serif text-sm text-texte-second max-w-lecture">
-            Attribution d'une voix par personnage : archiviste, chercheurs, anomalies, officiers FIM.
+            {t('studio.sousTitre')}
           </p>
 
           <div className="flex items-center gap-2">
@@ -245,7 +253,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
                 onClick={() => handleApplyPreset(preset.assignments)}
                 className="px-2.5 py-1 rounded-lg bg-scp-card hover:bg-scp-cardHover border border-scp-border text-xs font-mono text-texte-second hover:text-texte transition-colors shrink-0"
               >
-                {preset.name}
+                {t(preset.nomCle)}
               </button>
             ))}
           </div>
@@ -291,11 +299,11 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
                   {currentProfile.label}
                 </h3>
                 <span className={`text-xs font-mono px-2 py-0.5 rounded border ${ROLE_IMMERSION_TAGS[activeTab].color}`}>
-                  {ROLE_IMMERSION_TAGS[activeTab].tag}
+                  {t(ROLE_IMMERSION_TAGS[activeTab].cle)}
                 </span>
               </div>
               <p className="text-xs text-texte-second italic bg-scp-card/70 p-3 rounded-xl border border-scp-border">
-                "{SAMPLE_TEXTS[activeTab]}"
+                "{t(REPLIQUES_ESSAI[activeTab])}"
               </p>
             </div>
 
@@ -429,7 +437,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
                 className="flex-1 flex items-center justify-center gap-2 bg-accent hover:bg-accent disabled:opacity-50 text-texte font-mono text-xs font-semibold py-2.5 px-4 rounded-xl shadow transition-colors"
               >
                 <Play className="w-3.5 h-3.5 fill-white" />
-                <span>{isPlayingPreview ? 'Écoute en cours...' : 'Tester la Réplique Roleplay'}</span>
+                <span>{isPlayingPreview ? t('studio.ecouteEnCours') : t('studio.tester')}</span>
               </button>
 
               <button
@@ -457,7 +465,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
             </span>
             <button
               onClick={handlePurgeCache}
-              title={purgeArme ? 'Cliquer à nouveau pour confirmer la purge' : 'Vide le cache audio persistant de cet appareil'}
+              title={purgeArme ? t('studio.confirmerPurge') : t('studio.videCache')}
               className={`flex items-center gap-1.5 text-xs font-mono py-2.5 px-3 rounded-xl border transition-colors ${
                 purgeArme
                   ? 'bg-surface-3/70 border-accent-texte text-texte'

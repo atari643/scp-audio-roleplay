@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { CleTraduction, Dictionnaire, FR } from './fr';
+import { EN } from './en';
 
 /**
  * Les textes de l'interface, dans la langue choisie.
@@ -25,11 +26,16 @@ import { CleTraduction, Dictionnaire, FR } from './fr';
  * non ici : Vite refuse un import dynamique qui viserait son propre répertoire.
  */
 
-let langueCourante = 'fr';
-let dictionnaire: Dictionnaire = FR;
+// L'anglais démarre chargé : c'est la langue par défaut, et l'attendre en
+// `import()` ferait afficher le français le temps d'un rendu.
+let langueCourante = 'en';
+let dictionnaire: Dictionnaire = EN;
 
 const abonnes = new Set<() => void>();
-const charges = new Map<string, Dictionnaire>([['fr', FR]]);
+const charges = new Map<string, Dictionnaire>([
+  ['fr', FR],
+  ['en', EN]
+]);
 
 /**
  * L'instantané que lit `useSyncExternalStore`.
@@ -99,11 +105,11 @@ export async function definirLangue(code: string): Promise<void> {
       prevenir();
     }
   } catch {
-    // Branche sans traduction : on reste sur le français plutôt que d'afficher
+    // Branche sans traduction : on retombe sur l'anglais plutôt que d'afficher
     // des clés nues. Mémorisé pour ne pas retenter à chaque bascule.
-    charges.set(code, FR);
+    charges.set(code, EN);
     if (langueCourante === code) {
-      dictionnaire = FR;
+      dictionnaire = EN;
       prevenir();
     }
   }
@@ -117,7 +123,10 @@ export async function definirLangue(code: string): Promise<void> {
  * `erreur.relancer` affiché tel quel à l'écran.
  */
 export function t(cle: CleTraduction, params?: Record<string, string>): string {
-  let texte: string = dictionnaire[cle] ?? FR[cle] ?? cle;
+  // Repli en cascade : la branche affichée, puis l'anglais qui est le défaut,
+  // puis le français qui définit les clés. Un texte dans la mauvaise langue
+  // reste préférable à `erreur.relancer` affiché tel quel.
+  let texte: string = dictionnaire[cle] ?? EN[cle] ?? FR[cle] ?? cle;
   if (params) {
     for (const [nom, valeur] of Object.entries(params)) {
       texte = texte.split(`{${nom}}`).join(valeur);

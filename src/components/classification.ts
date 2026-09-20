@@ -30,7 +30,7 @@ const HABILLAGES: Record<ObjectClass, HabillageClasse> = {
   Apollyon: { couleur: 'var(--classe-apollyon)', abrege: 'APOL', dangereuse: true },
   Archon: { couleur: 'var(--classe-archon)', abrege: 'ARCH', dangereuse: false },
   Neutralized: { couleur: 'var(--classe-neutralisee)', abrege: 'NEUT', dangereuse: false },
-  Decommissioned: { couleur: 'var(--classe-neutralisee)', abrege: 'DÉCL', dangereuse: false },
+  Decommissioned: { couleur: 'var(--classe-neutralisee)', abrege: 'DECOM', dangereuse: false },
   'Non assigné': { couleur: 'var(--bordure-forte)', abrege: '—', dangereuse: false }
 };
 

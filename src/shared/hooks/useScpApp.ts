@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { LanguageBranch, ObjectClass, ScpItemSummary, SUPPORTED_LANGUAGES } from '../../types/scp';
+import { LanguageBranch, ObjectClass, ScpItemSummary, SUPPORTED_LANGUAGES, LANGUE_PAR_DEFAUT } from '../../types/scp';
 import { PlayerStatus, SpeechSegment } from '../../types/audioRoleplay';
 // `import type` et non `import` : seul le type est utilisé ici, et un import de
 // valeur tirerait les 73 Ko du calque éditorial dans le paquet d'entrée, que la
@@ -54,9 +54,19 @@ export function useScpApp() {
   // ensuite, et c'est lui qui réécrit l'adresse (voir l'effet plus bas).
   const [etatInitialPartage] = useState(lireEtatPartage);
 
-  const [currentLanguage, setCurrentLanguage] = useState<LanguageBranch>(
-    etatInitialPartage.langue ?? SUPPORTED_LANGUAGES[0]
-  );
+  /**
+   * La branche ouverte au démarrage, par ordre de priorité.
+   *
+   * 1. `?lang=` dans l'adresse — un lien partagé doit s'ouvrir dans SA langue,
+   *    sinon le travail sur les liens partageables n'a plus d'objet ;
+   * 2. la branche mémorisée à la visite précédente ;
+   * 3. l'anglais, pour qui arrive sans rien.
+   */
+  const [currentLanguage, setCurrentLanguage] = useState<LanguageBranch>(() => {
+    if (etatInitialPartage.langue) return etatInitialPartage.langue;
+    const memorisee = storageService.getLangue();
+    return SUPPORTED_LANGUAGES.find(l => l.code === memorisee) ?? LANGUE_PAR_DEFAUT;
+  });
   const [selectedClass, setSelectedClass] = useState<ObjectClass | 'ALL'>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSeries, setSelectedSeries] = useState<string | null>(null);
@@ -248,6 +258,10 @@ export function useScpApp() {
     // L'interface suit la même langue que le catalogue : c'était le défaut le
     // plus visible, on lisait un dossier anglais entouré de boutons français.
     void definirLangue(currentLanguage.code);
+    // Mémorisée pour la prochaine visite. Écrite à chaque changement plutôt
+    // qu'au seul clic du sélecteur : la langue peut aussi venir d'un lien, et
+    // c'est encore un choix qu'on a de bonnes raisons de retrouver ensuite.
+    storageService.saveLangue(currentLanguage.code);
   }, [currentLanguage]);
 
   // L'adresse suit l'état, pour qu'elle soit copiable à tout instant sans bouton

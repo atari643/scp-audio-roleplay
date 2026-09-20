@@ -124,7 +124,7 @@ export const RaisaTerminal: React.FC<RaisaTerminalProps> = ({
             <div className="flex items-center gap-2">
               <Terminal className="w-3.5 h-3.5 text-accent-texte" />
               <span className="text-accent-texte font-bold text-xs tracking-wider">RAISA WATCHDOG CONSOLE v4.19</span>
-              <span className="text-xs text-systeme font-bold">● CONNECTÉ</span>
+              <span className="text-xs text-systeme font-bold">{t('log.connecte')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-texte-attenue">{logs.length} événements</span>
