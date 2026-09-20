@@ -56,6 +56,39 @@ le moteur). Vise zéro : c'est le filet des règles de `speechText.ts`, que ni l
 couverture ni la duplication ne voient, puisque le mot est bien lu — seulement
 mal dit.
 
+## Langues de l'interface
+
+```bash
+npm run i18n     # régénère en.ts, vérifie les 9 branches, cherche le français oublié
+```
+
+**L'anglais est la langue par défaut**, le français celle du code et du
+dictionnaire de référence — ce sont deux choses différentes. `src/i18n/fr.ts`
+définit les clés et le type ; `src/i18n/en.ts` est **généré** depuis
+`langues/en.json` et embarqué dans le paquet d'entrée, parce que l'attendre en
+`import()` ferait clignoter le français au premier rendu. Les huit autres
+branches sont chargées à la demande.
+
+**Pour ajouter un texte : la clé dans `fr.ts`, puis les neuf branches.** Le type
+`CleTraduction` se déduit de `fr.ts` et `en.ts` est typé `Dictionnaire`, donc
+`tsc` refuse déjà une traduction anglaise incomplète. `npm run i18n` couvre le
+reste.
+
+**Trois pièges déjà payés.** Vite refuse un `import()` dynamique visant son
+propre répertoire — d'où `langues/`, sans quoi le build passe et aucun
+dictionnaire ne se charge. L'instantané de `useSyncExternalStore` doit être un
+**compteur**, jamais la langue : `definirLangue()` notifie deux fois, et avec la
+langue pour instantané la seconde était avalée, si bien que le dictionnaire
+arrivait sans jamais s'afficher. Enfin, un texte affiché sans passer par `t()` —
+`habillage.abrege`, un tableau de constantes, du JSX multi-ligne — échappe au
+détecteur si celui-ci ne cherche pas les trois formes : `detecter-francais.mjs`
+les cherche, s'en tenir à lui.
+
+**Ne replie jamais le contenu du wiki sur une autre langue.** `resumeEntite()`
+ne sert que la branche affichée : montrer un paragraphe anglais à qui a choisi le
+français est précisément ce qu'on a supprimé. L'interface, elle, se replie sur
+l'anglais puis le français.
+
 **Lance l'audit après toute modification de `scriptParser.ts` ou `cromApi.ts`.**
 Il sort en code ≠ 0 s'il détecte une duplication ou un défaut de parsing, et son
 cache disque (`scripts/.audit-cache/`) fait que le second passage ne refait
