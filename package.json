@@ -37,7 +37,7 @@
     "entities:repertoire": "node scripts/build-entities.mjs --repertoire",
     "entities": "node scripts/build-entities.mjs --lang en && node scripts/build-entities.mjs --lang fr",
     "icones": "node scripts/generer-icones.mjs",
-    "i18n": "node scripts/generer-en-ts.mjs && node scripts/verifier-traductions.mjs && node scripts/detecter-francais.mjs",
+    "i18n": "node scripts/generer-en-ts.mjs && node scripts/verifier-traductions.mjs && node scripts/auditer-langues.mjs && node scripts/detecter-francais.mjs",
     "serve:build": "esbuild server/index.ts --bundle --platform=node --format=esm --target=node20 --outfile=dist-server/server.mjs --log-level=error",
     "serve": "npm run serve:build && node dist-server/server.mjs",
     "cap:sync": "npm run build && npx cap sync android",

@@ -59,7 +59,8 @@ mal dit.
 ## Langues de l'interface
 
 ```bash
-npm run i18n     # régénère en.ts, vérifie les 9 branches, cherche le français oublié
+npm run i18n     # régénère en.ts, vérifie les 9 branches, audite les langues,
+                 # puis cherche le texte affiché sans passer par t()
 ```
 
 **L'anglais est la langue par défaut**, le français celle du code et du
@@ -83,6 +84,16 @@ arrivait sans jamais s'afficher. Enfin, un texte affiché sans passer par `t()` 
 `habillage.abrege`, un tableau de constantes, du JSX multi-ligne — échappe au
 détecteur si celui-ci ne cherche pas les trois formes : `detecter-francais.mjs`
 les cherche, s'en tenir à lui.
+
+**Deux contrôles, deux questions différentes.**
+`verifier-traductions.mjs` demande « les clés sont-elles toutes là ? » ;
+`auditer-langues.mjs` demande « le texte est-il dans la bonne langue ? ». Le
+second croise cinq signaux, dont le plus fiable ne dépend d'aucun lexique :
+**l'écriture attendue** — une valeur en alphabet latin dans la branche russe,
+japonaise, coréenne ou chinoise est une traduction oubliée. Il vérifie aussi que
+les marques `{n}` survivent à la traduction : une marque perdue affiche un trou.
+Ce qu'il tolère est énuméré et justifié — les classes d'objet restent « Safe »,
+« Euclid », « Keter » dans toutes les branches, c'est l'usage du wiki.
 
 **Ne replie jamais le contenu du wiki sur une autre langue.** `resumeEntite()`
 ne sert que la branche affichée : montrer un paragraphe anglais à qui a choisi le
