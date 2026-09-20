@@ -183,7 +183,7 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
           <BandeauEntites slug={scp.slug} languageCode={languageCode} onOuvrirEntite={onOuvrirEntite} />
 
           <p className="mt-3 pt-2.5 border-t border-bordure-faible font-mono text-xs uppercase tracking-technique text-texte-attenue">
-            {segments.length} séquences audio
+            {t('compte.sequences', { n: String(segments.length) })}
           </p>
         </div>
       </header>

@@ -518,6 +518,38 @@ export const FR = {
   'dossier.audioDisponible': 'Audio disponible',
   'general.ouvrir': 'Ouvrir',
 
+  // --- Textes mêlés à une valeur --------------------------------------------
+  'compte.dossiers': '{montres} / {total} dossiers',
+  'compte.branche': 'Branche · {langue}',
+  'compte.entites': '{n} entités répertoriées',
+  'compte.confirme': '{n} confirmé',
+  'compte.confirmes': '{n} confirmés',
+  'compte.evenements': '{n} événements',
+  'compte.repliques': 'Transcription · {n} répliques',
+  'compte.sequences': '{n} séquences audio',
+  'compte.sauvegardes': '{n} dossiers sauvegardés',
+  'compte.autresRattaches':
+    '{n} autres dossiers rattachés — les mieux notés sont affichés en premier',
+  'accred.niveau': 'Niveau {n}',
+  'dossier.classeValeur': 'Classe · {classe}',
+  'dossier.consulter': 'Consulter',
+  'recherche.dansBranche': 'Recherche dans la branche {langue}…',
+  'recherche.scipnet': 'Recherche SCiPNET {langue}…',
+  'accueil.declassification': 'Déclassification et analyse roleplay de {dossier}…',
+  'accueil.declassificationCourt': 'Déclassification du dossier {dossier}…',
+  'accueil.pasTraduiteDetail':
+    '{dossier} existe dans les archives anglophones mais n’a pas encore de traduction dans cette branche.',
+  'accueil.titreOriginal': 'Titre original : « {titre} »',
+  'memetique.ondes': 'ONDES THÊTA : {valeur}',
+  'memetique.effectue': '{n} % effectué',
+  'boot.initialisation': 'INITIALISATION : {n} %',
+  'studio.cache': 'Cache : {taille}',
+  'studio.voixCalibrees': '{n} voix calibrées pour le jeu d’acteur SCP',
+  'studio.aigu': 'Aigu / dynamique',
+  'studio.neutre': 'Neutre',
+  'studio.grave': 'Grave / sombre',
+  'explorateur.titre': 'Explorateur SCiPNET',
+
   // --- Écran de confinement d'erreur ---------------------------------------
   'erreur.banniere': "Confinement de l'erreur",
   'erreur.titre': "L'interface a cessé de répondre.",

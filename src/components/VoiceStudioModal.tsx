@@ -398,7 +398,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
               <div className="flex justify-between text-xs font-mono text-texte-second">
                 <span>{t('studio.tonalite')}</span>
                 <span className="text-accent-texte font-bold">
-                  {currentProfile.pitch < 0.9 ? 'Grave / Sombre' : currentProfile.pitch > 1.1 ? 'Aigu / Dynamique' : 'Neutre'}
+                  {t(currentProfile.pitch < 0.9 ? 'studio.grave' : currentProfile.pitch > 1.1 ? 'studio.aigu' : 'studio.neutre')}
                 </span>
               </div>
               <input
@@ -456,12 +456,12 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
         <div className="bg-scp-card px-5 py-3 border-t border-scp-border flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 text-xs font-mono text-classe-safe">
             <Award className="w-3.5 h-3.5" />
-            <span>{stats.totalVoices} voix calibrées pour le jeu d'acteur SCP</span>
+            <span>{t('studio.voixCalibrees', { n: String(stats.totalVoices) })}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1.5 text-xs font-mono text-texte-attenue">
               <Database className="w-3.5 h-3.5" />
-              <span>Cache : {cacheLabel}</span>
+              <span>{t('studio.cache', { taille: cacheLabel })}</span>
             </span>
             <button
               onClick={handlePurgeCache}

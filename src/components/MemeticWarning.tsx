@@ -164,7 +164,7 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
                   <span className="w-1.5 h-1.5 rounded-full bg-classe-euclid animate-ping" />
                   {t('memetique.rythme')}
                 </span>
-                <span className="text-texte-attenue">ONDES THÊTA : {telemetryVal}</span>
+                <span className="text-texte-attenue">{t('memetique.ondes', { valeur: String(telemetryVal) })}</span>
               </div>
 
               {/* Slow retro progress bar */}
@@ -180,7 +180,7 @@ export const MemeticWarning: React.FC<MemeticWarningProps> = ({ onComplete }) =>
 
               <div className="flex items-center justify-between text-xs font-mono text-texte-attenue mt-2">
                 <span>{t('rp.resistance')}</span>
-                <span className="text-classe-euclid font-bold">{Math.round(scanProgress)}% EFFECTUÉ</span>
+                <span className="text-classe-euclid font-bold">{t('memetique.effectue', { n: String(Math.round(scanProgress)) })}</span>
               </div>
             </div>
           )}

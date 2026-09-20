@@ -325,7 +325,7 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
               <div className="text-center py-16 flex flex-col items-center justify-center gap-2">
                 <Loader2 className="w-7 h-7 animate-spin text-accent-texte" />
                 <p className="text-xs font-mono text-texte-attenue">
-                  Recherche SCiPNET {currentLanguage.name}...
+                  {t('recherche.scipnet', { langue: currentLanguage.name })}
                 </p>
               </div>
             ) : filteredItems.length === 0 ? (
@@ -391,7 +391,7 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
               <div className="text-center py-20 flex flex-col items-center justify-center gap-3">
                 <Loader2 className="w-8 h-8 animate-spin text-accent-texte" />
                 <p className="text-xs font-mono text-texte-second">
-                  Déclassification du dossier {activeSlug?.toUpperCase()}...
+                  {t('accueil.declassificationCourt', { dossier: activeSlug?.toUpperCase() ?? '' })}
                 </p>
               </div>
             ) : activeScpDetail ? (
@@ -448,8 +448,7 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
                       PAGE PAS ENCORE TRADUITE
                     </p>
                     <p className="text-xs font-mono text-texte-attenue mt-2 leading-relaxed">
-                      {activeSlug?.toUpperCase()} existe dans les archives anglophones mais n'a pas
-                      encore de traduction française.
+                      {t('accueil.pasTraduiteDetail', { dossier: activeSlug?.toUpperCase() ?? '' })}
                     </p>
                     <p className="text-xs font-mono text-texte-attenue mt-1">
                       « {englishFallback.title} »

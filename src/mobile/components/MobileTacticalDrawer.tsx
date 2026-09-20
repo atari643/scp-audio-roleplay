@@ -118,7 +118,7 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
                 <Star className="w-4 h-4 text-classe-euclid fill-current" />
                 <div>
                   <div className="text-xs font-mono font-bold text-texte">{t('menu.favoris')}</div>
-                  <div className="text-xs font-mono text-texte-attenue">{favoritesCount} dossiers sauvegardés</div>
+                  <div className="text-xs font-mono text-texte-attenue">{t('compte.sauvegardes', { n: String(favoritesCount) })}</div>
                 </div>
               </div>
               <span className="text-xs font-mono px-2 py-0.5 rounded bg-surface-3 text-classe-euclid border border-classe-euclid">

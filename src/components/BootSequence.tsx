@@ -196,7 +196,7 @@ export const BootSequence: React.FC<BootSequenceProps> = ({ onComplete }) => {
         </div>
         <div className="mt-1.5 flex justify-between text-xs font-mono text-texte-attenue">
           <span>{t('rp.systeme')}</span>
-          <span>INITIALISATION : {Math.min(100, Math.round((visibleLines.length / BOOT_LINES.length) * 100))}%</span>
+          <span>{t('boot.initialisation', { n: String(Math.min(100, Math.round((visibleLines.length / BOOT_LINES.length) * 100))) })}</span>
         </div>
       </div>
 

@@ -205,7 +205,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
                   className="font-mono text-xs font-semibold uppercase tracking-technique px-2.5 py-1 rounded-sm border"
                   style={styleBadgeClasse(scp.objectClass)}
                 >
-                  Classe · {scp.objectClass}
+                  {t('dossier.classeValeur', { classe: scp.objectClass })}
                 </span>
               </div>
 
@@ -263,7 +263,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Transcription · {segments.length} répliques</span>
+            <span>{t('compte.repliques', { n: String(segments.length) })}</span>
           </button>
 
           <button

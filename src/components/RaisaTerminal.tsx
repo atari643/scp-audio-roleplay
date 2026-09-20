@@ -127,7 +127,7 @@ export const RaisaTerminal: React.FC<RaisaTerminalProps> = ({
               <span className="text-xs text-systeme font-bold">{t('log.connecte')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-texte-attenue">{logs.length} événements</span>
+              <span className="text-xs text-texte-attenue">{t('compte.evenements', { n: String(logs.length) })}</span>
               <button
                 onClick={() => setCollapsed(true)}
                 className="p-1 hover:bg-surface-3/60 rounded text-texte-attenue hover:text-texte transition-colors"

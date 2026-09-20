@@ -97,7 +97,7 @@ export const MobileScpCard: React.FC<MobileScpCardProps> = ({
       <div className="flex items-center justify-between pt-2 border-t border-bordure-faible font-mono text-xs text-texte-attenue">
         <span className="uppercase tracking-technique">{t('dossier.audioDisponible')}</span>
         <span className="flex items-center gap-0.5">
-          Consulter
+          {t('dossier.consulter')}
           <ChevronRight className="w-3.5 h-3.5" />
         </span>
       </div>

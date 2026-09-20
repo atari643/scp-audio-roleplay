@@ -242,14 +242,14 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
     <FenetreScipnet
       isOpen={isOpen}
       onClose={onClose}
-      titre="Explorateur SCiPNET"
+      titre={t('explorateur.titre')}
       classification={t('explorateur.repertoire')}
       icone={<FolderOpen className="w-4 h-4" />}
       largeur="max-w-6xl"
       hauteur="pleine"
       barreEtat={
         <div className="flex flex-wrap items-center justify-between gap-2 uppercase">
-          <span className="tabular-nums">{totalEntites} entités répertoriées</span>
+          <span className="tabular-nums">{t('compte.entites', { n: String(totalEntites) })}</span>
           <span>{t('explorateur.reseau')}</span>
         </div>
       }
@@ -567,7 +567,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                         const { confirmes, mentions } = compterDossiers(currentSelection.entity.id, languageCode);
                         return (
                           <span className="text-xs font-mono normal-case text-texte-attenue">
-                            {confirmes} confirmé{confirmes > 1 ? 's' : ''}
+                            {t(confirmes > 1 ? 'compte.confirmes' : 'compte.confirme', { n: String(confirmes) })}
                             {mentions > 0 && ` · ${mentions} mention${mentions > 1 ? 's' : ''}`}
                           </span>
                         );
@@ -603,8 +603,9 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
 
                     {currentSelection.entity.iconicScps.length > LIMITE_DOSSIERS && (
                       <p className="mt-2 text-xs font-mono text-texte-attenue">
-                        {currentSelection.entity.iconicScps.length - LIMITE_DOSSIERS} autres dossiers rattachés —
-                        les mieux notés sont affichés en premier.
+                        {t('compte.autresRattaches', {
+                          n: String(currentSelection.entity.iconicScps.length - LIMITE_DOSSIERS)
+                        })}
                       </p>
                     )}
                   </div>
@@ -758,7 +759,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                             <td className="p-2 font-bold text-accent-texte whitespace-nowrap">{entity.code}</td>
                             <td className="p-2 font-bold text-texte whitespace-nowrap">{entity.name}</td>
                             <td className="p-2 text-texte-attenue uppercase text-xs">{entity.category}</td>
-                            <td className="p-2 text-texte-second">Niveau {entity.clearanceLevel}</td>
+                            <td className="p-2 text-texte-second">{t('accred.niveau', { n: String(entity.clearanceLevel) })}</td>
                             <td className="p-2 text-texte-attenue truncate max-w-xs">{entity.title}</td>
                             <td className="p-2 text-right text-accent-texte font-bold">{t('explorateur.ouvrir')} &gt;</td>
                           </tr>

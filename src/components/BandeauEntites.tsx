@@ -96,7 +96,7 @@ export const BandeauEntites: React.FC<BandeauEntitesProps> = ({ slug, languageCo
           {t('entites.rattachements')}
         </span>
         <span className="text-xs font-mono text-texte-attenue">
-          {confirmes.length} confirmé{confirmes.length > 1 ? 's' : ''}
+          {t(confirmes.length > 1 ? 'compte.confirmes' : 'compte.confirme', { n: String(confirmes.length) })}
           {mentions.length > 0 && ` · ${mentions.length} mention${mentions.length > 1 ? 's' : ''}`}
         </span>
       </div>

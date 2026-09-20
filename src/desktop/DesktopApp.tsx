@@ -232,7 +232,7 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
             <div className="text-center py-28 flex flex-col items-center justify-center gap-3">
               <Loader2 className="w-8 h-8 animate-spin text-accent-texte" />
               <p className="text-sm font-mono text-texte-second">
-                Déclassification et analyse roleplay de {activeSlug.toUpperCase()}...
+                {t('accueil.declassification', { dossier: activeSlug.toUpperCase() })}
               </p>
             </div>
           ) : activeScpDetail ? (
@@ -284,11 +284,10 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
                     {t('accueil.pasTraduite')}
                   </p>
                   <p className="font-serif text-md text-texte-second mt-2 max-w-lecture mx-auto">
-                    {activeSlug?.toUpperCase()} existe dans les archives anglophones mais n'a pas
-                    encore de traduction française.
+                    {t('accueil.pasTraduiteDetail', { dossier: activeSlug?.toUpperCase() ?? '' })}
                   </p>
                   <p className="font-mono text-xs text-texte-attenue mt-2">
-                    Titre original : « {englishFallback.title} »
+                    {t('accueil.titreOriginal', { titre: englishFallback.title })}
                   </p>
                   <div className="flex items-center justify-center gap-3 mt-5 flex-wrap">
                     <button
@@ -393,7 +392,7 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
               <div className="text-center py-20 flex flex-col items-center justify-center gap-3">
                 <Loader2 className="w-7 h-7 animate-spin text-accent-texte" />
                 <p className="font-mono text-xs text-texte-attenue">
-                  Recherche dans la branche {currentLanguage.name}...
+                  {t('recherche.dansBranche', { langue: currentLanguage.name })}
                 </p>
               </div>
             ) : filteredItems.length === 0 ? (
@@ -414,9 +413,9 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
               <div>
                 <div className="flex items-center justify-between mb-3 font-mono text-xs uppercase tracking-technique text-texte-attenue">
                   <span className="tabular-nums">
-                    {Math.min(displayLimit, filteredItems.length)} / {filteredItems.length} dossiers
+                    {t('compte.dossiers', { montres: String(Math.min(displayLimit, filteredItems.length)), total: String(filteredItems.length) })}
                   </span>
-                  <span>Branche · {currentLanguage.nativeName}</span>
+                  <span>{t('compte.branche', { langue: currentLanguage.nativeName })}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

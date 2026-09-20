@@ -87,7 +87,7 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       titre={`${entity.code} · ${entity.name}`}
-      classification={`Niveau ${entity.clearanceLevel}`}
+      classification={t('accred.niveau', { n: String(entity.clearanceLevel) })}
       icone={<FolderOpen className="w-4 h-4" />}
       largeur="max-w-4xl"
       barreEtat={
@@ -183,7 +183,7 @@ export const EntityDetailModal: React.FC<EntityDetailModalProps> = ({
 
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-texte-attenue">{t('fiche.accreditation')}</span>
-                  <span className="text-classe-euclid font-bold">Niveau {entity.clearanceLevel}</span>
+                  <span className="text-classe-euclid font-bold">{t('accred.niveau', { n: String(entity.clearanceLevel) })}</span>
                 </div>
 
                 <div className="flex justify-between items-center text-xs">

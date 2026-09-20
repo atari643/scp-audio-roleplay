@@ -62,7 +62,7 @@ const IDENTITES_NORMALES = new Set([
   // Allemand : « Zone » et « Code » sont les mots allemands.
   'Zone',
   // Italien : la classe D et le mot « classe » s'écrivent ainsi.
-  'Classe-D', 'Classe', 'Console RAISA',
+  'Classe-D', 'Classe', 'Console RAISA', 'Classe · {classe}',
   // Espagnol.
   'Audio disponible'
 ]);
