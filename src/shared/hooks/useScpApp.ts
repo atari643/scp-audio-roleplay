@@ -9,7 +9,7 @@ import type { ScpEntity } from '../../data/departmentsData';
 import { SCP_SERIES } from '../../data/seriesData';
 import { cromApi } from '../../services/cromApi';
 import { chargerEntites, dossiersDeLEntite, entiteParId } from '../../services/entityService';
-import { scpDataApi } from '../../services/scpDataApi';
+import { catalogueDe, chargerCatalogue } from '../../services/catalogueDefaut';
 import { parseScpDossier } from '../../services/scriptParser';
 import { WikiLink } from '../../services/linkExtractor';
 import { definirLangue } from '../../i18n';
@@ -76,6 +76,12 @@ export function useScpApp() {
   // de corpus, pas sur Crom, qui ne sait filtrer aucun des quatre.
   const [filtresEcoute, setFiltresEcoute] = useState<FiltresEcoute>(FILTRES_VIDES);
   const [indexCorpus, setIndexCorpus] = useState<IndexCorpus | null>(null);
+
+  // Le catalogue de démarrage, dans la langue de la branche. Semé avec ce qui est
+  // déjà en mémoire pour que le retour sur une branche déjà vue soit immédiat.
+  const [catalogueDemarrage, setCatalogueDemarrage] = useState<ScpItemSummary[]>(
+    () => catalogueDe(currentLanguage.code)
+  );
 
   const handleSetSelectedSeries = useCallback((seriesId: string | null) => {
     setSelectedSeries(seriesId);
@@ -168,8 +174,8 @@ export function useScpApp() {
   });
 
   // TanStack Query 1b: Browse a whole series (SCP-000→999, 1000→1999, …) from Crom.
-  // Without this the catalogue could only ever show the 64 hand-picked dossiers in
-  // scpDataApi, which is why most of the corpus looked "missing".
+  // Without this the catalogue could only ever show the 64 dossiers of the branch's
+  // starter catalogue, which is why most of the corpus looked "missing".
   const activeSeries = SCP_SERIES.find(s => s.id === selectedSeries) || null;
   const {
     data: seriesData,
@@ -272,6 +278,17 @@ export function useScpApp() {
     ecrireEtatPartage(activeSlug, currentLanguage);
   }, [activeSlug, currentLanguage]);
 
+  // Le catalogue de démarrage suit la branche. Il ne suivait rien : une liste figée,
+  // bâtie sur la branche française, servait d'accueil à tout le monde — un lecteur
+  // anglophone ouvrait l'application sur « La Statue - L'original » et « SCP-101-FR ».
+  useEffect(() => {
+    let annule = false;
+    chargerCatalogue(currentLanguage.code).then(items => {
+      if (!annule) setCatalogueDemarrage(items);
+    });
+    return () => { annule = true; };
+  }, [currentLanguage]);
+
   // L'index de la branche est chargé à la demande (morceau séparé, ~69 Ko gzip en FR).
   // Toutes les branches n'en ont pas : sans index, les filtres d'écoute restent inertes
   // plutôt que de masquer des dossiers dont on ignore la durée.
@@ -307,7 +324,7 @@ export function useScpApp() {
       ? (entiteData || [])
       : activeSeries
         ? (seriesData || [])
-        : scpDataApi.getIconicScps();
+        : catalogueDemarrage;
 
   const currentSubRange = activeSeries?.subRanges?.find(r => r.id === selectedSubRange);
 
@@ -380,10 +397,10 @@ export function useScpApp() {
   }, [activeScpDetail]);
 
   const handleRandomScp = useCallback(() => {
-    const iconic = scpDataApi.getIconicScps();
-    const randomPick = iconic[Math.floor(Math.random() * iconic.length)];
+    if (catalogueDemarrage.length === 0) return;
+    const randomPick = catalogueDemarrage[Math.floor(Math.random() * catalogueDemarrage.length)];
     handleSelectScp(randomPick.slug);
-  }, [handleSelectScp]);
+  }, [catalogueDemarrage, handleSelectScp]);
 
   const handleToggleFavorite = useCallback((item: ScpItemSummary) => {
     storageService.toggleFavorite(item);

@@ -13,7 +13,13 @@
  */
 
 import { CategorieEntite, Entite } from '../types/entities';
-import { nomEntite, pageSourceEntite, resumeEntite } from '../services/entityService';
+import {
+  dossiersDeLEntite,
+  entiteParId,
+  nomEntite,
+  pageSourceEntite,
+  resumeEntite
+} from '../services/entityService';
 import { ALL_ENTITIES, EntityCategory, ScpEntity } from './departmentsData';
 
 /** Le calque éditorial, indexé par l'entité du wiki à laquelle il se rapporte. */
@@ -122,21 +128,36 @@ export function versScpEntity(entite: Entite, langue: string, dossiers: string[]
   const nom = nomEntite(entite, langue);
   const resume = resumeEntite(entite, langue);
 
+  /**
+   * Le calque éditorial est écrit en français, et rien que.
+   *
+   * Nom, titre, devise, directeur, description, lore : six champs de prose
+   * rédigés ici, jamais traduits. Les servir à toutes les branches faisait lire
+   * « Département de Pataphysique » et « Division Métanarrative & Quatrième Mur »
+   * à qui avait choisi l'anglais, alors que le répertoire du wiki connaît
+   * « Pataphysics Department ». Hors du français, on s'en remet donc au wiki —
+   * qui n'a parfois qu'un nom, et c'est encore mieux qu'un paragraphe français.
+   *
+   * Ce qui n'est pas de la prose — code de dossier, accréditation, palette —
+   * reste pris au calque : ces valeurs valent dans toutes les langues.
+   */
+  const prose = langue === 'fr' ? editorial : undefined;
+
   return {
     id: entite.id,
     entiteId: entite.id,
     slug: entite.id,
-    name: editorial?.name ?? nom,
+    name: prose?.name ?? nom,
     code: editorial?.code ?? codeDe(entite),
     category: VERS_ANCIENNE[entite.categorie],
-    title: editorial?.title ?? entite.designation ?? nom,
-    director: editorial?.director,
+    title: prose?.title ?? entite.designation ?? nom,
+    director: prose?.director,
     clearanceLevel: editorial?.clearanceLevel ?? ACCREDITATION[entite.categorie],
-    motto: editorial?.motto,
+    motto: prose?.motto,
     // Le résumé du wiki est plus fiable qu'une description rédigée : il vient de la
     // page que la communauté maintient. On garde le texte éditorial en repli.
-    description: resume ?? editorial?.description ?? nom,
-    lore: editorial?.lore ?? resume ?? '',
+    description: resume ?? prose?.description ?? nom,
+    lore: prose?.lore ?? resume ?? '',
     // Le résumé étant repris mot pour mot de l'annuaire, la licence CC BY-SA 3.0
     // impose d'en citer la source. Le résumé vient toujours de la branche
     // affichée — il n'y a pas de repli de langue — donc c'est sa page qu'on cite.
@@ -156,4 +177,37 @@ export function versScpEntity(entite: Entite, langue: string, dossiers: string[]
 /** Le calque éditorial d'une entité, s'il y en a un. */
 export function calqueEditorial(id: string): ScpEntity | undefined {
   return CALQUE.get(id);
+}
+
+/**
+ * Une des quatre listes d'accès rapide, rendue dans la langue affichée.
+ *
+ * `SCP_DEPARTMENTS`, `SCP_RESEARCHERS`, `SCP_GOI` et `SCP_SITES` sont du texte
+ * français : le tiroir de l'accueil affichait « Département de Pataphysique » et
+ * « Division Métanarrative & Quatrième Mur » à qui avait choisi l'anglais.
+ * Chaque entrée repasse donc par le répertoire du wiki, qui connaît son nom dans
+ * la branche — et, à défaut, son nom anglais.
+ *
+ * Une entrée que le wiki ne connaît pas sort de la liste hors du français : il
+ * n'existe alors aucune version non française de son nom, et une ligne française
+ * au milieu d'une liste anglaise est exactement ce qu'on retire. Onze des
+ * soixante-huit sont dans ce cas.
+ *
+ * Renvoie une liste vide tant que le répertoire n'est pas chargé — l'appelant
+ * doit donc déclencher `chargerRepertoire()` et redemander ensuite.
+ */
+export function calqueDansLaLangue(liste: ScpEntity[], langue: string): ScpEntity[] {
+  if (langue === 'fr') return liste;
+
+  const sortie: ScpEntity[] = [];
+  for (const entree of liste) {
+    const entite = entree.entiteId ? entiteParId(entree.entiteId) : undefined;
+    if (!entite) continue;
+    // `nomEntite()` finit par rendre n'importe quel nom connu plutôt qu'un
+    // identifiant — bon repli dans l'explorateur, mauvais ici : la seule entité
+    // dont le wiki ne connaisse que le nom français y reviendrait par la bande.
+    if (!(entite.noms[langue] ?? entite.noms.en ?? entite.designation)) continue;
+    sortie.push(versScpEntity(entite, langue, dossiersDeLEntite(entite.id, langue)));
+  }
+  return sortie;
 }

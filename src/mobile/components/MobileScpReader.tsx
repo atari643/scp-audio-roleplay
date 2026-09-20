@@ -8,6 +8,7 @@ import { ReadingQueue } from '../../components/ReadingQueue';
 import { BandeauEntites } from '../../components/BandeauEntites';
 import { CreditsDossier } from '../../components/CreditsDossier';
 import {
+  cleLibelleClasse,
   habillageClasse,
   styleBadgeClasse,
   styleFondClasse
@@ -172,7 +173,7 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
               className="font-mono text-xs px-2 py-0.5 rounded-sm border uppercase tracking-technique font-semibold"
               style={styleBadgeClasse(scp.objectClass)}
             >
-              {scp.objectClass}
+              {t(cleLibelleClasse(scp.objectClass))}
             </span>
           </div>
 

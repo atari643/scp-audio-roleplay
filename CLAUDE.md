@@ -23,7 +23,8 @@ npm run entities                                       # arêtes en puis fr
 node scripts/build-entities.mjs --lang ru              # une autre branche
 node scripts/build-entities.mjs --lang fr --limit 800  # échantillon, pour vérifier
 node scripts/build-entities.mjs --reconcilier          # rapport sur departmentsData.ts
-node scripts/build-entities.mjs --iconiques --lang fr  # régénère ICONIC_SCPS
+node scripts/build-entities.mjs --classes           # tags de classe de chaque branche
+node scripts/build-entities.mjs --iconiques --lang en  # src/data/catalogue.en.json
 
 # Sonde de prononciation : le moteur lit-il DÉJÀ cette forme correctement ?
 node scripts/probe-speech.mjs                          # toute la table
@@ -134,6 +135,30 @@ code encore `scp` en dur : ne lui passe pas `--lang ru` sans lire le profil d'ab
 33. Tout vient maintenant de Crom ou du wiki. `src/data/departmentsData.ts` reste le
 calque **éditorial** (lore, devise, directeur, couleurs), relié au répertoire par
 `entiteId` ; ses listes de dossiers, elles, viennent de `entityService`.
+
+**Chaque branche a son catalogue de démarrage.** `ICONIC_SCPS`, une liste figée bâtie
+sur la branche française, servait d'accueil à TOUTES les langues : un lecteur anglophone
+ouvrait l'application sur « La Statue - L'original » et « SCP-101-FR ». Il y a maintenant
+un `src/data/catalogue.<lang>.json` par branche, chargé à la demande par
+`catalogueDefaut.ts` — le patron de `entityIndex.<lang>.json`. Régénère-les avec
+`--iconiques --lang <code>`, jamais à la main.
+
+**Les tags de classe sont appris, pas écrits.** « Keter » se tague `кетер` en russe,
+`케테르` en coréen, `bezpieczne` (Safe) en polonais. La table écrite en dur ne connaissait
+que l'anglais et le français : 64 dossiers russes sur 64 ressortaient « Non assigné ».
+`--classes` les découvre en comparant les traductions à leur original anglais — si les
+pages russes dont l'original est tagué `keter` portent presque toutes `кетер`, alors
+`кетер` EST le tag Keter — et écrit `tagsClasse` dans `branchProfiles.json` plus une table
+à plat `src/data/tagsClasse.json` que `cromApi.extractObjectClass()` lit. N'ajoute pas un
+tag à la main : relance `--classes`.
+
+**Le calque éditorial est français, et rien que.** `departmentsData.ts` porte six champs
+de prose — nom, titre, devise, directeur, description, lore — jamais traduits. Hors du
+français, `versScpEntity()` ne les sert plus : le nom vient du répertoire du wiki, qui le
+connaît dans la branche (et, à défaut, en anglais). Une entité que le wiki ignore sort des
+listes d'accès rapide hors du français plutôt que d'y laisser une ligne française — onze
+sur soixante-huit. Ce qui n'est pas de la prose (code, accréditation, palette) reste pris
+au calque : ces valeurs valent dans toutes les langues.
 
 **Les quatre certitudes ne se mélangent pas.** `t` (tag), `a` (annuaire) et `o`
 (origine) sont des liens que la communauté a écrits ; `m` (mention) est une inférence

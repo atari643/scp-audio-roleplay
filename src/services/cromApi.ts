@@ -1,33 +1,46 @@
 import { AttributionScp, LanguageBranch, ObjectClass, ScpItemDetail, ScpItemSummary, SUPPORTED_LANGUAGES, LANGUE_PAR_DEFAUT } from '../types/scp';
 import { getSeriesById } from '../data/seriesData';
-import { ICONIC_SCPS } from './scpDataApi';
+import { enrichissementDe } from './catalogueDefaut';
+import TAGS_CLASSE from '../data/tagsClasse.json';
 
 const CROM_ENDPOINT = 'https://api.crom.avn.sh/graphql';
-
-// Fast lookup map for enriched metadata of iconic dossiers
-const iconicMap = new Map<string, ScpItemSummary>();
-for (const item of ICONIC_SCPS) {
-  iconicMap.set(item.slug.toLowerCase(), item);
-  iconicMap.set(item.scpNumber.toLowerCase(), item);
-}
 
 // In-memory cache for full series to make tab switching instant
 const seriesCache = new Map<string, ScpItemSummary[]>();
 
+/**
+ * La classe d'objet d'un dossier, d'après ses tags.
+ *
+ * La table vient du wiki, pas d'ici : `build-entities.mjs --classes` apprend les
+ * tags de classe de chaque branche en comparant les traductions à leur original
+ * anglais, et les réunit dans `tagsClasse.json`. Cette fonction ne sait pas de
+ * quelle branche vient la page — elle n'en a pas besoin, aucun tag ne désignant
+ * deux classes.
+ *
+ * Elle ne connaissait auparavant que l'anglais et le français, écrits en dur :
+ * dans la branche russe, dont le tag est « кетер » et non « keter », TOUS les
+ * dossiers ressortaient « Non assigné ». En coréen aussi.
+ *
+ * L'ordre de la table décide en cas de double tag, ce qui arrive : un dossier
+ * neutralisé garde souvent sa classe d'origine. `ORDRE` place donc les états
+ * terminaux avant, parce que c'est l'information la plus récente sur l'objet.
+ */
+const ORDRE: ObjectClass[] = [
+  'Decommissioned', 'Neutralized', 'Apollyon', 'Keter',
+  'Euclid', 'Safe', 'Thaumiel', 'Archon'
+];
+
 function extractObjectClass(tags?: string[]): ObjectClass {
   if (!tags) return 'Non assigné';
-  const tagSet = new Set(tags.map(t => t.toLowerCase()));
 
-  if (tagSet.has('keter')) return 'Keter';
-  if (tagSet.has('euclid') || tagSet.has('euclide')) return 'Euclid';
-  if (tagSet.has('safe') || tagSet.has('sûr') || tagSet.has('sur')) return 'Safe';
-  if (tagSet.has('thaumiel')) return 'Thaumiel';
-  if (tagSet.has('apollyon')) return 'Apollyon';
-  if (tagSet.has('archon')) return 'Archon';
-  if (tagSet.has('neutralized') || tagSet.has('neutralisé')) return 'Neutralized';
-  if (tagSet.has('decommissioned') || tagSet.has('déclassé')) return 'Decommissioned';
+  const trouvees = new Set<ObjectClass>();
+  for (const tag of tags) {
+    const classe = (TAGS_CLASSE as Record<string, ObjectClass>)[tag.toLowerCase()];
+    if (classe) trouvees.add(classe);
+  }
+  if (trouvees.size === 0) return 'Non assigné';
 
-  return 'Non assigné';
+  return ORDRE.find(c => trouvees.has(c)) ?? 'Non assigné';
 }
 
 function extractScpNumber(slugOrTitle: string): string {
@@ -89,7 +102,7 @@ function isNearDuplicate(a: string, b: string): boolean {
 const RAFALE_MAX_TENTATIVES = 4;
 
 function delaiRafale(message: string): number | null {
-  const m = message.match(/wait for (d+) second/i);
+  const m = message.match(/wait for (\d+) second/i);
   return m ? (parseInt(m[1], 10) + 1) * 1000 : null;
 }
 
@@ -594,6 +607,7 @@ export const cromApi = {
       }
 
       const regex = /(?:[*#]|\b)\s*\[\[\[(?:([^|\]]+)\|)?(SCP-[0-9A-Za-z\-_]+)\]\]\]\s*(?:-\s*([^\n\r]+))?/gi;
+      const enrichissement = enrichissementDe(langCode);
       const items: ScpItemSummary[] = [];
       const seen = new Set<string>();
       let match: RegExpExecArray | null;
@@ -615,7 +629,7 @@ export const cromApi = {
         const canonicalUrl = `${primaryBaseUrl}/${slug}`;
 
         // Enrich with iconic metadata if available
-        const iconic = iconicMap.get(slug) || iconicMap.get(scpNumber.toLowerCase());
+        const iconic = enrichissement.get(slug) || enrichissement.get(scpNumber.toLowerCase());
 
         items.push({
           url: canonicalUrl,

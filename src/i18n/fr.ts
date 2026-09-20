@@ -362,6 +362,10 @@ export const FR = {
   'classe.keter': 'KETER',
   'classe.thaumiel': 'THAUMIEL',
   'classe.apollyon': 'APOLLYON',
+  'classe.archon': 'ARCHON',
+  'classe.neutralisee': 'NEUTRALISÉ',
+  'classe.declassee': 'DÉCLASSÉ',
+  'classe.nonAssignee': 'NON ASSIGNÉ',
 
   // --- Explorateur, suite ---------------------------------------------------
   'explorateur.repertoire': 'Répertoire des entités · CL-5',

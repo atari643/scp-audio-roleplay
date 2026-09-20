@@ -5,6 +5,7 @@ import { sfx } from '../services/sfxService';
 import { prefetchScpDossier } from '../services/queryClient';
 import { BadgesEcoute } from './BadgesEcoute';
 import {
+  cleLibelleClasse,
   habillageClasse,
   styleBadgeClasse,
   styleLisereClasse,
@@ -98,7 +99,7 @@ export const ScpCard: React.FC<ScpCardProps> = ({
             className="shrink-0 font-mono text-xs font-semibold uppercase tracking-technique px-2 py-0.5 rounded-sm border"
             style={styleBadgeClasse(item.objectClass)}
           >
-            {item.objectClass}
+            {t(cleLibelleClasse(item.objectClass))}
           </span>
         </div>
 

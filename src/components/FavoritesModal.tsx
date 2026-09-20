@@ -3,6 +3,7 @@ import { Bookmark, Trash2, Headphones } from 'lucide-react';
 import { FenetreScipnet } from './FenetreScipnet';
 import { ScpItemSummary } from '../types/scp';
 import { sfx } from '../services/sfxService';
+import { cleLibelleClasse } from './classification';
 import { useT } from '../i18n';
 
 interface FavoritesModalProps {
@@ -54,7 +55,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                       {item.scpNumber}
                     </span>
                     <span className="text-xs font-mono px-1.5 py-0.5 rounded bg-surface-3/80 text-accent-texte border border-accent-texte/40">
-                      {item.objectClass}
+                      {t(cleLibelleClasse(item.objectClass))}
                     </span>
                   </div>
                   <p className="text-xs text-texte-second truncate">

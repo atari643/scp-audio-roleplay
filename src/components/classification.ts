@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import { ObjectClass } from '../types/scp';
+import type { CleTraduction } from '../i18n';
 
 /**
  * Habillage d'une classe d'objet — partagé par le desktop et le mobile.
@@ -36,6 +37,34 @@ const HABILLAGES: Record<ObjectClass, HabillageClasse> = {
 
 export function habillageClasse(classe: ObjectClass): HabillageClasse {
   return HABILLAGES[classe] ?? HABILLAGES['Non assigné'];
+}
+
+/**
+ * La clé du libellé d'une classe.
+ *
+ * `ObjectClass` est une valeur de donnée, pas un libellé : ses neuf cas sont
+ * écrits en anglais sauf un, « Non assigné », qui était affiché tel quel sur les
+ * cartes — du français au milieu d'un catalogue anglais, russe ou japonais. Le
+ * badge passe donc par une clé, comme le filtre mobile le faisait déjà.
+ *
+ * Safe, Euclid et Keter restent en alphabet latin dans les branches japonaise,
+ * coréenne et chinoise : c'est l'usage de ces communautés, et `auditer-langues`
+ * le sait (`LATIN_VOULU`).
+ */
+const LIBELLES: Record<ObjectClass, CleTraduction> = {
+  Safe: 'classe.safe' as CleTraduction,
+  Euclid: 'classe.euclid' as CleTraduction,
+  Keter: 'classe.keter' as CleTraduction,
+  Thaumiel: 'classe.thaumiel' as CleTraduction,
+  Apollyon: 'classe.apollyon' as CleTraduction,
+  Archon: 'classe.archon' as CleTraduction,
+  Neutralized: 'classe.neutralisee' as CleTraduction,
+  Decommissioned: 'classe.declassee' as CleTraduction,
+  'Non assigné': 'classe.nonAssignee' as CleTraduction
+};
+
+export function cleLibelleClasse(classe: ObjectClass): CleTraduction {
+  return LIBELLES[classe] ?? LIBELLES['Non assigné'];
 }
 
 /**

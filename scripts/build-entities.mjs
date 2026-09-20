@@ -22,7 +22,8 @@
  *   node scripts/build-entities.mjs --lang en           src/data/entityIndex.en.json
  *   node scripts/build-entities.mjs --lang fr --limit 800    échantillon, pour vérifier
  *   node scripts/build-entities.mjs --reconcilier       rapport sur departmentsData.ts
- *   node scripts/build-entities.mjs --iconiques         régénère ICONIC_SCPS depuis Crom
+ *   node scripts/build-entities.mjs --classes           tags de classe de chaque branche
+ *   node scripts/build-entities.mjs --iconiques --lang en   src/data/catalogue.en.json
  */
 
 import fs from 'node:fs';
@@ -98,6 +99,7 @@ function parseArgs(argv) {
     else if (a === '--repertoire') args.mode = 'repertoire';
     else if (a === '--reconcilier') args.mode = 'reconcilier';
     else if (a === '--iconiques') args.mode = 'iconiques';
+    else if (a === '--classes') args.mode = 'classes';
     else if (a === '--lang') { args.lang = argv[++i]; args.mode = args.mode ?? 'aretes'; }
     else if (a === '--limit') args.limit = parseInt(argv[++i], 10);
     else if (a === '--out') args.sortie = argv[++i];
@@ -1015,12 +1017,196 @@ const REQUETE_ICONIQUES = `query($f: QueryPagesFilter, $a: ID) {
   }
 }`;
 
-const CLASSES = [
-  ['keter', 'Keter'], ['euclid', 'Euclid'], ['euclide', 'Euclid'], ['safe', 'Safe'],
-  ['sûr', 'Safe'], ['sur', 'Safe'], ['thaumiel', 'Thaumiel'], ['apollyon', 'Apollyon'],
-  ['archon', 'Archon'], ['neutralized', 'Neutralized'], ['neutralisé', 'Neutralized'],
-  ['decommissioned', 'Decommissioned'], ['déclassé', 'Decommissioned']
+/**
+ * Les tags de classe de la branche anglaise, et la valeur d'`ObjectClass` qu'ils
+ * portent. C'est le point de départ de la découverte : tout le reste en dérive.
+ */
+const CLASSES_EN = [
+  ['safe', 'Safe'], ['euclid', 'Euclid'], ['keter', 'Keter'], ['thaumiel', 'Thaumiel'],
+  ['apollyon', 'Apollyon'], ['archon', 'Archon'], ['neutralized', 'Neutralized'],
+  ['decommissioned', 'Decommissioned']
 ];
+
+/**
+ * Les tags de classe d'une branche, appris ou à défaut ceux de l'anglais.
+ *
+ * `branchProfiles.json` porte `tagsClasse` dès que `--classes` a tourné. Sans lui,
+ * on retombe sur les tags anglais : c'est juste pour les branches qui les gardent
+ * (ja, zh-CN, it…) et faux pour les autres, ce que le compte de dossiers sans
+ * classe affiché en fin de `--iconiques` rend visible.
+ */
+function tagsClasseDe(profil) {
+  const appris = Object.entries(profil.tagsClasse ?? {}).map(([tag, classe]) => [tag.toLowerCase(), classe]);
+  const connues = new Set(appris.map(([, classe]) => classe));
+  // Les classes rares — Apollyon, Archon, Decommissioned — n'apparaissent pas assez
+  // dans l'échantillon de certaines branches pour être apprises. Le tag anglais leur
+  // sert de repli : la plupart des branches le gardent tel quel, et un tag appris
+  // passe de toute façon avant.
+  return [...appris, ...CLASSES_EN.filter(([, classe]) => !connues.has(classe))];
+}
+
+// ------------------------------------------------------- découverte des classes
+
+const REQUETE_CLASSES = `query($f: QueryPagesFilter, $a: ID) {
+  pages(filter: $f, sort: { key: RATING, order: DESC }, first: 100, after: $a) {
+    pageInfo { hasNextPage endCursor }
+    edges { node {
+      wikidotInfo { tags }
+      translationOf { wikidotInfo { tags } }
+    } }
+  }
+}`;
+
+/**
+ * Apprend les tags de classe d'une branche en lisant ses traductions.
+ *
+ * POURQUOI. `--iconiques` lisait la classe d'un dossier dans une table écrite en
+ * anglais et en français. Sur la branche russe, les 64 dossiers du catalogue
+ * ressortaient donc « Non assigné » — le tag y est « кетер », pas « keter » — et
+ * 64 sur 64 en coréen. Une carte sur deux affichait une classe fausse.
+ *
+ * COMMENT. Le même raisonnement que `relierTagsParTraduction()`, appliqué aux
+ * classes : si les pages russes dont l'ORIGINAL anglais est tagué `keter` portent
+ * presque toutes le tag « кетер », alors « кетер » est le tag Keter de la branche.
+ * C'est le wiki qui l'affirme, par ses propres liens de traduction.
+ *
+ * Deux conditions, et les deux comptent :
+ *  - `P(tag | classe) ≥ 0,5` : le tag accompagne vraiment la classe ;
+ *  - `P(tag | pas cette classe) ≤ 0,08` : il ne l'accompagne QUE là. Sans cette
+ *    seconde condition, le tag de type de la branche (« объект », posé sur tous
+ *    les dossiers) sortirait vainqueur pour les huit classes à la fois.
+ */
+async function apprendreClasses(profil, echantillon = 1200) {
+  // Crom ne sait pas filtrer sur `translationOf` : on prend les dossiers de la
+  // branche, et on écarte à la lecture ceux qui n'ont pas d'original. Une branche
+  // presque entièrement originale (l'anglaise, la française pour ses `-FR`) en
+  // fournit donc moins — d'où l'échantillon large et le plafond de pages visitées.
+  const filtre = {
+    _and: [
+      { url: { startsWith: profil.baseUrl } },
+      { wikidotInfo: { tags: { eq: profil.tagDossier } } }
+    ]
+  };
+
+  const pages = [];
+  let curseur = null;
+  let visitees = 0;
+  while (pages.length < echantillon && visitees < 5000) {
+    let data;
+    try {
+      data = await gql(REQUETE_CLASSES, { f: filtre, a: curseur });
+    } catch {
+      break;
+    }
+    const edges = data?.pages?.edges ?? [];
+    if (edges.length === 0) break;
+    for (const { node } of edges) {
+      visitees++;
+      const siens = node.wikidotInfo?.tags;
+      const originaux = node.translationOf?.wikidotInfo?.tags;
+      if (!siens || !originaux) continue;
+      pages.push({
+        siens: new Set(siens.map(t => String(t).toLowerCase())),
+        originaux: new Set(originaux.map(t => String(t).toLowerCase()))
+      });
+      if (pages.length >= echantillon) break;
+    }
+    if (!data.pages.pageInfo.hasNextPage) break;
+    curseur = data.pages.pageInfo.endCursor;
+  }
+
+  const appris = {};
+  const journal = [];
+  for (const [tagEn, classe] of CLASSES_EN) {
+    const dedans = pages.filter(p => p.originaux.has(tagEn));
+    const dehors = pages.filter(p => !p.originaux.has(tagEn));
+    // Moins de huit exemples : on ne conclut pas. Archon et Decommissioned sont
+    // rares partout, et une classe apprise sur trois pages serait un tirage.
+    if (dedans.length < 8) continue;
+
+    const compteDedans = new Map();
+    for (const p of dedans) for (const t of p.siens) compteDedans.set(t, (compteDedans.get(t) ?? 0) + 1);
+
+    let meilleur = null;
+    for (const [tag, n] of compteDedans) {
+      const dans = n / dedans.length;
+      if (dans < 0.5) continue;
+      const hors = dehors.length ? dehors.filter(p => p.siens.has(tag)).length / dehors.length : 0;
+      if (hors > 0.08) continue;
+      if (!meilleur || dans - hors > meilleur.marge) meilleur = { tag, marge: dans - hors, dans, hors };
+    }
+    if (!meilleur) continue;
+    appris[meilleur.tag] = classe;
+    journal.push({ classe, tag: meilleur.tag, exemples: dedans.length, dans: meilleur.dans, hors: meilleur.hors });
+  }
+
+  return { appris, journal, examinees: pages.length };
+}
+
+/**
+ * `--classes` : écrit `tagsClasse` dans `branchProfiles.json`, branche par branche.
+ *
+ * L'anglais n'a rien à apprendre — il EST la référence — et se voit simplement
+ * inscrire ses propres tags, pour que `tagsClasseDe()` n'ait pas de cas à part.
+ */
+async function construireClasses(args) {
+  const fichier = path.join(DATA, 'branchProfiles.json');
+  const profils = lireJson(fichier);
+  if (!profils) throw new Error("Profils absents — lance d'abord --profil.");
+
+  const cibles = args.lang ? [args.lang] : Object.keys(profils);
+  console.log(`=== TAGS DE CLASSE — ${cibles.length} branche(s) ===\n`);
+
+  for (const code of cibles) {
+    const profil = profils[code];
+    if (!profil) {
+      console.log(`  ${code.padEnd(7)} profil absent, ignorée`);
+      continue;
+    }
+    if (code === 'en') {
+      profil.tagsClasse = Object.fromEntries(CLASSES_EN);
+      console.log(`  en      référence — ${CLASSES_EN.length} tags inscrits tels quels`);
+      continue;
+    }
+
+    const { appris, journal, examinees } = await apprendreClasses(profil);
+    profil.tagsClasse = appris;
+    console.log(`  ${code.padEnd(7)} ${examinees} traductions lues → ${journal.length} classes apprises`);
+    for (const j of journal) {
+      console.log(
+        `            ${j.classe.padEnd(15)} « ${j.tag} »` +
+          `   ${(j.dans * 100).toFixed(0)} % des ${j.exemples} exemples, ${(j.hors * 100).toFixed(1)} % ailleurs`
+      );
+    }
+  }
+
+  // Une table à plat, pour le client.
+  //
+  // `cromApi.extractObjectClass()` lit les tags d'une page sans savoir de quelle
+  // branche elle vient, et n'avait donc qu'une liste anglaise et française écrite en
+  // dur : une recherche dans la branche russe renvoyait des dossiers tous « Non
+  // assigné ». Les tags appris peuvent être réunis sans risque, parce qu'aucun ne
+  // désigne deux classes — « кетер » ne veut dire Keter nulle part ailleurs. Les
+  // collisions sont signalées plutôt que résolues en silence.
+  const plat = {};
+  const collisions = [];
+  for (const [code, profil] of Object.entries(profils)) {
+    for (const [tag, classe] of Object.entries(profil.tagsClasse ?? {})) {
+      const t = tag.toLowerCase();
+      if (plat[t] && plat[t] !== classe) collisions.push(`${t} : ${plat[t]} contre ${classe} (${code})`);
+      plat[t] = classe;
+    }
+  }
+
+  const ko = ecrireJson(fichier, profils);
+  const fichierPlat = path.join(DATA, 'tagsClasse.json');
+  const koPlat = ecrireJson(fichierPlat, plat);
+  console.log(`\n${Object.keys(plat).length} tags de classe réunis pour le client`);
+  for (const c of collisions) console.log(`  COLLISION  ${c}`);
+  console.log(`écrit : ${path.relative(ROOT, fichier)} (${ko} Ko)`);
+  console.log(`écrit : ${path.relative(ROOT, fichierPlat)} (${koPlat} Ko)`);
+  return profils;
+}
 
 /**
  * Régénère `ICONIC_SCPS` depuis Crom.
@@ -1036,6 +1222,7 @@ async function construireIconiques(args) {
   if (!profil) throw new Error(`Profil « ${code} » absent — lance d'abord --profil.`);
 
   const combien = Number.isFinite(args.limit) ? args.limit : 64;
+  const tableClasses = tagsClasseDe(profil);
   const filtre = {
     _and: [
       { url: { startsWith: profil.baseUrl } },
@@ -1055,7 +1242,7 @@ async function construireIconiques(args) {
       const slug = node.url.split('/').pop();
       if (!info || !slug) continue;
       const tags = (info.tags ?? []).map(t => t.toLowerCase());
-      const classe = CLASSES.find(([tag]) => tags.includes(tag))?.[1] ?? 'Non assigné';
+      const classe = tableClasses.find(([tag]) => tags.includes(tag))?.[1] ?? 'Non assigné';
       const item = {
         url: node.url,
         slug,
@@ -1076,33 +1263,25 @@ async function construireIconiques(args) {
     curseur = data.pages.pageInfo.endCursor;
   }
 
-  const fichier = path.join(ROOT, 'src', 'services', 'scpDataApi.ts');
-  const contenu = `import { ObjectClass, ScpItemSummary } from '../types/scp';
+  // Un fichier par branche, et non un module unique.
+  //
+  // La liste servait de catalogue de démarrage quelle que soit la langue, alors
+  // qu'elle n'était bâtie que sur une seule branche : un lecteur anglophone voyait
+  // « SCP-101-FR » et « La Statue - L'original ». Même découpage que
+  // `entityIndex.<lang>.json`, chargé à la demande par `catalogueDefaut.ts`.
+  const fichier = path.join(DATA, `catalogue.${profil.code}.json`);
+  const ko = ecrireJson(fichier, items);
 
-/**
- * Les dossiers affichés au démarrage, avant toute requête.
- *
- * GÉNÉRÉ par \`node scripts/build-entities.mjs --iconiques\` — ne pas éditer à la main.
- * Les notes, titres alternatifs et vignettes viennent de Crom ; la version précédente
- * de ce fichier les inventait (des notes à 12 850 pour un corpus dont le 95e centile
- * est à 33), ce qui affichait des chiffres faux à l'utilisateur.
- *
- * Branche ${profil.code} · ${items.length} dossiers · les mieux notés au ${new Date().toISOString().slice(0, 10)}.
- */
-export const ICONIC_SCPS: ScpItemSummary[] = ${JSON.stringify(items, null, 2)};
-
-export const scpDataApi = {
-  /** La liste de démarrage, pour un premier rendu sans attendre le réseau. */
-  getIconicScps(): ScpItemSummary[] {
-    return ICONIC_SCPS;
-  }
-};
-`;
-  fs.writeFileSync(fichier, contenu);
-  console.log(`=== ICONIQUES ${profil.code.toUpperCase()} — ${items.length} dossiers ===`);
+  const sansClasse = items.filter(i => i.objectClass === 'Non assigné').length;
+  console.log(`=== CATALOGUE DE DÉMARRAGE ${profil.code.toUpperCase()} — ${items.length} dossiers ===`);
   console.log(`  notes : ${items[0]?.rating} (max) … ${items[items.length - 1]?.rating} (min)`);
+  console.log(
+    `  classes : ${items.length - sansClasse} lues, ${sansClasse} non assignées` +
+      (profil.tagsClasse ? ` (tags appris par --classes)` : ` (tags anglais par défaut — lance --classes)`)
+  );
   console.log(`  vignettes : ${items.filter(i => i.thumbnailUrl).length} · titres alternatifs : ${items.filter(i => i.alternateTitle).length}`);
-  console.log(`\nécrit : ${path.relative(ROOT, fichier)}`);
+  console.log(`
+écrit : ${path.relative(ROOT, fichier)} (${ko} Ko)`);
   return items;
 }
 
@@ -1114,11 +1293,12 @@ const modes = {
   repertoire: construireRepertoire,
   aretes: construireAretes,
   reconcilier,
-  iconiques: construireIconiques
+  iconiques: construireIconiques,
+  classes: construireClasses
 };
 
 if (!args.mode) {
-  console.error('Précise un mode : --profil, --repertoire, --lang <code>, --reconcilier, --iconiques');
+  console.error('Précise un mode : --profil, --repertoire, --lang <code>, --reconcilier, --iconiques, --classes');
   process.exit(1);
 }
 

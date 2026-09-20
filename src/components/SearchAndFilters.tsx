@@ -21,6 +21,8 @@ import {
   SCP_SITES,
   ScpEntity
 } from '../data/departmentsData';
+import { calqueDansLaLangue } from '../data/entityPresentation';
+import { chargerRepertoire } from '../services/entityService';
 import { SCP_SERIES, ScpSeriesInfo } from '../data/seriesData';
 import { prefetchScpSeries } from '../services/queryClient';
 import { styleBadgeClasse } from './classification';
@@ -178,6 +180,27 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
   const categorieOuverte = CATEGORIES.find((c) => c.cle === activeQuickTab);
   const serieActive = (availableSeries ?? SCP_SERIES).find((s) => s.id === selectedSeries);
 
+  // Hors du français, les quatre listes passent par le répertoire du wiki pour être
+  // nommées dans la langue affichée. Il est chargé ici plutôt qu'au clic : c'est un
+  // morceau séparé, et l'attendre au moment où le tiroir s'ouvre le ferait paraître
+  // vide une fraction de seconde.
+  const [repertoirePret, setRepertoirePret] = useState(false);
+  useEffect(() => {
+    if (languageCode === 'fr') return;
+    let annule = false;
+    chargerRepertoire().then(() => {
+      if (!annule) setRepertoirePret(true);
+    });
+    return () => { annule = true; };
+  }, [languageCode]);
+
+  const entitesOuvertes = React.useMemo(
+    () => (categorieOuverte ? calqueDansLaLangue(categorieOuverte.entites, languageCode) : []),
+    // `repertoirePret` n'est pas lu dans le calcul mais le commande : sans lui, la
+    // liste resterait celle d'avant le chargement, c'est-à-dire vide.
+    [categorieOuverte, languageCode, repertoirePret]
+  );
+
   return (
     <div className="space-y-2.5 mb-6">
       {entiteFiltreNom && (
@@ -300,7 +323,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
             {t(categorieOuverte.titre)}
           </p>
           <div className="flex flex-wrap gap-1.5">
-            {categorieOuverte.entites.map((entite) => (
+            {entitesOuvertes.map((entite) => (
               <button
                 key={entite.id}
                 onClick={() => handleEntityClick(entite)}

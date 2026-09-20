@@ -1,6 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
 import { cromApi } from './cromApi';
-import { scpDataApi } from './scpDataApi';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
