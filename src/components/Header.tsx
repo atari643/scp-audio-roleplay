@@ -83,7 +83,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-2 min-w-0">
           <ShieldAlert className="w-3.5 h-3.5 text-accent-texte shrink-0" aria-hidden="true" />
           <span className="text-accent-texte font-semibold tracking-technique uppercase shrink-0">
-            Restreint · O5
+            {t('entete.restreint')}
           </span>
           <span className="text-bordure-forte hidden sm:inline" aria-hidden="true">|</span>
           <span className="hidden sm:inline text-texte-attenue truncate tracking-technique">
@@ -123,7 +123,7 @@ export const Header: React.FC<HeaderProps> = ({
               FONDATION <span className="text-accent-texte">SCP</span>
             </h1>
             <p className="text-xs text-texte-attenue hidden sm:block font-mono tracking-technique truncate">
-              Terminal d'archive RAISA · Lecture audio
+              {t('entete.sousTitre')}
             </p>
           </div>
         </div>

@@ -324,7 +324,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
                           : 'bg-scp-card border border-scp-border text-texte-attenue hover:text-texte'
                       }`}
                     >
-                      Toutes
+                      {t('studio.toutes')}
                     </button>
                     {availableRegions.map(reg => (
                       <button
@@ -483,7 +483,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
             }}
             className="bg-surface-2 hover:bg-surface-3 text-texte text-xs font-mono font-medium px-4 py-2 rounded-xl transition-colors"
           >
-            Appliquer & Fermer
+            {t('studio.appliquer')}
           </button>
         </div>
       </div>

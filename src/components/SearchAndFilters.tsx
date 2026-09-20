@@ -68,36 +68,36 @@ type OngletRapide = 'none' | 'departments' | 'researchers' | 'goi' | 'sites';
  */
 const CATEGORIES: Array<{
   cle: Exclude<OngletRapide, 'none'>;
-  libelle: string;
-  titre: string;
+  libelle: CleTraduction;
+  titre: CleTraduction;
   icone: React.ComponentType<{ className?: string }>;
   entites: ScpEntity[];
 }> = [
   {
     cle: 'departments',
     libelle: 'filtre.departements' as CleTraduction,
-    titre: 'filtre.departementsInfo',
+    titre: 'filtre.departementsInfo' as CleTraduction,
     icone: Building2,
     entites: SCP_DEPARTMENTS
   },
   {
     cle: 'researchers',
-    libelle: 'Chercheurs',
-    titre: 'Personnel de recherche',
+    libelle: 'filtre.chercheurs' as CleTraduction,
+    titre: 'filtre.chercheursInfo' as CleTraduction,
     icone: User,
     entites: SCP_RESEARCHERS
   },
   {
     cle: 'goi',
-    libelle: 'Factions',
-    titre: 'filtre.factionsInfo',
+    libelle: 'filtre.factions' as CleTraduction,
+    titre: 'filtre.factionsInfo' as CleTraduction,
     icone: Radio,
     entites: SCP_GOI
   },
   {
     cle: 'sites',
-    libelle: 'Sites',
-    titre: 'Sites et zones de confinement',
+    libelle: 'filtre.sites' as CleTraduction,
+    titre: 'filtre.sitesInfo' as CleTraduction,
     icone: Shield,
     entites: SCP_SITES
   }
@@ -193,7 +193,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
             className="shrink-0 inline-flex items-center gap-1 h-8 px-2 rounded-sm text-texte-attenue hover:text-texte transition-colors"
           >
             <X className="w-3.5 h-3.5" />
-            Retirer
+            {t('filtre.retirer')}
           </button>
         </div>
       )}
@@ -277,7 +277,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
               }`}
             >
               <Icone className="w-3.5 h-3.5" />
-              <span>{libelle}</span>
+              <span>{t(libelle)}</span>
               <ChevronDown className={`w-3 h-3 transition-transform ${ouvert ? 'rotate-180' : ''}`} />
             </button>
           );
@@ -297,7 +297,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
       {categorieOuverte && (
         <div className="bg-surface-1 border border-bordure rounded p-3 animate-fade-in">
           <p className="font-mono text-xs uppercase tracking-technique text-texte-attenue border-b border-bordure-faible pb-1.5 mb-2">
-            {categorieOuverte.titre}
+            {t(categorieOuverte.titre)}
           </p>
           <div className="flex flex-wrap gap-1.5">
             {categorieOuverte.entites.map((entite) => (
@@ -358,7 +358,7 @@ export const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
       {serieActive?.subRanges && serieActive.subRanges.length > 0 && (
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-bordure-faible pb-2 animate-fade-in">
           <span className="shrink-0 mr-1 font-mono text-xs uppercase tracking-technique text-texte-attenue">
-            Tranche
+            {t('filtre.tranche')}
           </span>
           <button
             onClick={() => {

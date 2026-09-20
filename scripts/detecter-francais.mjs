@@ -1,19 +1,18 @@
 #!/usr/bin/env node
 /**
- * Cherche le français resté en dur dans l'interface.
+ * Cherche le texte d'interface qui ne passe pas par `t()`.
  *
- * Ce script existe parce que mes deux détecteurs précédents m'ont menti, et pas
- * de la même façon :
+ * **Il ne cherche pas « du français ».** Les trois versions précédentes le
+ * faisaient — accents, puis mots grammaticaux — et chacune a laissé passer
+ * quelque chose. La dernière annonçait zéro pendant que l'écran affichait
+ * « Chercheurs », « Factions », « Sites », « Ouvrir », « DOSSIERS »,
+ * « BRANCHE » : aucun accent, aucun mot-outil, donc invisibles. Reconnaître une
+ * langue par son orthographe ne marche pas.
  *
- *  · le premier ne regardait que le JSX d'une seule ligne et les attributs. Il
- *    a laissé passer `BOOT_LINES` — onze lignes rangées dans un tableau, et
- *    affichées plein écran pendant les dix premières secondes ;
- *  · le second a ajouté les chaînes littérales, mais ignorait le **JSX réparti
- *    sur plusieurs lignes**, où les deux écrans d'accueil cachent tout leur
- *    texte de présentation.
- *
- * D'où les trois formes cherchées ici, et le fait qu'il soit versionné : une
- * mesure jetable se retrompe à chaque fois.
+ * Le critère est mécanique : **un texte affiché doit venir d'une clé.** Peu
+ * importe la langue dans laquelle il est écrit ; s'il est en dur, il ne
+ * changera jamais. C'est vérifiable sans juger du contenu, donc sans angle
+ * mort.
  *
  *   node scripts/detecter-francais.mjs            # le compte par fichier
  *   node scripts/detecter-francais.mjs --detail   # chaque occurrence
@@ -26,39 +25,50 @@ import { join, sep } from 'node:path';
 
 const RACINES = ['src/components', 'src/desktop', 'src/mobile', 'src/shared'];
 
-/** Un accent, ou un mot grammatical que l'anglais n'emploie pas ainsi. */
-const FRANCAIS =
-  /[àâäéèêëïîôöùûüçÀÂÄÉÈÊËÏÎÔÖÙÛÜÇ]|\b(le|la|les|des|une|un|pour|dans|avec|sur|par|est|sont|vers|aucun|aucune|cette|ce|vos|votre|qui|que|sans|plus|tout|tous|leur)\b/i;
+/** Attributs dont la valeur est lue par l'utilisateur ou son lecteur d'écran. */
+const ATTRIBUTS = /\b(title|placeholder|aria-label|alt)="([^"]{2,})"/g;
 
 /**
- * Ce qui ressemble à du texte mais n'en est pas.
+ * Texte entre l'ouverture d'une balise et sa fermeture, sur une ligne ou
+ * plusieurs.
  *
- * Les sigles et noms propres du projet ne se traduisent pas — les mettre dans
- * le dictionnaire reviendrait à traduire un logo. Les étiquettes dessinées dans
- * les illustrations SVG sont déjà en anglais.
+ * La fermeture `</` est exigée : sans elle, le motif attrapait les génériques
+ * TypeScript — `useState<Type>(valeur)` ressemble à s'y méprendre à du texte
+ * entre deux chevrons.
  */
-const IGNORE = [
-  /^(\.{1,2}\/|https?:|\/|#)/,
-  /^[a-z][a-z0-9-]*(\s+[a-z0-9:[\]/.%-]+)*$/, // classes utilitaires
-  /^[a-z]+\.[a-zA-Z0-9.]+$/, // clés de traduction déjà posées
+const TEXTE_JSX = />([^<>{}]{2,})<\//g;
+
+/**
+ * Ce qui n'est pas du texte d'interface.
+ *
+ * Sigles, codes de classification et noms propres du projet : ils s'écrivent
+ * pareil dans toutes les langues, les mettre au dictionnaire reviendrait à
+ * traduire un logo. Le reste est du balisage ou de la ponctuation.
+ */
+const TOLERE = [
+  /^[\s·•|/\\<>→←↑↓✓●○—–-]*$/, // séparateurs, flèches, puces
+  /^[A-Z0-9][A-Z0-9\s._:/#-]*$/, // SIGLES, CODES, SCP-173, O5-COMM, CL-5
+  /^(SCP|SCiPNET|RAISA|CROM|CRT|CLI|BPM|HUD|TTS|MTF|FIM|GdI|GoI|O5|Site-19|Edge Neural TTS)/,
+  /^[a-z][a-z0-9-]*(\s+[a-z0-9:[\]/.%()-]+)*$/, // classes utilitaires Tailwind
+  /^[a-z]+\.[a-zA-Z0-9.]+$/, // une clé de traduction déjà posée
   /var\(--/,
-  /^\d/,
-  /^(SCP|SCiPNET|RAISA|CRT|CLI|BPM|HUD|O5|MTF|FIM)[\s\-_:/]*$/i,
-  // Un gabarit qui n'est fait que de classes utilitaires et d'interpolations.
-  // `icôneCouleur` est un nom de propriété, pas un texte : il porte un accent
-  // parce que le code du projet est en français.
-  /^[a-z0-9\s:[\]/.%-]*\$\{[^}]*\}[a-z0-9\s:[\]/.%${}-]*$/i,
-  // Message de diagnostic réservé au développement : `import.meta.env.DEV` le
-  // garde hors production, et il s'adresse au contributeur, pas au visiteur.
-  /^\[useScpApp\]|^dans App\.tsx|^unique de speechEngine/,
-  // Valeur du type `ObjectClass` quand le wiki n'annonce aucune classe. C'est
-  // une clé de données, pas un libellé : `habillageClasse()` l'indexe, et
-  // l'affichage passe par `abrege`.
-  /^Non assigné$/,
-  // Magritte, dessiné dans l'illustration de SCP-2950. « Ceci n'est pas… » se
-  // cite en français dans toutes les langues : le traduire détruirait la
-  // référence, qui est tout le propos de l'image.
-  /CECI N'EST PAS UN SCP/
+  /^\{/,
+  // Magritte, dessiné dans l'illustration de SCP-2950 : « Ceci n'est pas… » se
+  // cite en français dans toutes les langues.
+  /CECI N'EST PAS UN SCP/,
+  // Décor de terminal : un chemin de fichier fictif et une invite de commande
+  // ne se traduisent pas plus qu'un `C:\>` ne se traduirait.
+  /^C:\\[A-Z\\]+$/,
+  /^SCIPNET(&gt;|>)$/,
+  // Croix de fermeture. L'intitulé lisible est dans son `aria-label`, lui
+  // traduit — c'est là que le lecteur d'écran va chercher.
+  /^\[x\]$/i
+];
+
+/** Fichiers dont le texte n'atteint jamais l'écran. */
+const FICHIERS_HORS_SUJET = [
+  // Étiquettes dessinées à l'intérieur des SVG : elles font partie du dessin.
+  'illustrations/ScpIllustrations.tsx'
 ];
 
 function fichiers(dossier) {
@@ -67,12 +77,12 @@ function fichiers(dossier) {
   );
 }
 
-/** Retire commentaires et imports : ils ne s'affichent jamais. */
+/** Neutralise commentaires et imports sans décaler les positions. */
 function sansCommentaires(source) {
   return source
     .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
-    .replace(/^\s*\/\/.*$/gm, '')
-    .replace(/^import .*$/gm, '');
+    .replace(/^\s*\/\/.*$/gm, m => ' '.repeat(m.length))
+    .replace(/^import .*$/gm, m => ' '.repeat(m.length));
 }
 
 function occurrences(source) {
@@ -81,22 +91,23 @@ function occurrences(source) {
 
   const ajouter = (texte, index) => {
     const net = texte.replace(/\s+/g, ' ').trim();
-    if (net.length < 4) return;
-    if (!FRANCAIS.test(net)) return;
-    if (IGNORE.some(r => r.test(net))) return;
-    trouvees.push([propre.slice(0, index).split('\n').length, net.slice(0, 72)]);
+    if (net.length < 2) return;
+    if (!/[A-Za-zÀ-ÿ]/.test(net)) return;
+    if (TOLERE.some(r => r.test(net))) return;
+    trouvees.push([propre.slice(0, index).split('\n').length, net.slice(0, 68)]);
   };
 
-  // 1. Texte JSX, sur une ligne ou plusieurs.
-  for (const m of propre.matchAll(/>([^<>{}]{4,})</g)) ajouter(m[1], m.index);
-
-  // 2. Chaînes littérales : tableaux, objets, arguments, attributs.
-  for (const m of propre.matchAll(/(['"`])((?:\\.|(?!\1)[^\\\n]){4,})\1/g)) ajouter(m[2], m.index);
+  for (const m of propre.matchAll(TEXTE_JSX)) ajouter(m[1], m.index);
+  for (const m of propre.matchAll(ATTRIBUTS)) ajouter(m[2], m.index);
 
   return trouvees;
 }
 
-const cibles = RACINES.flatMap(fichiers);
+const cibles = RACINES.flatMap(fichiers).filter(f => {
+  const chemin = f.split(sep).join('/');
+  return !FICHIERS_HORS_SUJET.some(h => chemin.endsWith(h));
+});
+
 const parFichier = [];
 let total = 0;
 
@@ -110,8 +121,8 @@ for (const f of cibles) {
 
 parFichier.sort((a, b) => b[1].length - a[1].length);
 
-console.log(`chaînes françaises en dur : ${total}`);
-console.log(`fichiers concernés        : ${parFichier.length} / ${cibles.length}\n`);
+console.log(`textes affichés sans passer par t() : ${total}`);
+console.log(`fichiers concernés                  : ${parFichier.length} / ${cibles.length}\n`);
 
 for (const [f, trouvees] of parFichier) {
   console.log(String(trouvees.length).padStart(4), f);
@@ -124,4 +135,4 @@ if (total > 0) {
   console.log('\nRelancer avec --detail pour voir chaque occurrence.');
   process.exit(1);
 }
-console.log("Aucun français en dur dans l'interface.");
+console.log("Tout le texte de l'interface passe par le dictionnaire.");

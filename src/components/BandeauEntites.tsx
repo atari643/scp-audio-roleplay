@@ -67,6 +67,7 @@ interface BandeauEntitesProps {
 }
 
 export const BandeauEntites: React.FC<BandeauEntitesProps> = ({ slug, languageCode, onOuvrirEntite }) => {
+  const t = useT();
   const [rattachements, setRattachements] = useState<Rattachement[]>([]);
   const [toutAfficher, setToutAfficher] = useState(false);
 
@@ -92,7 +93,7 @@ export const BandeauEntites: React.FC<BandeauEntitesProps> = ({ slug, languageCo
     <div className="mt-4 pt-3 border-t border-bordure-faible">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xs font-mono uppercase tracking-wider text-texte-attenue">
-          Rattachements
+          {t('entites.rattachements')}
         </span>
         <span className="text-xs font-mono text-texte-attenue">
           {confirmes.length} confirmé{confirmes.length > 1 ? 's' : ''}

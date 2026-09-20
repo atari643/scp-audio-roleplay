@@ -293,7 +293,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                 }}
                 className={`win2k-btn px-2 py-0.5 text-xs ${viewMode === 'grid' ? 'bg-surface-2 text-texte font-bold' : 'text-texte-attenue'}`}
               >
-                Grille
+                {t('explorateur.grille')}
               </button>
               <button
                 onClick={() => {
@@ -595,7 +595,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                             </div>
                           </div>
                           <span className="text-xs text-accent-texte font-bold group-hover:translate-x-0.5 transition-transform">
-                            OUVRIR &gt;
+                            {t('explorateur.ouvrirCourt')} &gt;
                           </span>
                         </button>
                       ))}
@@ -616,7 +616,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div>
                         <span className="text-xs text-classe-euclid uppercase font-bold tracking-widest">
-                          REGISTRE OFFICIEL // 10 000 DOSSIERS SCiPNET
+                          {t('explorateur.registre')}
                         </span>
                         <h3 className="text-lg font-bold text-texte tracking-wide">
                           {currentSelection.series.name.toUpperCase()} : {currentSelection.series.range}

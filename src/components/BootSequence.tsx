@@ -201,7 +201,7 @@ export const BootSequence: React.FC<BootSequenceProps> = ({ onComplete }) => {
       </div>
 
       <div className="absolute bottom-6 flex flex-col items-center gap-1 opacity-40 select-none">
-        <div className="text-xl font-mono font-bold text-accent-texte tracking-[0.25em]">☣ FONDATION SCP ☣</div>
+        <div className="text-xl font-mono font-bold text-accent-texte tracking-[0.25em]">{t('boot.fondation')}</div>
         <div className="text-xs font-mono text-texte-attenue tracking-[0.3em]">{t('rp.devise')}</div>
       </div>
     </div>

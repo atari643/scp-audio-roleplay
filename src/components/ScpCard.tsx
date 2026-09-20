@@ -119,7 +119,7 @@ export const ScpCard: React.FC<ScpCardProps> = ({
         <BadgesEcoute meta={meta} rating={item.rating} className="pt-2" />
 
         <div className="mt-2 pt-2 border-t border-bordure-faible flex items-center justify-between font-mono text-xs text-texte-attenue">
-          <span className="tracking-technique uppercase">Audio</span>
+          <span className="tracking-technique uppercase">{t('dossier.audio')}</span>
           <span className="flex items-center gap-1 group-hover:text-accent-texte transition-colors">
             Ouvrir
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />

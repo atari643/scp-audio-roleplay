@@ -65,7 +65,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="flex items-center gap-1 text-xs font-mono text-accent-texte opacity-0 group-hover:opacity-100 transition-opacity">
                     <Headphones className="w-3 h-3" />
-                    Ouvrir
+                    {t('general.ouvrir')}
                   </span>
                   <button
                     onClick={(e) => {

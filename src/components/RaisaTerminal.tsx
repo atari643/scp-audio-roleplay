@@ -109,7 +109,7 @@ export const RaisaTerminal: React.FC<RaisaTerminalProps> = ({
           <span className="text-accent-texte font-bold">RAISA</span>
           <span className="hidden sm:inline text-texte-attenue">WATCHDOG</span>
           <span className="text-texte-attenue">|</span>
-          <span className="text-systeme">● ACTIF</span>
+          <span className="text-systeme">{t('log.actif')}</span>
           <span className="text-texte-attenue font-bold">({logs.length})</span>
           <ChevronUp className="w-3 h-3 text-texte-attenue ml-0.5" />
         </button>

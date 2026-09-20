@@ -396,7 +396,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
 
                     {segment.isHeader && (
                       <span className="font-mono text-xs uppercase tracking-technique text-texte-attenue">
-                        · Protocole
+                        {t('dossier.protocole')}
                       </span>
                     )}
 
@@ -410,7 +410,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
 
                     {isCurrent && !isPlaying && (
                       <span className="font-mono text-xs text-classe-euclid tracking-technique uppercase">
-                        · En pause
+                        {t('dossier.enPause')}
                       </span>
                     )}
                   </div>

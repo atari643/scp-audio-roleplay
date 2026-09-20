@@ -92,7 +92,7 @@ export const BiometricScanner: React.FC<BiometricScannerProps> = ({ scpTitle, on
             onClick={handleInstantGrant}
             className="text-xs font-mono text-texte-attenue hover:text-accent-texte border border-bordure hover:border-accent-texte px-2 py-1 rounded transition-colors"
           >
-            [ PASSER ]
+            {t('bio.passer')}
           </button>
         </div>
 

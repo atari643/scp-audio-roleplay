@@ -348,6 +348,11 @@ export const FR = {
 
   // --- Filtres rapides ------------------------------------------------------
   'filtre.departements': 'Départements',
+  'filtre.chercheurs': 'Chercheurs',
+  'filtre.chercheursInfo': 'Personnel de recherche',
+  'filtre.factions': 'Factions',
+  'filtre.sites': 'Sites',
+  'filtre.sitesInfo': 'Sites et zones de confinement',
   'filtre.departementsInfo': 'Départements de la Fondation',
   'filtre.factionsInfo': "Groupes d'intérêt et factions paranormales",
   'filtre.neutralise': 'NEUTRALISÉ',
@@ -490,6 +495,28 @@ export const FR = {
   'file.page': 'Page',
   'dossier.classifieCourt': 'Dossier classifié · Accréditation 4',
   'menu.systeme': 'SYSTÈME & IMMERSION',
+
+  // --- Ce que la capture d'écran a révélé -----------------------------------
+  'entete.sousTitre': "Terminal d'archive RAISA · Lecture audio",
+  'entete.restreint': 'Restreint · O5',
+  'explorateur.grille': 'Grille',
+  'explorateur.registre': 'REGISTRE OFFICIEL // 10 000 DOSSIERS SCiPNET',
+  'filtre.retirer': 'Retirer',
+  'filtre.tranche': 'Tranche',
+  'dossier.protocole': '· Protocole',
+  'dossier.enPause': '· En pause',
+  'studio.toutes': 'Toutes',
+  'studio.appliquer': 'Appliquer et fermer',
+  'accueil.retourArchives': 'Retourner aux archives',
+  'menu.fermerConsole': 'FERMER LA CONSOLE [X]',
+  'entites.rattachements': 'Rattachements',
+  'bio.passer': '[ PASSER ]',
+  'bio.bypass': "[Bypass d'urgence · terminal Superviseur]",
+  'boot.fondation': '☣ FONDATION SCP ☣',
+  'log.actif': '● ACTIF',
+  'dossier.audio': 'Audio',
+  'dossier.audioDisponible': 'Audio disponible',
+  'general.ouvrir': 'Ouvrir',
 
   // --- Écran de confinement d'erreur ---------------------------------------
   'erreur.banniere': "Confinement de l'erreur",

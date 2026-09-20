@@ -154,7 +154,7 @@ export const MobileBiometricScanner: React.FC<MobileBiometricScannerProps> = ({
           }}
           className="text-xs font-mono text-texte-attenue underline hover:text-texte-second"
         >
-          [Bypass d'urgence terminal Superviseur]
+          {t('bio.bypass')}
         </button>
       </div>
     </div>

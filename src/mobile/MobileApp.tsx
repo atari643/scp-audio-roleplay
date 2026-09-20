@@ -465,7 +465,7 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
                         onClick={() => setActiveTab('catalog')}
                         className="px-4 py-2.5 rounded-xl bg-surface-1 border border-bordure text-xs font-mono text-texte-second"
                       >
-                        Retourner aux archives
+                        {t('accueil.retourArchives')}
                       </button>
                     </div>
                   </>
@@ -666,7 +666,7 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
               onClick={() => setShowRaisaModal(false)}
               className="text-xs font-mono px-3 py-1 bg-surface-3 border border-accent-texte text-accent-texte rounded"
             >
-              FERMER CONSOLE [X]
+              {t('menu.fermerConsole')}
             </button>
           </div>
           <div className="h-[75vh]">
