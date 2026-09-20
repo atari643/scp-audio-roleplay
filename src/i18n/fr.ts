@@ -301,7 +301,7 @@ export const FR = {
   'intercom.canal': 'CANAL GÉNÉRAL',
   'intercom.dosimetre': 'Rappel à tout le personnel : le port du dosimètre est obligatoire en Zone 3.',
   'intercom.transfert': 'Attention — transfert de sujet Classe-D en cours dans le couloir 7. Veuillez dégager le passage.',
-  'intercom.bright': 'Le Dr Bright est formellement interdit d\'utiliser SCP-999 sans accord O5.',
+  'intercom.controle': 'Rappel : le personnel Classe-D du niveau 3 passe au contrôle mémétique avant la relève.',
   'intercom.alarme': 'Test d\'alarme de confinement programmé. Ne pas évacuer sauf ordre direct.',
   'intercom.keter': 'Rappel : les interactions non autorisées avec des anomalies de classe Keter sont passibles de sanction.',
   'intercom.protocoles': 'Personnel de confinement, veuillez vérifier les protocoles de sécurité du secteur.',

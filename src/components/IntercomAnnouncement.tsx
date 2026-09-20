@@ -13,7 +13,7 @@ import { CleTraduction, useT } from '../i18n';
 const ANNONCES: CleTraduction[] = [
   'intercom.dosimetre',
   'intercom.transfert',
-  'intercom.bright',
+  'intercom.controle',
   'intercom.alarme',
   'intercom.keter',
   'intercom.protocoles'

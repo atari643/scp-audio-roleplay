@@ -269,23 +269,7 @@ export const CryptographyIllustration: React.FC<IllustrationProps> = ({ classNam
 // 2. CHERCHEURS & PERSONNELS CLÉS (16)
 // ==========================================
 
-// 1. Dr. Bright
-export const BrightIllustration: React.FC<IllustrationProps> = ({ className = 'w-full h-full' }) => (
-  <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <rect x="25" y="20" width="150" height="160" rx="6" stroke="#f59e0b" strokeWidth="2" fill="#1c1917" />
-    <circle cx="100" cy="85" r="38" stroke="#fbbf24" strokeWidth="3" fill="#78350f" fillOpacity="0.8" />
-    <polygon points="100,55 125,75 120,105 100,120 80,105 75,75" fill="#f59e0b" stroke="#fef3c7" strokeWidth="2" />
-    <circle cx="100" cy="88" r="10" fill="#dc2626" stroke="#ffffff" strokeWidth="1.5" />
-    <line x1="85" y1="20" x2="100" y2="52" stroke="#d97706" strokeWidth="2" />
-    <line x1="115" y1="20" x2="100" y2="52" stroke="#d97706" strokeWidth="2" />
-    <rect x="40" y="140" width="120" height="22" fill="#000000" stroke="#f59e0b" strokeWidth="1" />
-    <text x="100" y="155" textAnchor="middle" fill="#fde68a" fontSize="8" fontFamily="monospace" fontWeight="bold">
-      DR. BRIGHT // SCP-963
-    </text>
-  </svg>
-);
-
-// 2. Dr. Clef
+// 1. Dr. Clef
 export const ClefIllustration: React.FC<IllustrationProps> = ({ className = 'w-full h-full' }) => (
   <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <rect x="25" y="20" width="150" height="160" rx="6" stroke="#dc2626" strokeWidth="2" fill="#18181b" />
@@ -1070,8 +1054,6 @@ export const EntityIllustration: React.FC<{ id: string; className?: string }> = 
       return <CryptographyIllustration className={className} />;
 
     // 2. Chercheurs
-    case 'bright':
-      return <BrightIllustration className={className} />;
     case 'clef':
       return <ClefIllustration className={className} />;
     case 'gears':

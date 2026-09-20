@@ -43,8 +43,6 @@ export const CANONICAL_SCP_PERSONNEL: Record<string, { gender: CharacterGender; 
   'hina neru': { gender: 'female', note: 'Chercheuse Hina Neru' },
 
   // MALE SCIENTISTS & DIRECTORS
-  'bright': { gender: 'male', note: 'Dr. Jack Bright - Chercheur immortel SCP-963' },
-  'jack bright': { gender: 'male', note: 'Dr. Jack Bright' },
   'clef': { gender: 'male', note: 'Dr. Alto Clef - Spécialiste des réalités et humanoïdes' },
   'alto clef': { gender: 'male', note: 'Dr. Alto Clef' },
   'gears': { gender: 'male', note: 'Dr. Charles Gears - Scientifique logique et impassible' },
@@ -70,7 +68,6 @@ export const CANONICAL_SCP_PERSONNEL: Record<string, { gender: CharacterGender; 
   'mcdoctorate': { gender: 'male', note: 'Dr. Placeholder McDoctorate' },
   'bridge': { gender: 'male', note: 'Dr. Django Bridge - Archiviste en chef' },
   'django bridge': { gender: 'male', note: 'Dr. Django Bridge' },
-  'shaw': { gender: 'male', note: 'Dr. Elias Shaw' },
   'von hanz': { gender: 'male', note: 'Dr. Johannes Von Hanz - Branche Francophone' },
   'johannes von hanz': { gender: 'male', note: 'Dr. Johannes Von Hanz' },
   'macro': { gender: 'male', note: 'Dr. Macro - Branche Francophone' },

@@ -97,55 +97,78 @@ modérateur coûte plus qu'il ne rapporte.
 > Live: https://scp-audio-roleplay.vercel.app
 > Code: https://github.com/atari643/scp-audio-roleplay
 
+### Avant de poster sur r/SCP — quatre règles qui touchent ce projet
+
+| Règle | Ce qu'elle impose ici |
+|---|---|
+| **9 — No AI generated content** | « images, text, etc. » et « AI-edited text », sous peine de bannissement permanent. **Réécris le texte ci-dessous avec tes mots** : tel quel, c'est du texte écrit par une IA. Et surtout, l'application *est* de la synthèse vocale neurale — envoie un modmail aux modérateurs avant de poster, la réponse coûte deux phrases et évite un bannissement. |
+| **4 — No roleplaying** | La règle s'ouvre sur « This is not the subreddit for SCP Roleplay! ». N'écris jamais le mot dans le post : c'est un **lecteur multi-voix**. Ne montre pas non plus de capture de la séquence de démarrage ou de l'avertissement mémétique. |
+| **3 — Overdone** | Les posts non artistiques sur 049, 096, 173 et 682 vont dans un fil dédié. Le lien de démonstration vise donc **SCP-3008**, qui contient des entretiens — c'est lui qui montre ce que l'app fait de particulier. |
+| **8 — Pas de média le jeudi** | Un lien avec vignette compte comme média. Poste mardi, mercredi ou du vendredi au dimanche, **heure de New York**. |
+
+Les règles 1, 2, 5, 6, 7 et 10 ne posent pas de problème : une adaptation du wiki
+est explicitement autorisée, les branches internationales aussi, un site web n'est
+pas un « social space », et l'application crédite déjà chaque auteur.
+
 ### Reddit — r/SCP (anglais)
 
-> **I made a site that reads SCP articles out loud, with a different voice for
-> each character**
+> **I built a free site that reads SCP articles out loud, with a different voice for each speaker**
 
-> Not one flat TTS voice for the whole thing. The narrator reads the file, the
-> researcher gives the containment procedure, the anomaly answers in the
-> interview, the D-class panics, the Site-19 intercom cuts everyone off.
+> Not one flat TTS voice for the whole article. The narrator reads the file, the
+> researcher reads the containment procedure, the anomaly answers in the
+> interview logs, the Class-D panics, the site intercom cuts in.
 >
-> Two things I cared about:
+> Three things I spent most of the time on:
 >
-> - **Redacted blocks aren't read.** They turn into a censor beep, on the exact
+> - **Redacted blocks are never read.** They become a censor beep, on the exact
 >   millisecond the text goes black.
-> - **Footnotes are spoken where they're marked**, not dumped at the end.
+> - **Footnotes are spoken where their marker sits**, not dumped at the end.
+> - **Tab blocks, terminal logs and interview transcripts keep their structure**,
+>   which is normally lost the moment the article is flattened into plain text.
 >
-> Free, no account, nothing to install. Articles are pulled live from the wiki.
+> Ten branches — EN, FR, ES, DE, IT, PL, RU, JA, KO, ZH — with articles pulled
+> live from the wikis, so nothing is a stale copy.
+>
+> Free, no account, no ads, nothing to install, source is open.
 >
 > → https://scp-audio-roleplay.vercel.app
-> → Straight into 173: https://scp-audio-roleplay.vercel.app/?scp=scp-173
+> → Straight into SCP-3008: https://scp-audio-roleplay.vercel.app/?scp=scp-3008
 >
-> Fan project, not official, no money in it. Content stays CC BY-SA 3.0 and every
-> article credits its author.
+> Unofficial fan project, no money in it. The voices are Microsoft's neural
+> text-to-speech; no article text is generated, the wiki's own words are read as
+> written. Every article shows its author, its translator, the source link and
+> the CC BY-SA 3.0 licence.
 >
-> If one reads badly, tell me the number — that's usually enough to fix it.
+> If one reads badly, tell me the number — that's usually all I need.
 
-### Reddit / Discord — communauté francophone
+### Reddit — communauté francophone
 
-> **J'ai fait un site qui lit les dossiers SCP à voix haute, une voix par
-> personnage**
+> **J'ai fait un site gratuit qui lit les dossiers SCP à voix haute, une voix par personnage**
 
 > Pas une voix de synthèse qui débite tout d'un bloc. Le narrateur pose le
 > dossier, le chercheur donne la procédure de confinement, l'anomalie répond dans
-> l'entretien, le Classe-D panique, l'intercom du Site-19 coupe la parole à tout
-> le monde.
+> les entretiens, le Classe-D panique, l'intercom du site coupe la parole.
 >
-> Deux détails auxquels j'ai tenu :
+> Trois choses qui m'ont pris l'essentiel du temps :
 >
-> - **Les blocs caviardés ne sont pas lus.** Ils deviennent un bip, placé
+> - **Les blocs caviardés ne sont jamais lus.** Ils deviennent un bip, placé
 >   exactement là où le texte est noirci.
 > - **Les notes de bas de page sont dites à leur place**, pas entassées à la fin.
+> - **Les onglets, les journaux de terminal et les entretiens gardent leur
+>   structure**, normalement perdue dès que l'article est aplati en texte brut.
 >
-> Gratuit, sans compte, rien à installer. Les dossiers sont lus en direct depuis
-> le wiki.
+> Dix branches — FR, EN, ES, DE, IT, PL, RU, JA, KO, ZH — les dossiers sont lus
+> en direct depuis les wikis, rien n'est une copie figée.
+>
+> Gratuit, sans compte, sans publicité, rien à installer, code ouvert.
 >
 > → https://scp-audio-roleplay.vercel.app/?lang=fr
-> → Directement SCP-173 : https://scp-audio-roleplay.vercel.app/?scp=scp-173&lang=fr
+> → Directement SCP-3008 : https://scp-audio-roleplay.vercel.app/?scp=scp-3008&lang=fr
 >
-> Projet de fan, non officiel, sans revenu. Le contenu reste CC BY-SA 3.0 et
-> chaque dossier affiche son auteur et son traducteur.
+> Projet de fan, non officiel, sans revenu. Les voix sont de la synthèse neurale
+> Microsoft ; aucun texte d'article n'est généré, ce sont les mots du wiki lus
+> tels quels. Chaque dossier affiche son auteur, son traducteur, le lien vers la
+> source et la licence CC BY-SA 3.0.
 >
 > Si un dossier se lit mal, dites-moi lequel — le numéro suffit en général.
 
@@ -180,8 +203,8 @@ anglophone qui tombe sur ce qu'il cherchait.
 |---|---|
 | Accueil, **anglais** (défaut) | `https://scp-audio-roleplay.vercel.app` |
 | Accueil, français | `https://scp-audio-roleplay.vercel.app/?lang=fr` |
-| Un dossier précis, anglais | `…/?scp=scp-173` |
-| Un dossier précis, français | `…/?scp=scp-173&lang=fr` |
+| Un dossier précis, anglais | `…/?scp=scp-3008` |
+| Un dossier précis, français | `…/?scp=scp-3008&lang=fr` |
 
 Un lien qui **vise un dossier** saute la séquence de démarrage et ouvre
 directement le dossier : c'est celui qu'il faut poster, parce que le visiteur

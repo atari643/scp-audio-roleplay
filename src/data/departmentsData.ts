@@ -516,32 +516,6 @@ export const SCP_DEPARTMENTS: ScpEntity[] = [
 
 export const SCP_RESEARCHERS: ScpEntity[] = [
   {
-    "id": "bright",
-    "slug": "bright",
-    "name": "Dr Jack Bright (Dr Elias Shaw)",
-    "code": "SCI-963",
-    "category": "researcher",
-    "title": "Directeur du Personnel du Site-19 & Sujet SCP-963",
-    "clearanceLevel": 4,
-    "motto": "Immortel par nécessité, imprévisible par nature",
-    "description": "Chercheur légendaire dont la conscience est transférée dans tout corps humain touchant l'amulette SCP-963.",
-    "lore": "Doté d'une expérience inégalée acquise sur des dizaines d'existences successives, le Dr Bright dirige le personnel de recherche du Site-19. Il fait l'objet d'une liste officielle d'interdictions de plus de 300 protocoles pour indiscipline créative.",
-    "queryKeywords": [
-      "bright",
-      "shaw",
-      "963"
-    ],
-    "iconicScps": [
-      "SCP-963",
-      "SCP-5000",
-      "SCP-069-J"
-    ],
-    "color": "text-amber-400",
-    "badgeBg": "bg-amber-950/80",
-    "badgeBorder": "border-amber-600/70",
-    "badgeText": "text-amber-300"
-  },
-  {
     "id": "clef",
     "entiteId": "chercheur-alto-clef",
     "slug": "clef",
@@ -758,7 +732,7 @@ export const SCP_RESEARCHERS: ScpEntity[] = [
     "clearanceLevel": 4,
     "motto": "Même les esprits d'acier ont besoin d'un confident",
     "description": "Psychiatre réputé pour son humanité et sa douceur, chargé d'évaluer la santé mentale des chercheurs soumis à des stress cognitifs extrêmes.",
-    "lore": "Le Dr Glass est l'une des rares personnes au Site-19 à laquelle tous les chercheurs, y compris les plus instables comme Kondraki ou Bright, acceptent de se confier sans méfiance.",
+    "lore": "Le Dr Glass est l'une des rares personnes au Site-19 à laquelle tous les chercheurs, y compris les plus instables comme Kondraki, acceptent de se confier sans méfiance.",
     "queryKeywords": [
       "glass",
       "psychiatrie",
@@ -1384,7 +1358,7 @@ export const SCP_SITES: ScpEntity[] = [
     "code": "SITE-19",
     "category": "site",
     "title": "Installation Majeure de Confinement Polyvalent",
-    "director": "Dr. Jack Bright / Tilda Moose",
+    "director": "Tilda Moose",
     "clearanceLevel": 4,
     "motto": "Le cœur battant de la Fondation",
     "description": "La plus vaste et célèbre installation de la Fondation, abritant des centaines d'anomalies Euclide et Keter non humanoïdes et le QG de recherche central.",
@@ -1392,13 +1366,11 @@ export const SCP_SITES: ScpEntity[] = [
     "queryKeywords": [
       "site-19",
       "173",
-      "049",
-      "963"
+      "049"
     ],
     "iconicScps": [
       "SCP-173",
       "SCP-049",
-      "SCP-963",
       "SCP-682"
     ],
     "color": "text-red-400",
