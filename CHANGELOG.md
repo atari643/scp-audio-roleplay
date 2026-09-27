@@ -88,6 +88,11 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
 
 ### Corrigé
 
+- **Plus d'erreur JavaScript à chaque chargement sur Vercel.** Tant que la mesure
+  d'audience n'est pas activée dans le tableau de bord, son script
+  (`/_vercel/insights/script.js`) tombait sur la réécriture vers `index.html` : le
+  navigateur recevait une page HTML à la place d'un script. Les chemins `/_vercel/` sont
+  désormais laissés à Vercel.
 - **Le narrateur s'affiche dans la langue choisie.** Un dossier anglais montrait
   « ARCHIVISTE » au-dessus de chaque paragraphe, dans le lecteur, le mini-lecteur et
   l'écran de verrouillage : c'est le nom interne du rôle, désormais traduit à l'affichage.
