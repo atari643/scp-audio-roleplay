@@ -257,6 +257,8 @@
   "bascule.vueBureau": "Widok komputerowy — przełącz na widok mobilny",
   "bascule.versBureau": "Przełącz na widok komputerowy",
   "bascule.versMobile": "Przełącz na widok mobilny",
+  "bascule.libelleMobile": "WIDOK MOBILNY",
+  "bascule.libelleBureau": "WIDOK KOMPUTERA",
   "accred.n1": "Dostęp ogólny",
   "accred.n2": "Akta zastrzeżone",
   "accred.n3": "Aktywne anomalie",

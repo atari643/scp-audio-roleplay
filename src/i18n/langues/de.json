@@ -257,6 +257,8 @@
   "bascule.vueBureau": "Desktop-Ansicht — zur mobilen Ansicht wechseln",
   "bascule.versBureau": "Zur Desktop-Ansicht wechseln",
   "bascule.versMobile": "Zur mobilen Ansicht wechseln",
+  "bascule.libelleMobile": "MOBILANSICHT",
+  "bascule.libelleBureau": "DESKTOPANSICHT",
   "accred.n1": "Allgemeiner Zugang",
   "accred.n2": "Eingeschränkte Akten",
   "accred.n3": "Aktive Anomalien",

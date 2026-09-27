@@ -257,6 +257,8 @@
   "bascule.vueBureau": "Vista de escritorio — cambiar a vista móvil",
   "bascule.versBureau": "Cambiar a vista de escritorio",
   "bascule.versMobile": "Cambiar a vista móvil",
+  "bascule.libelleMobile": "VISTA MÓVIL",
+  "bascule.libelleBureau": "VISTA ESCRITORIO",
   "accred.n1": "Acceso general",
   "accred.n2": "Documentos restringidos",
   "accred.n3": "Anomalías activas",

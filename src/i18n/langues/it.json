@@ -257,6 +257,8 @@
   "bascule.vueBureau": "Vista desktop — passa alla vista mobile",
   "bascule.versBureau": "Passa alla vista desktop",
   "bascule.versMobile": "Passa alla vista mobile",
+  "bascule.libelleMobile": "VISTA MOBILE",
+  "bascule.libelleBureau": "VISTA DESKTOP",
   "accred.n1": "Accesso generale",
   "accred.n2": "Documenti riservati",
   "accred.n3": "Anomalie attive",

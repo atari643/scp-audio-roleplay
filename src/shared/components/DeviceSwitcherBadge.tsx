@@ -92,10 +92,10 @@ export const DeviceSwitcherBadge: React.FC<DeviceSwitcherBadgeProps> = ({
             pastille reste un rond de 44 px, la cible tactile minimale. */}
         <span
           className={`overflow-hidden whitespace-nowrap transition-[max-width,opacity] duration-200 ${
-            deploye ? 'max-w-[7rem] opacity-100' : 'max-w-0 opacity-0'
+            deploye ? 'max-w-[9rem] opacity-100' : 'max-w-0 opacity-0'
           }`}
         >
-          {isMobile ? 'VUE MOBILE' : 'VUE BUREAU'}
+          {t(isMobile ? 'bascule.libelleMobile' : 'bascule.libelleBureau')}
         </span>
       </button>
     </aside>

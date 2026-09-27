@@ -273,6 +273,8 @@ export const EN: Dictionnaire = {
   'bascule.vueBureau': "Desktop view — switch to mobile view",
   'bascule.versBureau': "Switch to desktop view",
   'bascule.versMobile': "Switch to mobile view",
+  'bascule.libelleMobile': "MOBILE VIEW",
+  'bascule.libelleBureau': "DESKTOP VIEW",
   'accred.n1': "General access",
   'accred.n2': "Restricted files",
   'accred.n3': "Active anomalies",

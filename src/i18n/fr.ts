@@ -321,6 +321,8 @@ export const FR = {
   'bascule.vueBureau': 'Vue bureau — basculer vers la vue mobile',
   'bascule.versBureau': 'Basculer vers la vue bureau',
   'bascule.versMobile': 'Basculer vers la vue mobile',
+  'bascule.libelleMobile': 'VUE MOBILE',
+  'bascule.libelleBureau': 'VUE BUREAU',
 
   // --- Accréditations -------------------------------------------------------
   'accred.n1': 'Accès général',

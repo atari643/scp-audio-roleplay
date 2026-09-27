@@ -257,6 +257,8 @@
   "bascule.vueBureau": "桌面视图 — 切换到移动端视图",
   "bascule.versBureau": "切换到桌面视图",
   "bascule.versMobile": "切换到移动端视图",
+  "bascule.libelleMobile": "移动视图",
+  "bascule.libelleBureau": "桌面视图",
   "accred.n1": "一般权限",
   "accred.n2": "受限文档",
   "accred.n3": "活跃异常",

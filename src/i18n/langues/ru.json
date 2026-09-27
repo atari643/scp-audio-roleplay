@@ -257,6 +257,8 @@
   "bascule.vueBureau": "Вид для компьютера — перейти к мобильному виду",
   "bascule.versBureau": "Перейти к виду для компьютера",
   "bascule.versMobile": "Перейти к мобильному виду",
+  "bascule.libelleMobile": "МОБИЛЬНЫЙ ВИД",
+  "bascule.libelleBureau": "ВИД ДЛЯ ПК",
   "accred.n1": "Общий доступ",
   "accred.n2": "Документы с ограничением",
   "accred.n3": "Активные аномалии",

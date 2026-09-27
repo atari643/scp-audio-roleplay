@@ -257,6 +257,8 @@
   "bascule.vueBureau": "デスクトップ表示 — モバイル表示に切り替え",
   "bascule.versBureau": "デスクトップ表示に切り替え",
   "bascule.versMobile": "モバイル表示に切り替え",
+  "bascule.libelleMobile": "モバイル表示",
+  "bascule.libelleBureau": "デスクトップ表示",
   "accred.n1": "一般アクセス",
   "accred.n2": "制限付き報告書",
   "accred.n3": "活動中のオブジェクト",

@@ -257,6 +257,8 @@
   "bascule.vueBureau": "데스크톱 화면 — 모바일 화면으로 전환",
   "bascule.versBureau": "데스크톱 화면으로 전환",
   "bascule.versMobile": "모바일 화면으로 전환",
+  "bascule.libelleMobile": "모바일 보기",
+  "bascule.libelleBureau": "데스크톱 보기",
   "accred.n1": "일반 접근",
   "accred.n2": "제한 문서",
   "accred.n3": "활성 변칙",
