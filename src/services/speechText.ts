@@ -220,7 +220,15 @@ function aerateLongSentences(text: string): string {
           // pas dire son nom.
           .replace(/\s*;\s*/g, '. ')
           // Le deux-points d'énoncé, jamais celui d'une heure (« 18:00 ») ni d'une échelle.
-          .replace(/(?<=[\p{L}\p{N}\)\]])\s*:\s+(?!\d)/gu, '. ')
+          // Ni celui d'une étiquette (« Procédures de confinement spéciales : L'objet… ») :
+          // en faire un point isolait une phrase de trois mots, et les voix multilingues, qui
+          // devinent la langue phrase par phrase, la lisaient en ESPAGNOL (Whisper, 97-99 %,
+          // 27/09/2026), contre 100 % de français avec le deux-points. Il faut au moins cinq
+          // mots avant le deux-points pour en faire une fin de phrase.
+          .replace(/(?<=[\p{L}\p{N}\)\]])\s*:\s+(?!\d)/gu, (deuxPoints, position: number, tout: string) => {
+            const avant = tout.slice(0, position).split(/[.!?…]/).pop() ?? '';
+            return (avant.match(/[\p{L}\p{N}]+/gu) ?? []).length >= 5 ? '. ' : deuxPoints;
+          })
           // Une conjonction d'opposition marque un tournant du raisonnement.
           .replace(
             /,\s+(mais|cependant|toutefois|néanmoins|pourtant|however|nevertheless|although)(?=\s)/giu,
@@ -229,6 +237,72 @@ function aerateLongSentences(text: string): string {
       );
     })
     .join('');
+}
+
+const UNITES_FR = [
+  'zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
+  'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize'
+];
+const DIZAINES_FR = ['', '', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante'];
+
+function moinsDeCent(n: number): string {
+  if (n <= 16) return UNITES_FR[n];
+  if (n < 20) return `dix-${UNITES_FR[n - 10]}`;
+  if (n < 70) {
+    const d = Math.floor(n / 10);
+    const u = n % 10;
+    if (u === 0) return DIZAINES_FR[d];
+    return u === 1 ? `${DIZAINES_FR[d]} et un` : `${DIZAINES_FR[d]}-${UNITES_FR[u]}`;
+  }
+  if (n < 80) return n === 71 ? 'soixante et onze' : `soixante-${moinsDeCent(n - 60)}`;
+  if (n === 80) return 'quatre-vingts';
+  return `quatre-vingt-${moinsDeCent(n - 80)}`;
+}
+
+function moinsDeMille(n: number, fin: boolean): string {
+  const c = Math.floor(n / 100);
+  const r = n % 100;
+  if (c === 0) return moinsDeCent(r);
+  // « deux cents » mais « deux cent un », et « deux cent mille » : le s tombe dès que
+  // quelque chose suit.
+  const cent = c === 1 ? 'cent' : `${UNITES_FR[c]} ${r === 0 && fin ? 'cents' : 'cent'}`;
+  return r === 0 ? cent : `${cent} ${moinsDeCent(r)}`;
+}
+
+/**
+ * Un nombre entier (0 à 999 999) en toutes lettres françaises : 49 → « quarante-neuf »,
+ * 173 → « cent soixante-treize », 9341 → « neuf mille trois cent quarante et un ».
+ */
+export function nombreEnLettres(n: number): string {
+  if (!Number.isInteger(n) || n < 0 || n > 999_999) return String(n);
+  if (n < 1000) return moinsDeMille(n, true);
+  const milliers = Math.floor(n / 1000);
+  const reste = n % 1000;
+  const mille = milliers === 1 ? 'mille' : `${moinsDeMille(milliers, false)} mille`;
+  return reste === 0 ? mille : `${mille} ${moinsDeMille(reste, true)}`;
+}
+
+const UNITS_EN = [
+  'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+  'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'
+];
+const TENS_EN = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+
+/** Un entier de 0 à 999 en toutes lettres anglaises. */
+function numberToWordsEn(n: number): string {
+  if (n < 20) return UNITS_EN[n];
+  if (n < 100) return TENS_EN[Math.floor(n / 10)] + (n % 10 ? `-${UNITS_EN[n % 10]}` : '');
+  const reste = n % 100;
+  return `${UNITS_EN[Math.floor(n / 100)]} hundred${reste ? ` ${numberToWordsEn(reste)}` : ''}`;
+}
+
+/**
+ * Les chiffres d'une désignation, en lettres, zéros de tête compris : « 049 » → « zéro
+ * quarante-neuf », comme on le dit à voix haute.
+ */
+function chiffresEnLettres(chiffres: string): string {
+  const zeros = chiffres.match(/^0+(?=\d)/)?.[0].length ?? 0;
+  return [...Array(zeros).fill('zéro'), nombreEnLettres(parseInt(chiffres.slice(zeros), 10))].join(' ');
 }
 
 export function normalizeForSpeech(
@@ -290,9 +364,19 @@ export function normalizeForSpeech(
   //    Condition : le jeton commence par une majuscule ET contient un chiffre. Sans le
   //    chiffre on massacrerait « Berryman-Langford », « avant-poste » ou « vingt-trois » ;
   //    sans la majuscule initiale on couperait les dates ISO et les intervalles d'années.
-  t = t.replace(/\p{Lu}[\p{L}\p{N}]*(?:-[\p{L}\p{N}]+)+/gu, token =>
-    /\p{N}/u.test(token) ? token.replace(/-/g, ' ') : token
-  );
+  //    En français, les chiffres d'une désignation passent en toutes lettres : « SCP-049 »
+  //    → « SCP zéro quarante-neuf ». Ce n'est pas une question de prononciation mais de
+  //    LANGUE : les voix sont multilingues et devinent la langue de chaque phrase, et
+  //    « SCP 049. Le Docteur de peste. » était lue avec un accent étranger — Whisper y
+  //    reconnaissait du roumain ou de l'anglais, avec 2 % de chances pour le français,
+  //    contre 99 % une fois les chiffres écrits en lettres (mesuré le 27/09/2026 sur Rémy
+  //    et Vivienne). Un code fait de sigles et de chiffres n'a rien de français ; des
+  //    nombres en lettres, si.
+  t = t.replace(/\p{Lu}[\p{L}\p{N}]*(?:-[\p{L}\p{N}]+)+/gu, token => {
+    if (!/\p{N}/u.test(token)) return token;
+    const espace = token.replace(/-/g, ' ');
+    return lang === 'fr' ? espace.replace(/\b\d{1,6}\b/g, chiffresEnLettres) : espace;
+  });
 
   //    Les désignations à suffixe alphabétique n'ont pas de chiffre et échappent à la règle
   //    ci-dessus : « Classe-D » (la moitié de ses 150 occurrences), et surtout « Site-A »,
@@ -384,6 +468,16 @@ export function normalizeForSpeech(
   //     virgule et peut donc lui aussi ouvrir une articulation à promouvoir.
   t = aerateLongSentences(t);
 
+  // 10 bis. En anglais, un nombre suivi de « may » ou « march » est lu comme une DATE :
+  //     « no fewer than 3 may enter » (SCP-173) devient « no fewer than May third enter »,
+  //     sur Christopher comme sur Andrew (Whisper, 27/09/2026) — le chiffre disparaît de
+  //     sa place. En toutes lettres, « three may enter », la phrase est lue telle quelle.
+  if (lang === 'en') {
+    t = t.replace(/\b(\d{1,3})(\s+)(may|march)\b/giu, (_, n: string, espace: string, mot: string) =>
+      `${numberToWordsEn(parseInt(n, 10))}${espace}${mot}`
+    );
+  }
+
   // 11. Nettoyage final.
   t = t.replace(/\s*\.\s*\./g, '.');
   t = t.replace(/,\s*,/g, ',');
@@ -395,7 +489,49 @@ export function normalizeForSpeech(
   // qu'elle croyait aérer.
   t = t.replace(/([;:])(?!\s)(?<!\d:)(\S)/g, '$1 $2');
 
+  // 12. Phrases-étiquettes, en français. Voir `rattacherEtiquettes`.
+  if (lang === 'fr') t = rattacherEtiquettes(t);
+
   return t.trim();
+}
+
+/** Les mots qui signent une phrase française — articles, pronoms, auxiliaires, négation. */
+const MOTS_OUTILS_FR = new Set([
+  'le', 'la', 'les', 'l', 'un', 'une', 'des', 'du', 'au', 'aux', 'il', 'elle', 'ils', 'elles',
+  'on', 'je', 'tu', 'nous', 'vous', 'est', 'sont', 'a', 'ont', 'et', 'ou', 'mais', 'ce', 'c',
+  'qui', 'que', 'qu', 'ne', 'pas', 'dans', 'sur', 'avec', 'pour', 'par', 'se', 's', 'son',
+  'sa', 'ses', 'leur', 'leurs', 'cette', 'cet', 'ces', 'y'
+]);
+
+/**
+ * Rattache à la phrase suivante une phrase courte qui n'a rien de français à part ses mots
+ * pleins : « SCP cent soixante-treize. », « Objet : SCP cent soixante-treize. ».
+ *
+ * Les voix multilingues devinent la langue PHRASE PAR PHRASE. Une étiquette de cinq mots au
+ * plus, faite de sigles, de noms et de mots communs à plusieurs langues, part dans une autre
+ * langue : mesuré le 27/09/2026 avec Whisper, « SCP cent soixante-treize. » est lu en anglais
+ * (84 %), « Objet : SCP cent soixante-treize. Classe : Euclide. » ne tient qu'à 80-89 % de
+ * français, et le même en une phrase (« …, classe : Euclide. ») à 100 %. Rattachée par une
+ * virgule, l'étiquette partage la langue de la phrase qui la suit. Une phrase qui porte un
+ * mot-outil français (« Il est guéri. ») n'en a pas besoin et garde son point — et son
+ * silence.
+ *
+ * Ce n'est pas une garantie : « SCP cent soixante-treize : la Statue, l'original. » tout
+ * entier sort en catalan (88 %) — trop court, trop proche de plusieurs langues romanes. Seul
+ * un vrai mot français l'ancre : « Le dossier SCP… » est lu en français à 99-100 %.
+ */
+function rattacherEtiquettes(texte: string): string {
+  return texte.replace(/([^.!?…]+)\.(\s+)(?=\S)/gu, (phrase, corps: string, espace: string) => {
+    // Un mot composé compte pour un : « soixante-treize » ne doit pas faire passer une
+    // étiquette pour une phrase.
+    const mots = corps.match(/[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*/gu) ?? [];
+    if (mots.length === 0 || mots.length > 5) return phrase;
+    if (mots.some(m => MOTS_OUTILS_FR.has(m.toLowerCase()))) return phrase;
+    // Seulement les étiquettes à sigle (« SCP », « FIM ») : ce sont les cas mesurés. Une
+    // phrase brève et sans sigle (« Silence. ») garde son point et son silence.
+    if (!mots.some(m => /^\p{Lu}{2,}$/u.test(m))) return phrase;
+    return `${corps},${espace}`;
+  });
 }
 
 /**

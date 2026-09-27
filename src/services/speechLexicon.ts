@@ -320,7 +320,7 @@ export interface StageEffect {
  * ordinaires.
  */
 export const STAGE_DIRECTIONS: ReadonlyArray<{ motif: RegExp; effet: StageEffect }> = [
-  { motif: /(?<![\p{L}])(?:pause|silence|un temps|beat)(?![\p{L}])/iu, effet: { pause: 700 } },
+  { motif: /(?<![\p{L}])(?:pauses?|paused|pausing|silence|un temps|beat)(?![\p{L}])/iu, effet: { pause: 700 } },
   {
     motif: /(?<![\p{L}])(?:murmur\w*|chuchot\w*|voix basse|whisper\w*|softly|apart[ée]|aside)(?![\p{L}])/iu,
     effet: { volume: '-25%', rate: 0.95 }
@@ -332,6 +332,14 @@ export const STAGE_DIRECTIONS: ReadonlyArray<{ motif: RegExp; effet: StageEffect
   { motif: /(?<![\p{L}])(?:soupir\w*|sigh\w*|souffle)(?![\p{L}])/iu, effet: { pause: 400 } },
   { motif: /(?<![\p{L}])(?:rit|rient|riant|rire|laugh\w*|rican\w*|chuckl\w*)(?![\p{L}])/iu, effet: { pause: 350 } },
   { motif: /(?<![\p{L}])(?:tousse|toussant|cough\w*|racle)(?![\p{L}])/iu, effet: { pause: 300 } },
+  // « (L'interrompt, en colère) » : la colère se dit plus fort et un peu plus vite, et une
+  // interruption coupe la parole — elle entre plus tôt que la pause d'un changement de
+  // locuteur (`pauseAvant` ne descend jamais sous zéro).
+  {
+    motif: /(?<![\p{L}])(?:col[èe]re|furieu\w*|[ée]nerv[ée]\w*|angr\w*|furious\w*)(?![\p{L}])/iu,
+    effet: { volume: '+12%', rate: 1.04 }
+  },
+  { motif: /(?<![\p{L}])(?:interromp\w*|interrupt\w*|coupe la parole)(?![\p{L}])/iu, effet: { pause: -200 } },
   { motif: /(?<![\p{L}])(?:lentement|slowly|h[ée]sit\w*|hesitat\w*)(?![\p{L}])/iu, effet: { rate: 0.92 } },
   { motif: /(?<![\p{L}])(?:rapidement|quickly|pr[ée]cipit\w*|h[âa]te)(?![\p{L}])/iu, effet: { rate: 1.08 } }
 ];

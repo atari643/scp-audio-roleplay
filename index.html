@@ -1,40 +1,54 @@
 <!doctype html>
-<html lang="fr" class="dark">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="apple-touch-icon" href="./icones/icone-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0a0c10" />
-    <meta name="description" content="Lecteur Audio Roleplay Multi-voix de dossiers de la Fondation SCP en plusieurs langues" />
+    <meta name="description" content="__DESCRIPTION_SITE__" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>SCP Foundation - Archive Audio Roleplay</title>
+    <title>__TITRE_SITE__</title>
 
     <!--
       Aperçu des liens partagés. Sans ces balises, l'adresse collée dans une
       conversation n'est qu'une URL nue : ni titre, ni image, ni description.
-      L'image est l'icône 512, la seule du projet qui reste lisible en vignette.
-      Elle est référencée en relatif pour valoir aussi bien sur le déploiement
-      Vercel que sur le miroir Pages, servi sous un sous-chemin. Pas d'`og:url` :
-      une URL en dur y désignerait toujours le même des deux hébergements.
+
+      Les jetons `__…__` sont remplacés au build par `sitePlugin` (vite.config.ts) :
+      adresse tirée de `src/services/adresseSite.ts`, textes du dictionnaire anglais,
+      qui est la langue par défaut. Pour un lien de dossier ou de branche, le
+      middleware Vercel (`middleware.ts`) récrit titre, description, langue et
+      adresse canonique à l'intention des robots.
+
+      L'image est une adresse ABSOLUE : le protocole Open Graph l'exige, et Facebook,
+      LinkedIn ou Reddit ignorent une adresse relative — le lien partait sans
+      vignette. Elle vise Vercel même depuis le miroir Pages : c'est l'adresse qui
+      fait foi. La bannière 1280 × 640 (`npm run icones`) a le format 2:1 de la
+      grande carte ; l'icône carrée qu'on servait n'avait droit qu'à la petite.
     -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="SCP Audio Roleplay" />
-    <meta property="og:title" content="SCP Audio Roleplay" />
-    <meta
-      property="og:description"
-      content="Les dossiers de la Fondation SCP, lus à voix haute — avec une voix par personnage."
-    />
-    <meta property="og:image" content="./icones/icone-512.png" />
-    <meta property="og:locale" content="fr_FR" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="SCP Audio Roleplay" />
-    <meta
-      name="twitter:description"
-      content="Les dossiers de la Fondation SCP, lus à voix haute — avec une voix par personnage."
-    />
-    <meta name="twitter:image" content="./icones/icone-512.png" />
+    <meta property="og:title" content="__TITRE_SITE__" />
+    <meta property="og:description" content="__DESCRIPTION_SITE__" />
+    <meta property="og:image" content="__URL_SITE__/icones/banniere-sociale.png" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
+    <meta property="og:image:alt" content="SCP Audio" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="fr_FR" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:locale:alternate" content="de_DE" />
+    <meta property="og:locale:alternate" content="it_IT" />
+    <meta property="og:locale:alternate" content="pl_PL" />
+    <meta property="og:locale:alternate" content="ru_RU" />
+    <meta property="og:locale:alternate" content="ja_JP" />
+    <meta property="og:locale:alternate" content="ko_KR" />
+    <meta property="og:locale:alternate" content="zh_CN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="__TITRE_SITE__" />
+    <meta name="twitter:description" content="__DESCRIPTION_SITE__" />
+    <meta name="twitter:image" content="__URL_SITE__/icones/banniere-sociale.png" />
 
     <!-- Le manifeste existait mais n'était lié nulle part : sans cette ligne, aucun
          navigateur ne le lit et l'application n'est pas installable. -->
@@ -61,7 +75,22 @@
     </noscript>
   </head>
   <body class="bg-fond text-texte font-sans antialiased">
-    <div id="root"></div>
+    <!--
+      Le contenu de #root est remplacé par React au montage. D'ici là, c'est un écran
+      d'attente — et, pour les robots qui n'exécutent pas le JavaScript (plusieurs
+      moteurs, les robots des assistants IA), le seul texte de la page : sans lui,
+      ils indexaient un <div> vide.
+    -->
+    <div id="root">
+      <main class="fixed inset-0 flex flex-col items-center justify-center gap-3 bg-fond px-6 text-center">
+        <h1 class="font-mono text-sm uppercase tracking-[0.25em] text-texte">SCP Audio Roleplay</h1>
+        <p class="max-w-md text-xs text-texte-attenue">__DESCRIPTION_SITE__</p>
+        <noscript>
+          <p class="max-w-md text-xs text-texte-attenue">JavaScript is required to play the files.</p>
+          <p class="max-w-md text-xs text-texte-attenue">__LIENS_LANGUES__</p>
+        </noscript>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -35,6 +35,11 @@ node scripts/probe-speech.mjs --homographs             # mots à double prononci
 node scripts/probe-speech.mjs --keep tmp/audio         # garder les MP3 pour écouter
 ```
 
+**Le son d'un dossier se décide dans `src/services/preparationLecture.ts`** : texte
+prononcé, voix, prosodie, pauses, caviardages. Le module n'a aucune dépendance au
+navigateur, pour qu'un script Node produise exactement le même audio que l'application ;
+une règle ajoutée dans le moteur seul casserait cette garantie.
+
 **N'ajoute jamais une règle de prononciation sans l'avoir mesurée avec
 `probe-speech.mjs`.** Il fait lire au moteur la forme écrite puis la forme voulue
 et compare la durée des deux audios : durées égales ⇒ le moteur prononçait déjà
@@ -207,18 +212,70 @@ retombe sur `speechSynthesis`. Pour tester la production, utilise `npm run serve
 `dist/` et le point d'accès avec le même code que le mode développement
 (`server/ttsHandler.ts`, partagé avec `ttsPlugin`).
 
+**Les robots d'aperçu et d'indexation n'exécutent pas le JavaScript.** Ce qu'ils
+lisent vit hors de React : `index.html` porte des jetons (`__URL_SITE__`,
+`__TITRE_SITE__`…) que `sitePlugin` (`vite.config.ts`) remplace au build, et qui
+émet aussi `robots.txt` et `sitemap.xml` ; pour `?scp=` et `?lang=`, `middleware.ts`
+récrit l'en-tête à l'intention des robots (`server/apercuPartage.ts`, que
+`npm run serve` sert aussi — `curl -A Discordbot` pour tester). L'adresse publique
+n'est écrite qu'à un endroit, `URL_SITE` dans `src/services/adresseSite.ts`. Deux
+règles : **`middleware.ts` n'a aucun import statique** — il tourne devant la page
+d'accueil, et un module qui ne se charge pas y serait une erreur 500 pour tout le
+monde ; et toute la chaîne qu'il importe garde l'extension `.js`, comme `api/`.
+
 **Seules les voix « Multilingual » sont utilisées.** Les voix Neural de première génération
 (Henri, Denise, Eloise, Antoine, Gerard…) ont été retirées du projet : elles sonnent
 nettement plus synthétiques. N'en réintroduis pas. Le catalogue français
 (`src/types/neuralVoices.ts`) compte **12 voix**, dont seulement **deux nativement
-françaises** (Rémy, Vivienne) — les dix autres sont des voix multilingues d'autres locales,
-qui lisent le français avec une possible coloration d'accent. C'est pourquoi Rémy et
-Vivienne sont réservées au narrateur et à l'intercom, les rôles les plus entendus.
+françaises** (Rémy, Vivienne).
+
+**En français, Rémy et Vivienne jouent TOUS les rôles**, et `src/services/timbres.ts` fait de
+chaque personnage une personne différente — hauteur et **formants** (la taille du conduit
+vocal), traités par Signalsmith Stretch (MIT, WASM copié dans `src/vendor/`, régénéré par
+`scripts/vendre-signalsmith.mjs`) juste après la synthèse. Les voix étrangères
+« Multilingual » devinent la langue phrase par phrase et **basculaient en anglais** (Brian
+sur SCP-049) ; mesuré le 26/09/2026 : Edge **ignore** `<speak xml:lang>` (audio identique à
+la milliseconde) et **refuse** `<lang xml:lang>` (connexion coupée, puis refusée plusieurs
+minutes). Aucun moyen de leur imposer le français — ne les réattribue pas à des rôles FR.
+La transformation ne change pas la durée : frontières de mots, surlignage et bips restent
+justes.
+
+**Rémy et Vivienne basculent aussi en anglais** — elles sont « Multilingual » elles aussi. La
+langue se devine sur le TEXTE : une réplique courte ou ouverte par un nom anglais part en
+anglais (« Guéri ? » → « Gary ? », « Dr Sherman : Guéri ? » à 76 % anglais). Le remède est
+dans le texte prononcé, en français seulement : annonces du locuteur avec article et titre
+en toutes lettres (« Le docteur Sherman : », `annonceFrancaise`, `preparationLecture.ts`),
+chiffres des désignations en lettres (« SCP zéro quarante-neuf », `normalizeForSpeech`),
+deux-points d'étiquette gardé (« Procédures de confinement spéciales : » — changé en point,
+il isolait une phrase lue en ESPAGNOL), étiquettes à sigle rattachées à la phrase suivante
+(`rattacherEtiquettes`). La détection se fait
+PHRASE PAR PHRASE : c'est la phrase courte et sans mot-outil français qui bascule.
+**Pour vérifier une question de langue, transcris avec Whisper** (`faster_whisper` est
+installé, modèle `medium`) : `detect_language` sur l'audio de chaque réplique dit la
+langue réellement parlée — `probe-speech.mjs`, qui compare des durées, ne le voit pas. `distribuerPersonnes()` répartit les personnes sur le dossier entier pour que deux
+interlocuteurs n'aient jamais la même (`speechEngine.setScript`).
 
 Les voix sont référencées à **cinq** endroits : le catalogue et `DEFAULT_AI_ROLES_FR`
 (`neuralVoices.ts`), les pools de timbres par personnage (`characterVoiceService.ts`), les
 préréglages de `VoiceStudioModal.tsx`, le repli de `speechEngine.ts` et le défaut serveur
-de `vite.config.ts`. Change-les toutes ou aucune.
+de `vite.config.ts`. Change-les toutes ou aucune — et, pour le français, `VOIX_NATIVES`
+et les personnes de `timbres.ts` avec.
+
+**L'annonce du locuteur est dite par l'Archiviste, puis 0,3 s de silence, puis la réplique**
+(`composerAnnonce`, `timbres.ts`, appelé par `speechEngine.preparerAudio`).
+Demandé à l'écoute : collée à la réplique et dite par la même voix, on ne savait pas qui
+parlait. On synthétise le MÊME texte (annonce + réplique) avec les deux voix et on coupe
+aux frontières de mots, retrouvées en comparant les lettres, pas en comptant les mots (le
+service coupe « L’agent » ou « quarante-neuf » à sa façon). Ne synthétise pas l'annonce et
+la réplique séparément : seules, une annonce brève et une réplique courte partent en
+anglais. Si les frontières ne concordent pas, la synthèse d'un seul tenant est gardée.
+
+**La lecture neurale passe par UN SEUL élément `<audio>`** (`speechEngine.lecteur`), dont
+on change la source, et **le silence entre deux répliques est joué** (un WAV de silence), pas
+attendu par une minuterie. C'est ce qui permet d'écouter écran éteint : un nouvel élément par
+segment est refusé hors d'un geste (iOS), une minuterie est gelée en arrière-plan, et un
+élément qui se tait laisse le téléphone suspendre la page. Ne recrée pas d'élément par
+segment ; `play()` déverrouille l'élément dans le geste de l'utilisateur, avant tout `await`.
 
 **Toute note de bas de page est annoncée « Note : » à voix haute**, mais uniquement dans
 le texte prononcé (`speechTextFor()` dans `speechEngine.ts`), jamais dans `segment.text`.
@@ -291,6 +348,18 @@ règles existantes. Les cas couverts :
   le digicode (clé relue dans le script du bloc) et ignore boutons et scripts.
 - `[[include component:preview]]` est en `display: none` mais présent dans
   textContent : retiré (`retirerApercuCache`).
+
+**Une didascalie n'est jamais dite par le personnage.** « SCP-049 : (L'interrompt, en
+colère) Pas mort ! » faisait dire « L'interrompt, en colère » à SCP-049. `separerDidascalies()`
+classe chaque parenthèse d'une réplique : **contenu** (« (D-4581) », « (1) », sigle, nom
+latin, énumération — lu comme avant), **indication de jeu** brève (ton, souffle, rire,
+silence, à qui l'on parle — retirée du texte, affichée en italique au-dessus de la réplique
+et traduite en silence, volume ou débit par `stageEffectFor`), ou didascalie qui **raconte**
+(geste, bruit, déplacement — dite par l'Archiviste, segment à part, à sa place). Le signal le
+plus sûr est l'italique de la source (`(//…//)`, `extraireDidascaliesItaliques`) ; le lexique
+n'est qu'un filet, et une parenthèse en pleine phrase (« une oie (Anser cygnoides) qui »)
+reste du contenu. Mesuré sur le cache de l'audit : aucune perte de contenu, les seuls mots
+qui ne sont plus lus sont des indications de jeu.
 
 **Les notes signées `[AF]` / `[SZ]` sont résolues automatiquement** en personnes
 via `resolveInitialSignatories()`, pour que chaque annotateur ait sa propre voix.

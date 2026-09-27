@@ -25,20 +25,45 @@ du *faire savoir*.
 | Discussions | ✅ activées |
 | Bannière d'aperçu social 1280 × 640 | ✅ générée — **reste à téléverser**, voir §2 |
 | Release avec APK installable | ✅ à partir de `v1.1.0` |
+| Aperçu d'un lien vers l'application | ✅ bannière en adresse absolue, grande carte (`summary_large_image`) |
+| Aperçu propre à chaque dossier et à chaque langue | ✅ `middleware.ts` — titre, auteur, langue du lien |
+| Bouton « Partager » dans les deux lecteurs | ✅ feuille native sur téléphone, copie ailleurs |
+| `robots.txt`, `sitemap.xml`, lien canonique | ✅ générés au build, 650 adresses dans le plan |
+| Mesure d'audience de l'application | ⚙️ en place — **reste à activer**, voir §2 |
 
-## 2. Les deux gestes qui demandent l'interface web
+## 2. Les gestes qui demandent une interface web
 
-GitHub n'expose pas d'API pour ces deux-là.
+Aucun de ceux-là ne passe par une API : ils se font à la main, une fois.
 
-1. **Aperçu social.** Réglages → *Social preview* → *Edit* → téléverser
-   `public/icones/banniere-sociale.png`. Sans lui, un lien collé dans une
-   conversation n'affiche qu'une URL nue ; avec lui, il affiche la bannière, le
-   titre et la description. C'est la différence entre un lien qu'on ignore et un
-   lien qu'on ouvre.
+1. **Aperçu social du dépôt.** Réglages → *Social preview* → *Edit* → téléverser
+   `public/icones/banniere-sociale.png`. Sans lui, un lien vers le dépôt collé
+   dans une conversation affiche l'avatar générique de GitHub ; avec lui, la
+   bannière. (Les liens vers l'*application*, eux, ont déjà la leur.)
 2. **Issues « good first issue ».** Ouvrez-en trois ou quatre, petites et
    décrites (une correction de prononciation, une amélioration d'affichage
    mobile, une branche linguistique à vérifier). Un dépôt sans porte d'entrée
    pour un premier contributeur n'en reçoit pas.
+3. **Mesure d'audience.** Vercel → le projet → *Analytics* → *Enable*. Le script
+   est déjà posé dans les builds faits par Vercel, et seulement là ; tant que ce
+   bouton n'est pas pressé, il répond 404 et rien n'est compté. Sans cookie, donc
+   sans bandeau de consentement. C'est la seule façon de savoir quel canal a
+   amené des visiteurs à l'**application** : GitHub ne compte que le dépôt.
+4. **Moteurs de recherche.** [Google Search Console](https://search.google.com/search-console)
+   → propriété « Préfixe de l'URL » `https://scp-audio-roleplay.vercel.app/` →
+   vérification par balise HTML (collez-moi la balise, je l'ajoute) → *Sitemaps* →
+   `sitemap.xml`. Puis [Bing Webmaster Tools](https://www.bing.com/webmasters),
+   qui sait importer la propriété depuis Google en un clic. Bing alimente aussi
+   DuckDuckGo et la recherche de plusieurs assistants IA.
+5. **Vérifier l'aperçu une fois déployé**, avant de poster quoi que ce soit :
+
+   ```bash
+   curl -s -A Discordbot "https://scp-audio-roleplay.vercel.app/?scp=scp-3008" | grep og:title
+   ```
+
+   doit répondre « SCP-3008 — A Perfectly Normal, Regular Old IKEA ». Puis collez
+   le même lien dans une conversation Discord avec vous-même : la carte doit
+   montrer la bannière, ce titre et l'auteur. Un aperçu raté au moment de
+   l'annonce ne se rattrape pas — la plupart des plateformes le gardent en cache.
 
 ## 3. Où le dire, et quand
 
@@ -89,7 +114,7 @@ modérateur coûte plus qu'il ne rapporte.
 >   the text plus a block at the end — and a bare digit is indistinguishable from
 >   "Site-19" or "1,000". It has to be a sequential scan, never a regex.
 >
-> No API key anywhere, nothing stored server-side, the wiki text is fetched live
+> No API key anywhere, no account, no cookies, the wiki text is fetched live
 > in ten languages. Code is MIT, the SCP content stays CC BY-SA 3.0 and every
 > file carries its author credit — which the licence requires and which I had
 > initially got wrong.
@@ -188,7 +213,15 @@ Un article qui apprend quelque chose est lu ; une annonce ne l'est pas.
 
 - **Insights → Traffic** donne les vues, les visiteurs uniques et les sites
   référents sur quatorze jours. C'est la seule façon de savoir quel canal a
-  réellement rapporté, et la fenêtre est glissante : relevez-la, elle s'efface.
+  réellement rapporté au **dépôt**, et la fenêtre est glissante : relevez-la,
+  elle s'efface.
+- **Vercel → Analytics** donne la même chose pour l'**application** : pages,
+  sites référents, pays, appareils. C'est là qu'on voit si Reddit a amené plus
+  d'auditeurs que Hacker News.
+- **Vercel → Usage**, le jour même : chaque phrase lue est un appel au relais de
+  synthèse. Le plan gratuit se met en pause s'il est dépassé — il ne facture
+  rien. Pointer toutes les annonces vers le **même** dossier aide : ses phrases,
+  déjà synthétisées une fois, sont servies depuis le cache du réseau.
 - Répondez à **toutes** les issues dans les 24 h, même par « pas tout de suite ».
 - Une annonce sans suite retombe. Un rythme de publication, même lent, retient
   les gens qui ont mis une étoile.
@@ -214,7 +247,14 @@ entend l'application dans les deux secondes au lieu d'attendre dix.
 anglais, interface comprise. C'est le français qui doit désormais se déclarer.
 La langue choisie est ensuite mémorisée, mais un `?lang=` dans le lien prime
 toujours sur elle — un lien partagé s'ouvre dans SA langue, pas dans celle du
-visiteur.
+visiteur. Le bouton « Partager » des lecteurs écrit donc toujours la langue, même
+l'anglais (`?scp=scp-3008&lang=en`) : sans elle, la langue mémorisée du visiteur
+l'emporterait.
+
+Ces liens ont **leur propre aperçu** : collé dans Discord ou Reddit, `?scp=scp-3008`
+affiche le titre du dossier et son auteur, `?lang=fr` un titre et une description
+en français. C'est le middleware (`middleware.ts`) qui les écrit pour les robots
+d'aperçu, qui n'exécutent pas le JavaScript.
 
 ## 7. Ce qui manque encore au produit
 

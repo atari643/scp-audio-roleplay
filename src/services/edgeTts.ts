@@ -283,6 +283,12 @@ function buildSsml(text: string, o: SynthesisOptions): string {
   const rate = prosodieSure(o.rate, /^[+-]\d{1,3}%$/, '+0%');
   const volume = prosodieSure(o.volume, /^[+-]\d{1,3}%$/, '+0%');
 
+  // `xml:lang` reste « en-US » quelle que soit la langue du texte : mesuré le 26/09/2026,
+  // le service IGNORE cet attribut (« fr-FR » donne un audio de durée identique au dixième
+  // de seconde), et REFUSE la balise `<lang xml:lang>` que Microsoft documente pour forcer
+  // la langue d'une voix multilingue — il coupe la connexion, puis rejette les suivantes
+  // plusieurs minutes. Une voix multilingue étrangère ne peut donc pas être empêchée de
+  // basculer dans sa langue : d'où le casting français sur Rémy et Vivienne (`timbres.ts`).
   return (
     "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'>" +
     `<voice name='${voixSure(o.voice)}'>` +

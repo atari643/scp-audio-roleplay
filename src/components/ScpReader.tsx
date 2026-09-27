@@ -8,9 +8,13 @@ import {
   FileText,
   Sparkles,
   Radio,
-  Crosshair
+  Crosshair,
+  Share2,
+  Check
 } from 'lucide-react';
 import { ScpItemDetail } from '../types/scp';
+import { adresseDePartage, titreDossier } from '../services/adresseSite';
+import { usePartage } from '../shared/hooks/usePartage';
 import { CreditsDossier } from './CreditsDossier';
 import { CharacterRole, SpeechSegment } from '../types/audioRoleplay';
 import { speechEngine } from '../services/speechEngine';
@@ -20,7 +24,7 @@ import { SpokenLine } from './SpokenLine';
 import { ReadingQueue } from './ReadingQueue';
 import { BandeauEntites } from './BandeauEntites';
 import { habillageClasse, styleBadgeClasse, styleFondClasse } from './classification';
-import { useT } from '../i18n';
+import { nomDuLocuteur, useT } from '../i18n';
 
 interface ScpReaderProps {
   scp: ScpItemDetail;
@@ -92,6 +96,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
   onOuvrirEntite
 }) => {
   const t = useT();
+  const { etat: etatPartage, partager } = usePartage();
   const [autoScroll, setAutoScroll] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'roleplay' | 'raw'>('roleplay');
   const segmentRefs = useRef<Record<number, HTMLDivElement | null>>({});
@@ -158,6 +163,34 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
           >
             <Star className={`w-3.5 h-3.5 ${isFavorite ? 'fill-current' : ''}`} />
             <span className="hidden sm:inline">{t(isFavorite ? 'favoris.classe' : 'filtre.classerCourt')}</span>
+          </button>
+
+          {/* Copie directe : sur ordinateur, la feuille de partage du système n'est
+              pas ce qu'on attend d'un bouton d'outil (voir `partagerLien`). */}
+          <button
+            onClick={() => {
+              sfx.playTerminalBeep();
+              void partager(
+                adresseDePartage(scp.slug, languageCode),
+                titreDossier(scp.scpNumber || scp.slug.toUpperCase(), scp.title, scp.alternateTitle),
+                false
+              );
+            }}
+            title={t('dossier.partagerInfo')}
+            className={BOUTON_OUTIL}
+          >
+            {etatPartage === 'copie' ? (
+              <Check className="w-3.5 h-3.5" />
+            ) : (
+              <Share2 className="w-3.5 h-3.5" />
+            )}
+            <span className="hidden sm:inline" aria-live="polite">
+              {etatPartage === 'copie'
+                ? t('dossier.lienCopie')
+                : etatPartage === 'echec'
+                  ? t('dossier.copieImpossible')
+                  : t('dossier.partager')}
+            </span>
           </button>
 
           <a
@@ -385,7 +418,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
                       className="etiquette-locuteur truncate"
                       style={{ color: isCurrent ? 'var(--texte)' : couleurRole }}
                     >
-                      {segment.speaker}
+                      {nomDuLocuteur(segment.speaker)}
                       {segment.gender === 'female' && (
                         <span className="ml-1 opacity-70" title={t('dossier.personnageFeminin')}>♀</span>
                       )}

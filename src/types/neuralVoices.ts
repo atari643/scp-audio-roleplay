@@ -373,21 +373,22 @@ export const NEURAL_VOICES_BY_LANG: Record<string, NeuralVoice[]> = {
 };
 
 /**
- * Uniquement des voix « Multilingual ». Les deux voix nativement françaises sont attribuées
- * aux rôles les plus entendus : sur SCP-6172, 276 segments sur 414 sont narrés — c'est le
- * narrateur qu'on écoute les trois quarts du temps, il lui faut la voix la plus sûre.
- * Les voix d'autres locales lisent le français mais peuvent le colorer d'un accent, parfois
- * jusqu'au code-switching (quelques mots qui basculent dans leur langue d'origine). On ne
- * confie donc les rôles qu'aux meilleures lectrices de français : la différenciation des
- * personnages vient du profil (pitch, débit), pas de l'accent.
+ * En français, Rémy et Vivienne seulement — la différenciation des personnages vient de
+ * `timbres.ts`, qui fait de chacun une personne différente (hauteur et formants).
+ *
+ * Les rôles étaient confiés à des voix « Multilingual » d'autres locales (Andrew, Brian,
+ * Emma, William, Florian). Elles devinent la langue de chaque phrase et basculaient en
+ * anglais sur les phrases courtes, les noms et les nombres — l'utilisateur l'entendait sur
+ * SCP-049, où Brian jouait l'anomalie. Mesuré le 26/09/2026 : Edge ignore `xml:lang` et
+ * refuse `<lang>`, il n'existe donc aucun moyen de leur imposer le français.
  */
 export const DEFAULT_AI_ROLES_FR: Record<CharacterRole, string> = {
   narrator: 'fr-FR-RemyMultilingualNeural',
-  researcher: 'en-US-AndrewMultilingualNeural',
-  anomaly: 'en-US-BrianMultilingualNeural',
-  classD: 'en-AU-WilliamMultilingualNeural',
-  agent: 'en-US-EmmaMultilingualNeural',
-  commander: 'de-DE-FlorianMultilingualNeural',
+  researcher: 'fr-FR-RemyMultilingualNeural',
+  anomaly: 'fr-FR-RemyMultilingualNeural',
+  classD: 'fr-FR-RemyMultilingualNeural',
+  agent: 'fr-FR-VivienneMultilingualNeural',
+  commander: 'fr-FR-RemyMultilingualNeural',
   intercom: 'fr-FR-VivienneMultilingualNeural'
 };
 

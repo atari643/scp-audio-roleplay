@@ -52,6 +52,30 @@ Ces deux verrous vivent **uniquement** dans `api/tts.ts`. Un clone hébergé en 
 (`npm run dev`, `npm run serve`) n'est ni filtré ni plafonné : il se comporte
 exactement comme avant.
 
+### Aperçus de lien : le middleware
+
+`middleware.ts` s'exécute devant `/` et récrit l'en-tête de `index.html` — titre,
+description, langue, adresse canonique — quand un **robot d'aperçu** (Discord,
+Reddit, X, WhatsApp, Google…) demande un lien `?scp=` ou `?lang=`. Ces robots
+n'exécutent pas le JavaScript : sans lui, tous les dossiers partagés
+s'afficheraient « SCP Audio Roleplay ». Les visiteurs humains ne passent jamais
+par la récriture, et toute erreur y retombe sur la page ordinaire.
+
+Rien à configurer. Pour le vérifier en local, avant de déployer :
+
+```bash
+npm run build && npm run serve
+curl -s -A Discordbot "http://localhost:4173/?scp=scp-3008" | grep og:title
+```
+
+### Mesure d'audience — à activer une fois
+
+Vercel → le projet → *Analytics* → *Enable*. `vite.config.ts` pose le script
+(`/_vercel/insights/script.js`) **uniquement dans les builds faits par Vercel** :
+le miroir Pages, l'APK et `npm run serve` ne l'ont pas. Tant que l'option n'est pas
+activée, le script répond 404 et rien n'est compté. Pas de cookie, donc pas de
+bandeau de consentement.
+
 ### Plan B : Cloudflare Workers
 
 Si Vercel posait problème, Workers convient aussi (gratuit, sans carte, 100 000
@@ -181,7 +205,8 @@ la **bannière 1024 × 500** et **deux captures d'écran minimum** par format
 
 - **Aucune donnée collectée.** Favoris, historique, file de lecture et profils de
   voix vivent dans le `localStorage` du téléphone ; l'audio déjà synthétisé est
-  en IndexedDB. Rien ne part vers un serveur du développeur.
+  en IndexedDB. Rien ne part vers un serveur du développeur. La mesure d'audience
+  du site web n'est pas dans l'APK (voir §2) : la réponse reste vraie.
 - **Aucune donnée partagée avec des tiers.**
 - L'application contacte deux services externes pour fonctionner : l'API Crom
   (pour le texte des dossiers) et le service de lecture à voix haute de

@@ -1,4 +1,5 @@
 import { LanguageBranch, SUPPORTED_LANGUAGES, LANGUE_PAR_DEFAUT } from '../types/scp';
+import { NOM_SITE, adresseCanonique } from './adresseSite';
 
 /**
  * Les liens partageables : `?scp=scp-173&lang=en`.
@@ -60,8 +61,9 @@ export function lireEtatPartage(recherche: string = window.location.search): Eta
  * l'historique du navigateur ferait que le bouton « précédent » ne correspondrait
  * plus à ce que montre l'interface.
  *
- * La barre d'adresse devient ainsi copiable à tout instant, sans bouton
- * « partager » à maintenir.
+ * La barre d'adresse devient ainsi copiable à tout instant. Elle ne suffit pas pour
+ * autant : l'application Android n'en a pas, et sur téléphone personne ne va la
+ * chercher — d'où `partagerLien()` et le bouton des deux lecteurs.
  */
 export function ecrireEtatPartage(slug: string | null, langue: LanguageBranch): void {
   if (typeof window === 'undefined' || !window.history?.replaceState) return;
@@ -72,7 +74,7 @@ export function ecrireEtatPartage(slug: string | null, langue: LanguageBranch): 
   else params.delete('scp');
 
   // La langue n'est écrite que si elle n'est pas celle par défaut : un lien vers
-  // un dossier français n'a pas besoin de le préciser, et l'adresse reste courte.
+  // un dossier anglais n'a pas besoin de le préciser, et l'adresse reste courte.
   if (langue.code === LANGUE_PAR_DEFAUT.code) params.delete('lang');
   else params.set('lang', langue.code);
 
@@ -86,5 +88,95 @@ export function ecrireEtatPartage(slug: string | null, langue: LanguageBranch): 
   } catch {
     // Contexte où l'historique est refusé (iframe cloisonnée, `file://`). Sans
     // conséquence : l'application fonctionne, seule l'adresse ne suit pas.
+  }
+}
+
+/** Le titre d'onglet livré par `index.html` (ou par le middleware des aperçus). */
+let titreInitial: string | null = null;
+
+/**
+ * Le titre de l'onglet et le lien canonique suivent le dossier ouvert.
+ *
+ * Le titre, parce qu'un onglet, un favori ou une entrée d'historique intitulés
+ * « SCP Audio Roleplay » pour chacun des dossiers écoutés ne servent à rien. Le
+ * lien canonique, parce que le miroir Pages sert la même application sous un
+ * autre domaine : il désigne Vercel des deux côtés, et un moteur de recherche ne
+ * voit plus qu'un site. Google lit un canonique posé par le script, à condition
+ * qu'il n'y en ait qu'un — d'où la mise à jour de la balise existante plutôt qu'un
+ * ajout.
+ *
+ * `titreAccueil` est fourni par l'appelant (`t('site.titre')`) : ce module ne
+ * dépend pas du dictionnaire, et le middleware le charge sans lui.
+ */
+export function ecrireEnTete(
+  nomDossier: string | null,
+  slug: string | null,
+  codeLangue: string,
+  titreAccueil: string
+): void {
+  if (typeof document === 'undefined') return;
+  if (titreInitial === null) titreInitial = document.title;
+
+  document.title = nomDossier ? `${nomDossier} · ${NOM_SITE}` : titreAccueil || titreInitial;
+
+  let lien = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (!lien) {
+    lien = document.createElement('link');
+    lien.rel = 'canonical';
+    document.head.appendChild(lien);
+  }
+  lien.href = adresseCanonique(slug, codeLangue);
+}
+
+/**
+ * Ce qu'il est advenu d'un partage. `annule` : la feuille de partage native a été
+ * fermée sans choisir d'application — ce n'est pas un échec, rien à signaler.
+ */
+export type IssuePartage = 'partage' | 'copie' | 'annule' | 'echec';
+
+/**
+ * Partage un lien : feuille native si on la demande et qu'elle existe, sinon copie.
+ *
+ * La feuille native (`navigator.share`) est réservée au téléphone : sur ordinateur,
+ * Chrome ouvre le panneau de partage de Windows, ce qu'on n'attend pas d'un bouton
+ * posé à côté de « Source ». La WebView Android ne l'a pas du tout — l'application
+ * installée passe donc par la copie.
+ *
+ * La copie a elle-même un repli : `navigator.clipboard` manque hors contexte
+ * sécurisé et peut être refusé dans une WebView, alors que `execCommand('copy')`,
+ * déprécié mais universel, fonctionne encore partout où il y a un geste de
+ * l'utilisateur.
+ */
+export async function partagerLien(adresse: string, titre: string, natif: boolean): Promise<IssuePartage> {
+  if (natif && typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+    try {
+      await navigator.share({ title: titre, url: adresse });
+      return 'partage';
+    } catch (erreur) {
+      if (erreur instanceof DOMException && erreur.name === 'AbortError') return 'annule';
+      // Refus pour une autre raison (permission, contexte) : on retombe sur la copie.
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(adresse);
+    return 'copie';
+  } catch {
+    // `clipboard` absent ou refusé : repli ci-dessous.
+  }
+
+  try {
+    const zone = document.createElement('textarea');
+    zone.value = adresse;
+    zone.setAttribute('readonly', '');
+    zone.style.position = 'fixed';
+    zone.style.opacity = '0';
+    document.body.appendChild(zone);
+    zone.select();
+    const copie = document.execCommand('copy');
+    zone.remove();
+    return copie ? 'copie' : 'echec';
+  } catch {
+    return 'echec';
   }
 }

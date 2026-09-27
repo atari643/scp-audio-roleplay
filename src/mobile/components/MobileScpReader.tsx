@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Star, Play, ZoomIn, ZoomOut, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Star, Play, ZoomIn, ZoomOut, ExternalLink, Share2, Check } from 'lucide-react';
 import { ScpItemDetail } from '../../types/scp';
+import { adresseDePartage, titreDossier } from '../../services/adresseSite';
+import { usePartage } from '../../shared/hooks/usePartage';
 import { CharacterRole, SpeechSegment } from '../../types/audioRoleplay';
 import { WikiLink } from '../../services/linkExtractor';
 import { SpokenLine } from '../../components/SpokenLine';
@@ -14,7 +16,7 @@ import {
   styleFondClasse
 } from '../../components/classification';
 import { sfx } from '../../services/sfxService';
-import { useT } from '../../i18n';
+import { nomDuLocuteur, useT } from '../../i18n';
 
 interface MobileScpReaderProps {
   scp: ScpItemDetail;
@@ -76,6 +78,7 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
   onOuvrirEntite
 }) => {
   const t = useT();
+  const { etat: etatPartage, partager } = usePartage();
   const [fontSize, setFontSize] = useState<keyof typeof TAILLES>('sm');
   const habillage = habillageClasse(scp.objectClass);
 
@@ -91,7 +94,9 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
           className="inline-flex items-center gap-1.5 h-10 px-3 rounded-sm font-mono text-xs text-texte-second bg-surface-2 border border-bordure active:bg-surface-3"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>{t('entites.retour')}</span>
+          {/* Sous 360 px, cinq outils et ce libellé ne tiennent plus sur une ligne :
+              la flèche reste, le libellé n'est plus que lu. */}
+          <span className="max-[359px]:sr-only">{t('entites.retour')}</span>
         </button>
 
         <div className="flex items-center gap-2">
@@ -128,6 +133,32 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
             }`}
           >
             <Star className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+          </button>
+
+          {/* Feuille de partage du téléphone quand elle existe, copie sinon — la
+              WebView de l'application Android n'en a pas (voir `partagerLien`). */}
+          <button
+            onClick={() => {
+              sfx.playTerminalBeep();
+              void partager(
+                adresseDePartage(scp.slug, languageCode),
+                titreDossier(scp.scpNumber || scp.slug.toUpperCase(), scp.title, scp.alternateTitle),
+                true
+              );
+            }}
+            title={t('dossier.partagerInfo')}
+            aria-label={
+              etatPartage === 'copie'
+                ? t('dossier.lienCopie')
+                : etatPartage === 'echec'
+                  ? t('dossier.copieImpossible')
+                  : t('dossier.partager')
+            }
+            className={`w-10 h-10 flex items-center justify-center rounded-sm border bg-surface-2 border-bordure active:text-texte ${
+              etatPartage === 'copie' ? 'text-accent' : 'text-texte-attenue'
+            }`}
+          >
+            {etatPartage === 'copie' ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
           </button>
 
           {/*
@@ -235,7 +266,7 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
                   className="etiquette-locuteur truncate"
                   style={{ color: isCurrent ? 'var(--texte)' : couleurRole }}
                 >
-                  {segment.speaker}
+                  {nomDuLocuteur(segment.speaker)}
                 </span>
 
                 {isActivelyPlaying ? (
@@ -248,6 +279,16 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
                   <Play className="w-3 h-3 text-texte-attenue shrink-0" aria-hidden="true" />
                 )}
               </div>
+
+              {/* Les didascalies ne sont pas dites par le personnage (`separerDidascalies`) :
+                  elles s'affichent ici, en italique, comme sur ordinateur. */}
+              {segment.stageDirections && segment.stageDirections.length > 0 && (
+                <p className="font-serif italic text-sm text-texte-attenue mb-1">
+                  {segment.stageDirections.map((d, i) => (
+                    <span key={i} className="mr-2">({d})</span>
+                  ))}
+                </p>
+              )}
 
               <p
                 className={`prose-dossier ${TAILLES[fontSize].classe} ${

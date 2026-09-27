@@ -55,17 +55,21 @@ const SCP_PRESETS = [
     descCle: 'studio.equilibre' as CleTraduction,
     assignments: DEFAULT_AI_ROLES_FR
   },
+  // Rémy et Vivienne seulement, comme le casting par défaut : une voix étrangère
+  // « Multilingual » bascule en anglais sur un texte français (voir `DEFAULT_AI_ROLES_FR`).
+  // Les préréglages ne se distinguent plus que par qui est une femme ; la personne que joue
+  // chaque voix vient de `timbres.ts`.
   {
     id: 'keter-tension',
     nomCle: 'prereglage.keter' as CleTraduction,
     descCle: 'studio.anomalieInquietante' as CleTraduction,
     assignments: {
       narrator: 'fr-FR-RemyMultilingualNeural',
-      researcher: 'en-US-BrianMultilingualNeural',
-      anomaly: 'en-US-AndrewMultilingualNeural',
-      classD: 'en-AU-WilliamMultilingualNeural',
-      agent: 'en-US-EmmaMultilingualNeural',
-      commander: 'de-DE-FlorianMultilingualNeural',
+      researcher: 'fr-FR-RemyMultilingualNeural',
+      anomaly: 'fr-FR-RemyMultilingualNeural',
+      classD: 'fr-FR-RemyMultilingualNeural',
+      agent: 'fr-FR-RemyMultilingualNeural',
+      commander: 'fr-FR-RemyMultilingualNeural',
       intercom: 'fr-FR-VivienneMultilingualNeural'
     }
   },
@@ -75,11 +79,11 @@ const SCP_PRESETS = [
     descCle: 'studio.voixFeminines' as CleTraduction,
     assignments: {
       narrator: 'fr-FR-RemyMultilingualNeural',
-      researcher: 'en-US-AvaMultilingualNeural',
-      anomaly: 'en-US-BrianMultilingualNeural',
-      classD: 'en-AU-WilliamMultilingualNeural',
-      agent: 'en-US-EmmaMultilingualNeural',
-      commander: 'de-DE-SeraphinaMultilingualNeural',
+      researcher: 'fr-FR-VivienneMultilingualNeural',
+      anomaly: 'fr-FR-RemyMultilingualNeural',
+      classD: 'fr-FR-RemyMultilingualNeural',
+      agent: 'fr-FR-VivienneMultilingualNeural',
+      commander: 'fr-FR-VivienneMultilingualNeural',
       intercom: 'fr-FR-VivienneMultilingualNeural'
     }
   }

@@ -17,9 +17,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleTtsRequest } from './ttsHandler.js';
+import { estRobotDApercu, pageAvecApercu } from './apercuPartage.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
+const INDEX = path.join(DIST, 'index.html');
 const PORT = Number(process.env.PORT) || 4173;
 
 const TYPES: Record<string, string> = {
@@ -34,7 +36,9 @@ const TYPES: Record<string, string> = {
   '.webp': 'image/webp',
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2',
-  '.mp3': 'audio/mpeg'
+  '.mp3': 'audio/mpeg',
+  '.txt': 'text/plain; charset=utf-8',
+  '.xml': 'application/xml; charset=utf-8'
 };
 
 const server = http.createServer(async (req, res) => {
@@ -50,7 +54,22 @@ const server = http.createServer(async (req, res) => {
   const demande = path.normalize(path.join(DIST, decodeURIComponent(url.pathname)));
   const cible = demande.startsWith(DIST) && fs.existsSync(demande) && fs.statSync(demande).isFile()
     ? demande
-    : path.join(DIST, 'index.html'); // l'application est une SPA : tout le reste retombe ici
+    : INDEX; // l'application est une SPA : tout le reste retombe ici
+
+  // Aperçu d'un lien de dossier pour les robots : le même code que `middleware.ts`
+  // sur Vercel, d'où un moyen de le vérifier sans déployer.
+  if (cible === INDEX && estRobotDApercu(req.headers['user-agent'])) {
+    try {
+      const avecApercu = await pageAvecApercu(url, fs.readFileSync(INDEX, 'utf8'));
+      if (avecApercu) {
+        res.setHeader('Content-Type', TYPES['.html']);
+        res.end(avecApercu);
+        return;
+      }
+    } catch {
+      // Page ordinaire ci-dessous, comme sur Vercel.
+    }
+  }
 
   try {
     const contenu = fs.readFileSync(cible);

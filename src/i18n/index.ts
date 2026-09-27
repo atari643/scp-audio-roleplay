@@ -81,6 +81,10 @@ function sabonner(callback: () => void): () => void {
 export async function definirLangue(code: string): Promise<void> {
   if (code === langueCourante) return;
 
+  // `<html lang>` suit : c'est lui qui choisit la voix d'un lecteur d'écran, la
+  // césure, et la langue qu'un moteur de recherche attribue à la page rendue.
+  if (typeof document !== 'undefined') document.documentElement.lang = code;
+
   const deja = charges.get(code);
   if (deja) {
     langueCourante = code;
@@ -144,6 +148,17 @@ export function t(cle: CleTraduction, params?: Record<string, string>): string {
  */
 export function libelleCategorie(id: string, pluriel = false): string {
   return t(`categorie.${id}${pluriel ? '.pluriel' : ''}` as CleTraduction);
+}
+
+/**
+ * Le nom d'un locuteur tel qu'on l'affiche. Le parseur nomme le narrateur « Archiviste »
+ * dans toutes les branches — c'est un identifiant, que la distribution des voix et les
+ * annonces comparent — : l'affichage, lui, le traduit, sans quoi un dossier anglais
+ * affichait « ARCHIVISTE » au-dessus de chaque paragraphe. Les autres noms viennent du
+ * dossier et restent tels quels.
+ */
+export function nomDuLocuteur(speaker: string): string {
+  return speaker === 'Archiviste' ? t('roles.narrateur') : speaker;
 }
 
 /** La langue affichée. Utile pour poser `lang` sur un élément. */

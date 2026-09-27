@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { PlayerStatus, SpeechSegment } from '../../types/audioRoleplay';
 import { sfx } from '../../services/sfxService';
-import { useT } from '../../i18n';
+import { nomDuLocuteur, useT } from '../../i18n';
 
 interface MobileAudioSheetProps {
   status: PlayerStatus;
@@ -156,7 +156,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
             >
               <span className="font-bold text-accent-texte shrink-0">#{idx + 1}</span>
               <div className="min-w-0 flex-1">
-                <div className="font-semibold text-texte truncate">{seg.speaker}</div>
+                <div className="font-semibold text-texte truncate">{nomDuLocuteur(seg.speaker)}</div>
                 <p className="text-xs text-texte-attenue line-clamp-2">{seg.text}</p>
               </div>
             </button>

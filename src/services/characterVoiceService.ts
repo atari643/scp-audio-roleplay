@@ -116,27 +116,18 @@ const MALE_FIRST_NAMES = new Set([
 /**
  * Pools de timbres attribués aux personnages nommés (un Dr Untel = toujours la même voix).
  *
- * Uniquement des voix « Multilingual » : les Neural de première génération ont été retirées
- * du projet. Le décalage de hauteur et de débit propre à chaque entrée reste le principal
- * outil de différenciation, puisque le vivier français natif se limite à deux voix.
- *
- * Hyunsu (ko-KR), Giuseppe (it-IT) et Thalita (pt-BR) ont été retirées des pools : leur
- * coloration d'origine dominait la lecture du français. Elles restent au catalogue et
+ * En français, les deux voix natives seulement : les voix étrangères « Multilingual »
+ * basculaient en anglais (voir `DEFAULT_AI_ROLES_FR`). Chaque personnage garde son décalage
+ * de hauteur et de débit, et `timbres.ts` en fait en plus une personne différente — c'est là
+ * que se joue désormais la différenciation. Les autres voix restent au catalogue et
  * sélectionnables dans le studio des voix.
  */
 const FEMALE_RESEARCHER_VOICES_FR = [
-  { id: 'fr-FR-VivienneMultilingualNeural', basePitch: '+0Hz', baseRate: '+0%', desc: 'Enveloppante, nette et experte' },
-  { id: 'en-US-AvaMultilingualNeural', basePitch: '-2Hz', baseRate: '+0%', desc: 'Calculée, froide et méthodique' },
-  { id: 'en-US-EmmaMultilingualNeural', basePitch: '+2Hz', baseRate: '+2%', desc: 'Observatrice, claire et clinique' },
-  { id: 'de-DE-SeraphinaMultilingualNeural', basePitch: '-4Hz', baseRate: '-2%', desc: 'Posée, grave et protocolaire' }
+  { id: 'fr-FR-VivienneMultilingualNeural', basePitch: '+0Hz', baseRate: '+0%', desc: 'Enveloppante, nette et experte' }
 ];
 
 const MALE_RESEARCHER_VOICES_FR = [
-  { id: 'fr-FR-RemyMultilingualNeural', basePitch: '+0Hz', baseRate: '+2%', desc: 'Naturel, éloquent et scientifique' },
-  { id: 'en-US-AndrewMultilingualNeural', basePitch: '+2Hz', baseRate: '+3%', desc: 'Curieux, engagé et analytique' },
-  { id: 'en-US-BrianMultilingualNeural', basePitch: '-3Hz', baseRate: '+0%', desc: 'Chaleureux, assuré et posé' },
-  { id: 'en-AU-WilliamMultilingualNeural', basePitch: '+4Hz', baseRate: '+3%', desc: 'Rugueux, direct et tendu' },
-  { id: 'de-DE-FlorianMultilingualNeural', basePitch: '-8Hz', baseRate: '-2%', desc: 'Grave, ferme et autoritaire' }
+  { id: 'fr-FR-RemyMultilingualNeural', basePitch: '+0Hz', baseRate: '+2%', desc: 'Naturel, éloquent et scientifique' }
 ];
 
 const FEMALE_RESEARCHER_VOICES_EN = [

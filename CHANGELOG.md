@@ -7,6 +7,50 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
 
 ### Ajouté
 
+- **Un dossier s'écoute écran éteint, comme un podcast.** Sur téléphone, la lecture
+  s'arrêtait au premier changement de réplique dès que l'écran se verrouillait : chaque
+  segment créait son propre élément audio, que le navigateur refuse de lancer hors d'un
+  geste, et le silence entre deux répliques était une minuterie, gelée en arrière-plan.
+  La lecture passe désormais par un seul élément, déverrouillé par le premier appui sur
+  lecture, qui joue les répliques ET les silences sans jamais se taire — il prolonge le
+  silence si la réplique suivante n'est pas encore prête. L'écran de verrouillage et le
+  casque affichent le dossier, qui parle et l'icône de l'application (en PNG : Android et
+  iOS ignoraient l'icône SVG), avec lecture, pause, réplique précédente ou suivante, arrêt.
+- **En français, chaque personnage a sa propre voix, et plus aucune ne bascule en
+  anglais.** Les rôles étaient prêtés à des voix étrangères « Multilingual » (Andrew,
+  Brian, Emma…) qui devinent la langue de chaque phrase : sur SCP-049, l'anomalie passait
+  à l'anglais au milieu d'une réplique. Mesuré : Edge ignore la langue qu'on lui déclare et
+  refuse la balise qui l'imposerait. Rémy et Vivienne jouent désormais tous les rôles, et
+  chaque personnage devient une personne différente — hauteur et formants (la taille du
+  conduit vocal) transformés juste après la synthèse par Signalsmith Stretch (MIT, WASM de
+  92 Ko chargé seulement en français). Deux interlocuteurs d'un même dossier n'ont jamais
+  la même personne.
+- **Les répliques courtes ne partent plus en anglais.** Même Rémy et Vivienne devinent
+  la langue sur le texte : « Dr Sherman : Guéri ? » était lu « Gary ? » (Whisper : 76 %
+  anglais). En français, l'annonce du locuteur prend son article et son titre en toutes
+  lettres (« Le docteur Sherman : », 99 % français) et les chiffres des désignations
+  s'écrivent en lettres (« SCP zéro quarante-neuf » : de 2 % à 99 % de français sur le
+  titre). Sur l'entretien de SCP-049, plus aucune réplique n'est reconnue en anglais.
+  Même cause pour les titres de section : « Procédures de confinement spéciales : » perdait
+  son deux-points au profit d'un point, et la phrase de trois mots ainsi isolée était lue
+  en espagnol (98 %). Le deux-points d'étiquette est gardé (100 % de français), et une
+  étiquette à sigle (« Objet : SCP cent soixante-treize. ») rejoint la phrase suivante.
+- **On entend qui va parler.** L'annonce du locuteur collait à sa réplique, dite par la
+  même voix : à l'écoute de SCP-049, on ne savait plus qui parlait. Elle est maintenant
+  dite par l'Archiviste, suivie de 0,3 s de silence, puis le personnage parle avec sa
+  propre voix. Les deux voix lisent le MÊME
+  texte et l'on coupe aux frontières de mots (`composerAnnonce`, `timbres.ts`) : séparées,
+  une annonce brève et une réplique courte repartiraient en anglais.
+
+- **Le son d'un dossier se décide en un seul endroit**
+  (`src/services/preparationLecture.ts`) : texte prononcé, voix, prosodie,
+  pauses et caviardages sortent du moteur de lecture, dans un module sans
+  dépendance au navigateur. Vérifié sur 272 segments réels : texte, voix et pauses
+  identiques à l'ancien moteur, au caractère près.
+- **Le hook `pre-commit` reconnaît davantage de clés d'API** (32 caractères
+  hexadécimaux, un point, 16 caractères), et refuse tout fichier que les règles
+  d'exclusion de git écartent, même ajouté de force.
+
 - **L'interface suit la langue choisie, dans les dix branches.** Choisir
   l'anglais changeait le catalogue mais pas un mot autour : on lisait un dossier
   anglais entouré de boutons français, et le badge du locuteur annonçait
@@ -24,6 +68,52 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
   bonne branche, `?lang=en` ouvre l'archive en anglais, et l'adresse se met à
   jour toute seule. Un lien qui vise un dossier saute la séquence de démarrage —
   dix secondes d'attente avant le dossier promis faisaient fuir le visiteur.
+- **Un bouton « Partager » dans les deux lecteurs.** La barre d'adresse suffisait
+  sur ordinateur ; l'application Android n'en a pas, et sur téléphone personne ne
+  va la chercher. Feuille de partage du système sur téléphone, copie ailleurs. Le
+  lien écrit toujours la langue, pour s'ouvrir chez l'autre dans celle qu'on avait
+  sous les yeux.
+- **Chaque lien partagé a son aperçu.** Discord, Reddit, X ou Google lisent la
+  page sans exécuter son JavaScript : tous les dossiers s'y affichaient « SCP Audio
+  Roleplay ». Un middleware Vercel leur sert désormais le titre du dossier, son
+  auteur et la langue du lien — aux robots seulement, les visiteurs n'attendent
+  pas une requête de plus.
+- **Ce que lisent les moteurs de recherche** : `robots.txt`, un plan du site de
+  650 adresses (l'accueil des dix branches et leur catalogue de démarrage), un
+  lien canonique qui désigne Vercel depuis le miroir Pages, un titre d'onglet par
+  dossier, et quelques lignes de texte dans `index.html` pour les robots qui
+  n'exécutent pas le JavaScript — ils indexaient un `<div>` vide.
+- **Mesure d'audience** (Vercel Web Analytics, sans cookie), dans la seule version
+  construite par Vercel. À activer dans le tableau de bord.
+
+### Corrigé
+
+- **Le narrateur s'affiche dans la langue choisie.** Un dossier anglais montrait
+  « ARCHIVISTE » au-dessus de chaque paragraphe, dans le lecteur, le mini-lecteur et
+  l'écran de verrouillage : c'est le nom interne du rôle, désormais traduit à l'affichage.
+- **Les personnages ne disent plus les didascalies.** « SCP-049 : (L'interrompt, en colère)
+  Pas mort ! » faisait dire « L'interrompt, en colère » à SCP-049. Une indication de jeu
+  (ton, souffle, rire, silence, à qui l'on parle) quitte le texte prononcé : elle s'affiche en
+  italique au-dessus de la réplique — sur mobile aussi — et se traduit en silence, en volume
+  ou en débit (la colère se dit plus fort, une interruption entre plus tôt). Une didascalie
+  qui raconte un geste ou un bruit (« (Parcourt la pièce du regard) », « (Coups de feu) »)
+  est dite par l'Archiviste. Les parenthèses de contenu (« (D-4581) », noms latins, sigles)
+  restent lues ; au passage, « (War Relocation Authority) » ou « priorité » ne sont plus
+  avalés parce qu'ils contenaient « rit ».
+- **« No fewer than 3 may enter » se lit enfin « three ».** Le service prenait « 3 may »
+  pour une date — le 3 mai — et avalait le nombre (SCP-173, en anglais). Un nombre suivi
+  de « may » ou « march » s'écrit désormais en lettres, ce qui lève l'ambiguïté.
+- **Le moteur de lecture pouvait planter dès son chargement** quand le navigateur
+  connaissait déjà ses voix système (Edge, deuxième visite) : il les répartissait entre
+  les rôles avant d'avoir chargé les profils de ces rôles.
+- **L'image d'aperçu était une adresse relative**, que le protocole Open Graph
+  interdit : Facebook, LinkedIn ou Reddit publiaient le lien sans vignette. C'est
+  maintenant la bannière 1280 × 640, en adresse absolue et en grande carte.
+- **`robots.txt` et `sitemap.xml` renvoyaient la page d'accueil**, avalés par la
+  réécriture de l'application monopage.
+- **La page se déclarait en français** (`<html lang="fr">`, description,
+  `og:locale`) alors que l'anglais est la langue par défaut ; `lang` suit
+  maintenant la langue choisie.
 
 ### Sécurité
 

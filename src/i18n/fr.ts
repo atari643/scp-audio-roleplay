@@ -147,6 +147,10 @@ export const FR = {
   'dossier.catalogue': 'Catalogue',
   'dossier.source': 'Source',
   'dossier.sourceInfo': "Consulter l'archive originale sur le wiki",
+  'dossier.partager': 'Partager',
+  'dossier.partagerInfo': 'Copier un lien qui ouvre directement ce dossier',
+  'dossier.lienCopie': 'Lien copié',
+  'dossier.copieImpossible': 'Copie impossible',
   'dossier.classifie': 'Dossier classifié RAISA · Accréditation 4',
   'dossier.confinement': 'Confinement maintenu · Site-19',
   'dossier.ecouter': 'Écouter',
@@ -553,6 +557,16 @@ export const FR = {
   'studio.neutre': 'Neutre',
   'studio.grave': 'Grave / sombre',
   'explorateur.titre': 'Explorateur SCiPNET',
+
+  // --- Titre d'onglet et aperçus de lien ------------------------------------
+  // Lus aussi hors de l'application : `vite.config.ts` pose l'anglais dans
+  // `index.html`, et le middleware des aperçus sert la branche du lien aux robots
+  // de Discord, Reddit ou Google, qui n'exécutent pas le JavaScript.
+  'site.titre': 'SCP Audio Roleplay — les dossiers de la Fondation SCP lus à voix haute',
+  'site.description':
+    'Les dossiers de la Fondation SCP lus à voix haute, avec une voix par personnage : narrateur, chercheurs, anomalie, Classe-D. Dix branches du wiki, gratuit, sans compte.',
+  'site.dossierDescription': 'Lu à voix haute, avec une voix par personnage.',
+  'site.dossierTexte': 'Texte : {auteurs} — wiki SCP, CC BY-SA 3.0.',
 
   // --- Écran de confinement d'erreur ---------------------------------------
   'erreur.banniere': "Confinement de l'erreur",

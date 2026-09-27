@@ -12,6 +12,7 @@
  *    frontières de mots avec le son ;
  *  · l'API Crom — les dossiers sont du contenu vivant, et TanStack Query gère
  *    déjà leur fraîcheur en mémoire ;
+ *  · `/_vercel/` — la mesure d'audience ;
  *  · toute requête qui n'est pas un GET de même origine.
  *
  * Écrit à la main, sans Workbox : soixante lignes lisibles valent mieux qu'une
@@ -45,6 +46,8 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(requete.url);
   if (url.origin !== self.location.origin) return;
   if (url.pathname.includes('/api/')) return;
+  // Mesure d'audience de Vercel : même origine, mais ce n'est pas l'application.
+  if (url.pathname.startsWith('/_vercel/')) return;
 
   // Navigation : le réseau d'abord, pour ne jamais servir une version périmée de
   // l'application ; le cache seulement quand il n'y a pas de réseau.

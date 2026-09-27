@@ -42,6 +42,7 @@ scp-app/
 │   ├── shared/                       # 🔄 SOCLE COMMUN ET LOGIQUE MÉTIER
 │   │   ├── hooks/
 │   │   │   ├── useScpApp.ts          # État global partagé (API CROM, TTS, Favoris, etc.)
+│   │   │   ├── usePartage.ts         # Bouton « Partager » des deux lecteurs
 │   │   │   └── useDeviceMode.ts      # Détection d'appareil & gestion de la bascule
 │   │   └── components/
 │   │       ├── DeviceSwitcherBadge.tsx # Pastille permettant de basculer Bureau ⇄ Mobile
@@ -66,7 +67,9 @@ scp-app/
 │   │   ├── speechEngine.ts           # Moteur TTS multi-voix et synchronisation
 │   │   ├── scriptParser.ts           # Analyseur de script & détection des dialogues
 │   │   ├── sfxService.ts             # Synthétiseur d'effets sonores et bruit blanc
-│   │   └── storageService.ts         # Persistance localStorage (favoris, historique)
+│   │   ├── storageService.ts         # Persistance localStorage (favoris, historique)
+│   │   ├── lienPartage.ts            # Liens ?scp=&lang=, titre d'onglet, partage
+│   │   └── adresseSite.ts            # L'adresse publique, et les adresses qui en dérivent
 │   │
 │   ├── data/                         # Données construites hors ligne, chargées à la demande
 │   │   ├── entities.json             # Répertoire des entités (généré, 10 branches)
@@ -88,8 +91,14 @@ scp-app/
 │   ├── build-index.mjs               # Construit l'index de corpus (durées, ambiances)
 │   ├── audit-coverage.mjs            # Audit de fidélité audio
 │   └── probe-speech.mjs              # Sonde de prononciation
+├── api/tts.ts                        # Relais de synthèse (fonction Vercel)
+├── server/
+│   ├── ttsHandler.ts                 # Logique du relais, partagée dev / serve / Vercel
+│   ├── apercuPartage.ts              # Aperçu d'un lien pour les robots (titre, auteur, langue)
+│   └── index.ts                      # `npm run serve` : dist/ + /api/tts + aperçus
+├── middleware.ts                     # Middleware Vercel devant `/` → apercuPartage
 ├── package.json
-└── vite.config.ts
+└── vite.config.ts                    # + sitePlugin : jetons d'index.html, robots, sitemap
 ```
 
 > **Les fichiers `.json` de `src/data/` sont générés, jamais édités à la main.** Ils

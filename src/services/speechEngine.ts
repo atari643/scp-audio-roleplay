@@ -1,19 +1,33 @@
 import { CharacterRole, PlayerStatus, SpeechSegment, VoiceProfile } from '../types/audioRoleplay';
-import { DEFAULT_AI_ROLES_EN, DEFAULT_AI_ROLES_FR, NEURAL_VOICES_BY_LANG } from '../types/neuralVoices';
-import { t } from '../i18n';
+import { DEFAULT_AI_ROLES_EN } from '../types/neuralVoices';
+import { nomDuLocuteur, t } from '../i18n';
 import { sfx } from './sfxService';
+import { hasSpeakableContent } from './speechText';
 import {
-  acronymPattern,
-  censoredSpokenWord,
-  glossaryFor,
-  hasSpeakableContent,
-  normalizeForSpeech
-} from './speechText';
-import { stageEffectFor } from './speechLexicon';
+  assignationsParDefaut,
+  ContexteLecture,
+  parametresVoix,
+  ParametresVoix,
+  pauseAvant,
+  PlageCensure,
+  plagesCensure,
+  preparerContexte,
+  texteDit
+} from './preparationLecture';
 import { audioCache } from './audioCache';
+import {
+  chargerMoteurTimbre,
+  composerAnnonce,
+  Distribution,
+  distribuerPersonnes,
+  encoderWav,
+  personneDe,
+  transformerTimbre
+} from './timbres';
 import { canSynthesizeDirectly, synthesize, WordBoundary } from './edgeTts';
 import { buildCues, SpokenCue, wordIndexAt } from './wordAlignment';
 import { storageService } from './storageService';
+import { NOM_SITE } from './adresseSite';
 
 type SegmentCallback = (index: number, segment: SpeechSegment) => void;
 type WordCallback = (segmentIndex: number, wordIndex: number) => void;
@@ -32,12 +46,6 @@ export type TtsEngineMode = 'neural' | 'system';
  * pas par ici : `canSynthesizeDirectly()` leur fait joindre le service en direct.
  */
 const POINT_ACCES_TTS = import.meta.env.VITE_TTS_ENDPOINT || '/api/tts';
-
-/** Un caviardage repéré dans l'audio synthétisé, en secondes. */
-interface CensorSpan {
-  start: number;
-  end: number;
-}
 
 /**
  * Ce qu'on garde en cache pour un texte donné : l'audio, et les frontières de mots quand le
@@ -97,31 +105,6 @@ class SpeechEngine {
   private lastStatusEmit: number = 0;
 
   /**
-   * Silence entre deux segments, en millisecondes.
-   *
-   * edge-tts n'accepte aucun SSML : impossible de demander une pause au moteur. Le seul
-   * levier interne au texte est la ponctuation, et il est faible — passer d'une virgule à
-   * un point n'achète que 0,36 s, mesuré. Une vraie respiration ne peut donc venir que d'ici,
-   * entre deux éléments audio.
-   *
-   * Sans ce délai, `onended` enchaînait immédiatement : un titre de section, un changement
-   * d'interlocuteur et une phrase de corps se collaient, et les bruitages de transition
-   * (intercom, friture radio) se superposaient aux premiers mots au lieu de les précéder.
-   */
-  private static readonly PAUSES = {
-    /** Même locuteur, suite du récit : juste de quoi ne pas coller les phrases. */
-    suite: 120,
-    /** Quelqu'un d'autre prend la parole. */
-    locuteur: 350,
-    /** Autour d'un titre de section : c'est ce qui rend la structure du dossier audible. */
-    titre: 500,
-    /** Ouverture ou fermeture de journal — le bruitage d'intercom a besoin de la place. */
-    journal: 600,
-    /** Une note de bas de page s'insère dans le corps ; il faut l'en détacher. */
-    note: 300
-  };
-
-  /**
    * Caviardages du segment en cours.
    *
    * `sfx.playCensorBeep()` existait sans appelant utile : le bip partait une fois, au début
@@ -134,7 +117,7 @@ class SpeechEngine {
    * seuls mots « donnée expurgée » en jouant le bip par-dessus. C'est la convention des
    * lectures SCP, et la phrase ne se casse plus.
    */
-  private censorSpans: CensorSpan[] = [];
+  private censorSpans: PlageCensure[] = [];
   /** Minuteries qui coupent et rétablissent le son autour d'un caviardage. */
   private censorTimers: ReturnType<typeof setTimeout>[] = [];
   /** Vrai pendant un caviardage : le son est coupé volontairement, ne pas le rétablir. */
@@ -143,7 +126,23 @@ class SpeechEngine {
   /** Durée du bip de censure, en secondes. */
   private static readonly BEEP_DURATION = 0.16;
 
-  /** Attente en cours avant le segment suivant. Annulée par pause/stop/saut. */
+  /**
+   * L'unique élément <audio> de la lecture, dont on change la source à chaque segment.
+   *
+   * Écran éteint, un téléphone ne laisse vivre une page que tant qu'elle JOUE : un nouvel
+   * élément par segment, lancé hors d'un geste de l'utilisateur, est refusé (iOS), et la
+   * minuterie du silence entre deux segments était ralentie puis gelée en arrière-plan — la
+   * lecture s'arrêtait au premier changement de réplique. Un seul élément, déverrouillé par
+   * le premier appui sur lecture, qui enchaîne répliques ET silences sans jamais se taire :
+   * c'est ce qui permet d'écouter un dossier comme un podcast, téléphone en poche.
+   */
+  private lecteur: HTMLAudioElement | null = null;
+  /** Silences WAV prêts à jouer, par durée arrondie à 50 ms. */
+  private silences = new Map<number, string>();
+  /** Titre du dossier, pour l'écran de verrouillage. */
+  private titreDossier = '';
+
+  /** Attente en cours avant le segment suivant (voix système seulement). Annulée par pause/stop/saut. */
   private transitionTimer: ReturnType<typeof setTimeout> | null = null;
   /**
    * Segment que la pause de transition va lancer. Mémorisé pour qu'une mise en pause
@@ -163,25 +162,16 @@ class SpeechEngine {
    * et seul le texte de la réplique se redessine.
    */
   /**
-   * Sigles à développer, par segment : `id du segment → sigles`.
+   * Annonces de locuteur et sigles à développer, par segment.
    *
-   * Rempli une fois par dossier dans `setScript`. Le faire au fil de la lecture rendrait le
-   * résultat dépendant de l'ordre des appels — le préchargement synthétise trois segments
-   * d'avance — et la clé de cache changerait d'une écoute à l'autre.
+   * Rempli une fois par dossier dans `setScript` (voir `ContexteLecture`). Le faire au fil
+   * de la lecture rendrait le résultat dépendant de l'ordre des appels — le préchargement
+   * synthétise trois segments d'avance — et la clé de cache changerait d'une écoute à
+   * l'autre.
    */
-  private glossaryFirstMentions: Map<number, Set<string>> = new Map();
-
-  /**
-   * Segment id → annonce orale du locuteur (« L'Œil qui Voit : »), à insérer dans le texte
-   * PRONONCÉ du premier segment de chaque prise de parole. Deux voix différentes ne disent
-   * pas qui elles sont : à l'écran le badge du locuteur suffit, à l'oreille il n'existe pas.
-   *
-   * Rempli une fois par dossier dans `setScript`, même raison que pour
-   * `glossaryFirstMentions` : le préchargement synthétise trois segments d'avance et
-   * appelle `speechTextFor` hors du flux de lecture — une annonce calculée à la volée y
-   * serait fondée sur un locuteur périmé et rendrait la clé de cache instable.
-   */
-  private annoncesLocuteur: Map<number, string> = new Map();
+  private contexteLecture: ContexteLecture = { annonces: new Map(), premieresMentions: new Map() };
+  /** Qui joue quel personnage (Rémy ou Vivienne transformés) : voir `distribuerPersonnes`. */
+  private distributionPersonnes: Distribution = new Map();
 
   private cues: SpokenCue[] = [];
   private currentWordIndex: number = -1;
@@ -193,6 +183,11 @@ class SpeechEngine {
   private onStatusChangeCb: StatusCallback | null = null;
 
   constructor() {
+    // Les profils AVANT les voix système : `loadSystemVoices` les répartit entre les rôles.
+    // Quand le navigateur a déjà sa liste de voix au chargement (Edge, deuxième visite), il
+    // les lisait encore vides et le singleton plantait à sa construction.
+    this.voiceProfiles = storageService.getVoiceProfiles();
+    this.aiVoiceAssignments = { ...DEFAULT_AI_ROLES_EN };
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       this.synth = window.speechSynthesis;
       this.loadSystemVoices();
@@ -200,8 +195,6 @@ class SpeechEngine {
         this.synth.onvoiceschanged = () => this.loadSystemVoices();
       }
     }
-    this.voiceProfiles = storageService.getVoiceProfiles();
-    this.aiVoiceAssignments = { ...DEFAULT_AI_ROLES_EN };
   }
 
   private loadSystemVoices(): void {
@@ -302,22 +295,10 @@ class SpeechEngine {
 
   public setLanguage(langCode: string): void {
     this.languageCode = langCode;
-    if (langCode === 'en') {
-      this.aiVoiceAssignments = { ...DEFAULT_AI_ROLES_EN };
-    } else if (langCode === 'fr') {
-      this.aiVoiceAssignments = { ...DEFAULT_AI_ROLES_FR };
-    } else {
-      const voices = NEURAL_VOICES_BY_LANG[langCode];
-      if (voices && voices.length > 0) {
-        const defaultVoice = voices[0].id;
-        const assigned: Record<string, string> = {};
-        const roles: CharacterRole[] = ['narrator', 'researcher', 'anomaly', 'classD', 'agent', 'commander', 'intercom'];
-        roles.forEach((r, idx) => {
-          assigned[r] = voices[idx % voices.length].id || defaultVoice;
-        });
-        this.aiVoiceAssignments = assigned as Record<CharacterRole, string>;
-      }
-    }
+    // Sans voix neurale pour la branche, on garde les assignations en place.
+    const assignations = assignationsParDefaut(langCode);
+    if (assignations) this.aiVoiceAssignments = assignations;
+    this.distribuer();
 
     // Le classement des voix du navigateur dépend de la langue : changer de branche doit
     // rebattre les cartes, sinon on lirait du russe avec des voix françaises en repli.
@@ -339,6 +320,20 @@ class SpeechEngine {
 
   public setAiVoiceAssignment(role: CharacterRole, voiceId: string): void {
     this.aiVoiceAssignments[role] = voiceId;
+    // Une voix de base qui change de genre change aussi le vivier de personnes du rôle.
+    this.distribuer();
+  }
+
+  /**
+   * Répartit les personnes (`timbres.ts`) entre les personnages du dossier. À refaire dès que
+   * le dossier, la langue ou une voix de base change : la personne dépend des trois.
+   */
+  private distribuer(): void {
+    this.distributionPersonnes = distribuerPersonnes(
+      this.segments,
+      this.languageCode,
+      segment => this.resolveVoiceParams(segment).voice
+    );
   }
 
   public getVoiceProfiles(): Record<CharacterRole, VoiceProfile> {
@@ -353,8 +348,8 @@ class SpeechEngine {
   public setScript(segments: SpeechSegment[], title: string = 'SCP Dossier'): void {
     this.stop();
     this.segments = segments;
-    this.buildGlossaryFirstMentions();
-    this.buildAnnoncesLocuteur();
+    this.contexteLecture = preparerContexte(segments, this.languageCode);
+    this.distribuer();
     this.currentIndex = 0;
     this.lastSpeaker = '';
     this.updateMediaSession(title);
@@ -363,53 +358,6 @@ class SpeechEngine {
     // High Reactivity: Immediately prefetch first 3 segments so play starts in 0ms!
     if (this.engineMode === 'neural') {
       this.prefetchUpcoming(0, 3);
-    }
-  }
-
-  /**
-   * Précalcule, par segment, l'annonce orale d'un changement de locuteur.
-   *
-   * Le premier segment de chaque prise de parole d'un personnage reçoit « Nom : » — les
-   * suivants du même locuteur non. Narrateur et intercom sont exclus : l'Archiviste se
-   * présente assez, et annoncer chaque paragraphe « Archiviste : » noierait le dossier.
-   * Les segments structurels (en-têtes, bornes de journal, notes) aussi : ils ont leur
-   * propre traitement ou leur badge.
-   */
-  private buildAnnoncesLocuteur(): void {
-    this.annoncesLocuteur = new Map();
-    let dernierLocuteur = '';
-    for (const segment of this.segments) {
-      if (segment.isHeader || segment.isLogMarker || segment.isFootnote) continue;
-      if (segment.role === 'narrator' || segment.role === 'intercom') continue;
-      if (!segment.speaker) continue;
-      if (segment.speaker !== dernierLocuteur) {
-        const deuxPoints = this.languageCode === 'en' ? ':' : ' :';
-        this.annoncesLocuteur.set(segment.id, `${segment.speaker}${deuxPoints}`);
-        dernierLocuteur = segment.speaker;
-      }
-    }
-  }
-
-  /**
-   * Repère, pour chaque sigle du glossaire, le segment où il apparaît en premier.
-   *
-   * Parcours dans l'ordre de lecture : le premier segment qui contient le sigle le
-   * développera, tous les autres le laisseront abrégé.
-   */
-  private buildGlossaryFirstMentions(): void {
-    this.glossaryFirstMentions = new Map();
-    const glossaire = glossaryFor(this.languageCode);
-    const restants = new Set(Object.keys(glossaire));
-
-    for (const segment of this.segments) {
-      if (restants.size === 0) break;
-      for (const sigle of restants) {
-        if (!acronymPattern(sigle).test(segment.text)) continue;
-        const deja = this.glossaryFirstMentions.get(segment.id);
-        if (deja) deja.add(sigle);
-        else this.glossaryFirstMentions.set(segment.id, new Set([sigle]));
-        restants.delete(sigle);
-      }
     }
   }
 
@@ -523,6 +471,9 @@ class SpeechEngine {
 
   public play(): void {
     if (this.segments.length === 0) return;
+    // Dans le geste de l'utilisateur, avant tout `await` : c'est ce qui autorise ensuite
+    // l'élément à jouer seul, écran éteint (voir `lecteur`).
+    this.deverrouillerLecteur();
 
     // Reprise pendant le silence de transition : le segment courant est celui qui vient de
     // se terminer, le reprendre le rejouerait en entier. On repart sur le suivant.
@@ -571,26 +522,6 @@ class SpeechEngine {
   }
 
   /**
-   * Combien de silence avant `next` ?
-   *
-   * On regarde les deux segments : le titre qu'on quitte compte autant que celui qu'on
-   * aborde, sinon une section s'ouvrirait sans respiration après son propre intitulé.
-   */
-  private pauseBefore(prev: SpeechSegment | null, next: SpeechSegment): number {
-    const P = SpeechEngine.PAUSES;
-    // « (Pause) », « (soupir) », « (rit) » : l'auteur demande explicitement du temps. On
-    // l'ajoute à la transition plutôt que de le remplacer, sinon un « (Pause) » entre deux
-    // interlocuteurs raccourcirait le silence au lieu de l'allonger.
-    const didascalie = stageEffectFor(next.stageDirections).pause ?? 0;
-    if (!prev) return didascalie;
-    if (prev.isLogMarker || next.isLogMarker) return P.journal + didascalie;
-    if (prev.isHeader || next.isHeader) return P.titre + didascalie;
-    if (next.isFootnote || prev.isFootnote) return P.note + didascalie;
-    if (prev.speaker !== next.speaker) return P.locuteur + didascalie;
-    return P.suite + didascalie;
-  }
-
-  /**
    * Annule une transition en attente. À appeler partout où la lecture change de cap.
    *
    * Le silence entre deux parties d'un même segment (autour d'un bip) est annulé avec, pour
@@ -628,9 +559,36 @@ class SpeechEngine {
       return;
     }
 
-    const delay = this.pauseBefore(this.segments[finishedIndex] ?? null, this.segments[nextIndex]);
+    const delay = pauseAvant(this.segments[finishedIndex] ?? null, this.segments[nextIndex]);
     this.clearTransition();
     this.pendingNextIndex = nextIndex;
+
+    if (this.engineMode === 'neural') {
+      // Le silence est JOUÉ par l'élément, pas attendu par une minuterie : en arrière-plan,
+      // une minuterie est ralentie, et un élément qui se tait laisse le téléphone suspendre
+      // la page. Si le segment suivant n'est pas encore prêt (réseau lent), on prolonge le
+      // silence par tranches plutôt que de laisser l'élément muet.
+      const suivant = this.segments[nextIndex];
+      let pret = !this.isSpeakable(suivant);
+      if (!pret) {
+        this.fetchAudio(suivant, false).then(
+          () => (pret = true),
+          () => (pret = true)
+        );
+      }
+      const enchainer = (): void => {
+        if (token !== this.playToken || !this.isPlaying || this.isPaused) return;
+        if (!pret) {
+          this.jouerSilence(250, token, enchainer);
+          return;
+        }
+        this.pendingNextIndex = null;
+        this.playSegment(nextIndex);
+      };
+      this.jouerSilence(delay, token, enchainer);
+      return;
+    }
+
     this.transitionTimer = setTimeout(() => {
       this.transitionTimer = null;
       this.pendingNextIndex = null;
@@ -646,14 +604,88 @@ class SpeechEngine {
     this.clearTransition(true);
     this.stopWordTracking();
     sfx.duckAmbience(false);
-    if (this.engineMode === 'neural' && this.currentAudio) {
-      this.currentAudio.pause();
+    if (this.engineMode === 'neural') {
+      // L'élément, qu'il joue une réplique ou le silence qui la suit.
+      this.lecteur?.pause();
     } else if (this.synth) {
       this.synth.pause();
     }
     this.isPaused = true;
     this.isPlaying = false;
     this.emitStatus();
+  }
+
+  /** L'élément <audio> unique de la lecture (voir `lecteur`). */
+  private element(): HTMLAudioElement {
+    if (!this.lecteur) {
+      this.lecteur = new Audio();
+      this.lecteur.preload = 'auto';
+    }
+    return this.lecteur;
+  }
+
+  /** Un silence WAV de `ms` millisecondes (arrondi à 50 ms, 50 au moins), mis en cache. */
+  private urlSilence(ms: number): string {
+    const cle = Math.max(50, Math.round(ms / 50) * 50);
+    let url = this.silences.get(cle);
+    if (!url) {
+      const frequence = 24000;
+      const wav = encoderWav(new Float32Array(Math.round((cle / 1000) * frequence)), frequence);
+      url = URL.createObjectURL(new Blob([wav as BlobPart], { type: 'audio/wav' }));
+      this.silences.set(cle, url);
+    }
+    return url;
+  }
+
+  /**
+   * Fait jouer l'élément une première fois DANS le geste de l'utilisateur. Sans ça, iOS
+   * refuse ensuite de lancer la lecture d'un segment dont la synthèse a pris une seconde :
+   * le geste est « consommé » par l'attente. Un élément qui a joué une fois reste autorisé.
+   */
+  private deverrouillerLecteur(): void {
+    if (this.engineMode !== 'neural') return;
+    const el = this.element();
+    // Une seule fois : ensuite l'élément a toujours une source — la réplique en pause, qu'une
+    // reprise doit retrouver, ou le dernier silence.
+    if (el.src) return;
+    el.onended = null;
+    el.onerror = null;
+    el.onplay = null;
+    el.ontimeupdate = null;
+    el.onloadedmetadata = null;
+    el.src = this.urlSilence(50);
+    el.play().catch(() => {});
+  }
+
+  /**
+   * Joue `ms` de silence sur l'élément, puis `ensuite`. Si le navigateur refuse (lecture
+   * automatique bloquée), une minuterie prend le relais — la lecture au premier plan ne
+   * dépend pas de cette astuce.
+   */
+  private jouerSilence(ms: number, token: number, ensuite: () => void): void {
+    const el = this.element();
+    this.currentAudio = null;
+    el.onplay = null;
+    el.ontimeupdate = null;
+    el.onloadedmetadata = null;
+    let fait = false;
+    const suite = (): void => {
+      if (fait || token !== this.playToken) return;
+      fait = true;
+      ensuite();
+    };
+    el.onended = suite;
+    el.onerror = suite;
+    el.src = this.urlSilence(ms);
+    el.defaultPlaybackRate = 1;
+    el.playbackRate = 1;
+    el.play().catch(() => {
+      if (token !== this.playToken || fait) return;
+      this.transitionTimer = setTimeout(() => {
+        this.transitionTimer = null;
+        suite();
+      }, ms);
+    });
   }
 
   public stop(): void {
@@ -667,6 +699,8 @@ class SpeechEngine {
       this.currentAudio.currentTime = 0;
       this.currentAudio = null;
     }
+    // Un silence de transition en cours se tait aussi.
+    this.lecteur?.pause();
     if (this.synth) {
       this.synth.cancel();
       this.currentUtterance = null;
@@ -688,6 +722,7 @@ class SpeechEngine {
       this.currentAudio.pause();
       this.currentAudio = null;
     }
+    this.lecteur?.pause();
     if (this.synth) {
       this.synth.cancel();
     }
@@ -719,182 +754,22 @@ class SpeechEngine {
     }
   }
 
-  // Generate a unique cache key for a segment configuration
   /**
-   * Resolve the voice, pitch and rate baked into the *generated* audio for a segment.
-   *
-   * IMPORTANT: `globalSpeed` is deliberately NOT part of this. Playback speed is applied
-   * at play time via `HTMLAudioElement.playbackRate`, which is instant and needs no
-   * refetch. Baking it in here too would (a) apply the speed twice and (b) make the
-   * blob cache key disagree with the URL, so a cached clip would keep playing at the
-   * old speed forever.
+   * La prosodie inscrite dans l'audio d'un segment — voir `parametresVoix`, qui décide du son
+   * d'un dossier hors du moteur (`preparationLecture.ts`).
    */
-  /**
-   * Un pourcentage au format attendu par edge-tts (« +10% », « -8% »).
-   */
-  private static toPercent(ratio: number): string {
-    const pct = Math.round((ratio - 1) * 100);
-    return pct >= 0 ? `+${pct}%` : `${pct}%`;
+  private resolveVoiceParams(segment: SpeechSegment): ParametresVoix {
+    return parametresVoix(segment, this.languageCode, this.aiVoiceAssignments, this.voiceProfiles);
   }
 
-  /**
-   * Le wiki écrit ses avertissements en capitales.
-   *
-   * `softenUppercaseRun` les remet en casse de phrase avant la synthèse — nécessaire, sinon
-   * le repli navigateur épelle — mais ce faisant il efface l'intention. Le cri redevient une
-   * phrase ordinaire. On la récupère ici, où elle s'exprime en volume et en débit plutôt
-   * qu'en typographie. La détection se fait sur `segment.text`, l'original, pas sur le texte
-   * normalisé qui n'a justement plus de capitales.
-   */
-  private static isShouted(segment: SpeechSegment): boolean {
-    const lettres = segment.text.replace(/[^\p{L}]/gu, '');
-    if (lettres.length < 12) return false;
-    const capitales = segment.text.replace(/[^\p{Lu}]/gu, '');
-    return capitales.length / lettres.length >= 0.9;
-  }
-
-  private resolveVoiceParams(segment: SpeechSegment): {
-    voice: string;
-    pitch: string;
-    rate: string;
-    volume: string;
-  } {
-    const profile = this.voiceProfiles[segment.role] || this.voiceProfiles.narrator;
-
-    const voice =
-      segment.voiceSignature?.voiceId ||
-      this.aiVoiceAssignments[segment.role] ||
-      (this.languageCode === 'en' ? 'en-US-AndrewMultilingualNeural' : 'fr-FR-RemyMultilingualNeural');
-
-    let pitch = segment.voiceSignature?.pitch;
-    if (!pitch) {
-      pitch = '+0Hz';
-      if (segment.role === 'anomaly') {
-        pitch = '-18Hz'; // deep, unsettling unnatural timbre
-      } else if (segment.role === 'classD') {
-        pitch = '+10Hz'; // stressed, agitated
-      } else if (segment.role === 'agent') {
-        pitch = '-5Hz'; // disciplined tactical
-      } else if (profile.pitch < 0.9) {
-        pitch = '-15Hz';
-      } else if (profile.pitch > 1.1) {
-        pitch = '+15Hz';
-      }
-    }
-
-    let rate = segment.voiceSignature?.rate;
-    if (!rate) {
-      rate = '+0%';
-      let calculatedRate = profile.rate;
-      if (segment.role === 'classD') calculatedRate *= 1.08; // slightly hurried
-      else if (segment.role === 'anomaly') calculatedRate *= 0.92; // ominous lingering delivery
-
-      // Un titre de section lu au débit du corps ne s'entend pas comme un titre. Avec la
-      // pause qui l'entoure (PAUSES.titre), c'est ce qui rend la structure du dossier
-      // audible — jusqu'ici `isHeader` n'était consommé nulle part dans le moteur.
-      if (segment.isHeader) calculatedRate *= 0.92;
-      else if (SpeechEngine.isShouted(segment)) calculatedRate *= 0.95;
-
-      if (calculatedRate !== 1.0) {
-        rate = SpeechEngine.toPercent(calculatedRate);
-      }
-    }
-
-    // Didascalies : « (lentement) », « (murmure) », « (crie) ». Appliquées PAR-DESSUS le
-    // débit du rôle, y compris quand le personnage a sa propre signature vocale — une
-    // indication de jeu vaut pour ce passage-là, pas pour le personnage en général.
-    const didascalie = stageEffectFor(segment.stageDirections);
-    if (didascalie.rate) {
-      const actuel = parseInt(rate, 10);
-      rate = SpeechEngine.toPercent((1 + (isNaN(actuel) ? 0 : actuel) / 100) * didascalie.rate);
-    }
-
-    // edge-tts accepte --volume, que le middleware ne transmettait pas : un levier de
-    // prosodie disponible et inutilisé. Il sert ici au seul cas mesurable, l'avertissement
-    // en capitales, dont l'insistance disparaissait à la normalisation.
-    const volume = didascalie.volume ?? (SpeechEngine.isShouted(segment) ? '+12%' : '+0%');
-
-    return { voice, pitch, rate, volume };
-  }
-
-  /**
-   * Le texte réellement prononcé. Distinct de `segment.text`, qui reste ce qui est AFFICHÉ :
-   * les crochets, les capitales de style et les marqueurs « (s) » se lisent mal à voix haute.
-   */
+  /** Le texte réellement prononcé — voir `texteDit`. */
   private speechTextFor(segment: SpeechSegment): string {
-    const normalized = normalizeForSpeech(segment.text, this.languageCode, {
-      expandAcronyms: this.glossaryFirstMentions.get(segment.id)
-    });
-    // La normalisation peut réduire un segment à de la ponctuation (« ... » → « … »,
-    // « — » → « , »). edge-tts refuse ce genre d'entrée avec NoAudioReceived, donc on
-    // revient au texte d'origine dès qu'il ne reste plus rien de prononçable.
-    const spoken = hasSpeakableContent(normalized) ? normalized : segment.text;
-
-    // Une note de bas de page est annoncée à voix haute. Sans ça, elle s'enchaîne au
-    // paragraphe précédent et on ne distingue plus l'annotation du corps du dossier —
-    // à l'écran le badge du locuteur suffit, à l'oreille il n'existe pas.
-    if (segment.isFootnote) {
-      const prefix = this.languageCode === 'en' ? 'Note:' : 'Note :';
-      // Ne pas doubler l'annonce si le texte de la note commence déjà par « Note ».
-      if (!/^\s*(?:note|footnote)\b/i.test(spoken)) {
-        return `${prefix} ${spoken}`;
-      }
-    }
-
-    // Annonce du locuteur au changement de prise de parole — précalculée dans setScript,
-    // jamais ici : le préchargement appelle cette fonction avec un contexte périmé.
-    const annonce = this.annoncesLocuteur.get(segment.id);
-    if (annonce && !spoken.startsWith(annonce)) {
-      return `${annonce} ${spoken}`;
-    }
-
-    return spoken;
+    return texteDit(segment, this.languageCode, this.contexteLecture);
   }
 
   /** Y a-t-il quelque chose à prononcer ? Un segment sans lettre ni chiffre n'a pas d'audio. */
   private isSpeakable(segment: SpeechSegment): boolean {
     return hasSpeakableContent(this.speechTextFor(segment));
-  }
-
-  /**
-   * Repère les caviardages dans l'audio à partir des frontières de mots.
-   *
-   * `normalizeForSpeech` a déjà remplacé « ██ » par une formule fixe (« donnée expurgée ») ;
-   * il suffit donc de retrouver cette suite de mots dans les frontières. Le balayage est
-   * séquentiel, et les caviardages consécutifs sont fusionnés : « ██ ██ ██ » ne doit donner
-   * qu'un seul bip, trois à la suite sonneraient comme un défaut.
-   */
-  private censorSpansFrom(boundaries: WordBoundary[]): CensorSpan[] {
-    const simplifier = (mot: string) =>
-      mot
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[^\p{L}\p{N}]/gu, '');
-
-    const attendus = censoredSpokenWord(this.languageCode).split(/\s+/).map(simplifier);
-    const spans: CensorSpan[] = [];
-
-    for (let i = 0; i < boundaries.length; i++) {
-      let k = 0;
-      while (
-        k < attendus.length &&
-        i + k < boundaries.length &&
-        simplifier(boundaries[i + k].text) === attendus[k]
-      ) {
-        k++;
-      }
-      if (k !== attendus.length) continue;
-
-      const debut = boundaries[i].offset;
-      const fin = boundaries[i + k - 1].offset + boundaries[i + k - 1].duration;
-      const precedent = spans[spans.length - 1];
-      // Fusion des caviardages qui se suivent de près.
-      if (precedent && debut - precedent.end < 0.35) precedent.end = fin;
-      else spans.push({ start: debut, end: fin });
-      i += k - 1;
-    }
-
-    return spans;
   }
 
   /**
@@ -934,8 +809,110 @@ class SpeechEngine {
   }
 
   private getCacheKey(segment: SpeechSegment, text: string = this.speechTextFor(segment)): string {
+    return `${this.cleBrute(segment, text)}${this.cleMontage(segment)}`;
+  }
+
+  /** La clé de l'audio tel que le service le rend : voix, prosodie et texte. */
+  private cleBrute(segment: SpeechSegment, text: string): string {
     const { voice, pitch, rate, volume } = this.resolveVoiceParams(segment);
     return `${voice}_${pitch}_${rate}_${volume}_${text}`;
+  }
+
+  /**
+   * Ce que la lecture ajoute à l'audio brut : la personne jouée (deux personnages qui disent
+   * la même phrase avec la même voix de base ne partagent pas leur audio transformé) et la
+   * voix qui annonce le locuteur.
+   */
+  private cleMontage(segment: SpeechSegment): string {
+    const { voice } = this.resolveVoiceParams(segment);
+    const personne = personneDe(segment, this.languageCode, voice, this.distributionPersonnes);
+    const annonce = this.contexteLecture.annonces.has(segment.id) ? `|annonce:${this.resolveVoiceParams(this.voixOffDe(segment)).voice}` : '';
+    return `${personne ? `|${personne.id}:${personne.demiTons}:${personne.formants}` : ''}${annonce}`;
+  }
+
+  /**
+   * Le segment tel que l'Archiviste le dirait : même texte, voix et prosodie du narrateur.
+   * C'est lui qui annonce le locuteur (voir `composerAnnonce`).
+   */
+  private voixOffDe(segment: SpeechSegment): SpeechSegment {
+    return { id: segment.id, speaker: 'Archiviste', role: 'narrator', text: segment.text, rawText: segment.rawText };
+  }
+
+  /**
+   * L'audio tel que le service le rend, depuis le cache persistant ou par synthèse. Le cache
+   * vient avant toute synthèse : un segment déjà entendu, même lors d'une session précédente,
+   * ne repart pas sur le réseau. On y garde l'audio brut ; ce que la lecture y ajoute (la
+   * personne, l'annonce) se refait en quelques dizaines de millisecondes.
+   */
+  private async octetsBruts(segment: SpeechSegment, text: string): Promise<{ octets: ArrayBuffer; boundaries: WordBoundary[] }> {
+    const cle = this.cleBrute(segment, text);
+    const stocke = await audioCache.get(cle);
+    if (stocke) return { octets: stocke.audio, boundaries: stocke.boundaries };
+
+    const { bytes, boundaries } = canSynthesizeDirectly()
+      ? await this.synthesizeDirect(segment, text)
+      : await this.synthesizeViaEndpoint(segment, text);
+    const octets = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+    // Écriture au mieux : une base pleine ou indisponible ne doit pas gêner la lecture.
+    void audioCache.put(cle, octets.slice(0), boundaries);
+    return { octets, boundaries };
+  }
+
+  /** Décode un MP3 du service en échantillons, à 24 kHz — sa fréquence d'origine. */
+  private async decoder(octets: ArrayBuffer): Promise<{ signal: Float32Array; frequence: number }> {
+    const contexte = new OfflineAudioContext(1, 1, 24000);
+    const decode = await contexte.decodeAudioData(octets.slice(0));
+    return { signal: decode.getChannelData(0), frequence: decode.sampleRate };
+  }
+
+  /**
+   * Prépare ce qu'on lira : la personne que joue le segment (`timbres.ts`), et, en tête de
+   * prise de parole, l'annonce du locuteur par l'Archiviste suivie d'un silence
+   * (`composerAnnonce`). Tout échec rend l'audio d'origine — mieux vaut la voix de base et
+   * l'annonce collée que le silence.
+   */
+  private async preparerAudio(segment: SpeechSegment, text: string, brut: { octets: ArrayBuffer; boundaries: WordBoundary[] }): Promise<CachedAudio> {
+    const original = (): CachedAudio => ({
+      url: URL.createObjectURL(new Blob([brut.octets], { type: 'audio/mpeg' })),
+      boundaries: brut.boundaries
+    });
+    const { voice } = this.resolveVoiceParams(segment);
+    const personne = personneDe(segment, this.languageCode, voice, this.distributionPersonnes);
+    const annonce = this.contexteLecture.annonces.get(segment.id);
+    if (!personne && !annonce) return original();
+
+    try {
+      const { signal, frequence } = await this.decoder(brut.octets);
+      let replique = signal;
+      if (personne) replique = transformerTimbre(await chargerMoteurTimbre(), signal, frequence, personne);
+
+      let sortie = replique;
+      let boundaries = brut.boundaries;
+      if (annonce && brut.boundaries.length) {
+        const voixOff = await this.octetsBruts(this.voixOffDe(segment), text);
+        const decodeVoixOff = await this.decoder(voixOff.octets);
+        const monte = composerAnnonce({
+          voixOff: decodeVoixOff.signal,
+          frontieresVoixOff: voixOff.boundaries,
+          replique,
+          frontieresReplique: brut.boundaries,
+          annonce,
+          frequence
+        });
+        if (monte) {
+          sortie = monte.signal;
+          boundaries = monte.frontieres;
+        }
+      }
+      if (sortie === signal) return original();
+      return {
+        url: URL.createObjectURL(new Blob([encoderWav(sortie, frequence) as BlobPart], { type: 'audio/wav' })),
+        boundaries
+      };
+    } catch (err) {
+      console.warn('[speechEngine] Montage de la voix non appliqué, audio d’origine conservé :', err);
+      return original();
+    }
   }
 
   // Construct query URL for TTS backend
@@ -976,30 +953,10 @@ class SpeechEngine {
 
     const fetchPromise = (async () => {
       try {
-        // Le cache persistant vient avant toute synthèse : un segment déjà entendu, même
-        // lors d'une session précédente, ne repart pas sur le réseau.
-        const stocke = await audioCache.get(key);
-        if (stocke) {
-          const entry: CachedAudio = {
-            url: URL.createObjectURL(new Blob([stocke.audio], { type: 'audio/mpeg' })),
-            boundaries: stocke.boundaries
-          };
-          this.rememberBlob(key, entry);
-          return entry;
-        }
-
-        const { bytes, boundaries } = canSynthesizeDirectly()
-          ? await this.synthesizeDirect(segment, text)
-          : await this.synthesizeViaEndpoint(segment, text);
-
+        const brut = await this.octetsBruts(segment, text);
         this.neuralFailureStreak = 0;
-        const entry: CachedAudio = {
-          url: URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'audio/mpeg' })),
-          boundaries
-        };
+        const entry = await this.preparerAudio(segment, text, brut);
         this.rememberBlob(key, entry);
-        // Écriture au mieux : une base pleine ou indisponible ne doit pas gêner la lecture.
-        void audioCache.put(key, bytes.buffer.slice(0) as ArrayBuffer, boundaries);
         return entry;
       } catch (err) {
         if (countFailure) this.neuralFailureStreak++;
@@ -1193,13 +1150,18 @@ class SpeechEngine {
 
         // Caviardages et repères de suivi sont calculés une fois par segment, avant
         // lecture : les frontières de mots servent aux deux.
-        this.censorSpans = boundaries.length ? this.censorSpansFrom(boundaries) : [];
+        this.censorSpans = boundaries.length ? plagesCensure(boundaries, this.languageCode) : [];
         this.cues = boundaries.length ? buildCues(boundaries, segment.text) : [];
         this.currentWordIndex = -1;
 
-        const audio = new Audio(audioSrc);
+        // Toujours le même élément (voir `lecteur`) : changer sa source, c'est ce qui reste
+        // permis écran éteint. Le chargement remet la vitesse à `defaultPlaybackRate`, d'où
+        // les deux réglages APRÈS la source.
+        const audio = this.element();
+        audio.src = audioSrc;
         // Playback speed lives here and only here — it is never baked into the
         // generated audio (see resolveVoiceParams).
+        audio.defaultPlaybackRate = this.globalSpeed;
         audio.playbackRate = this.globalSpeed;
         audio.volume = this.isMuted ? 0 : this.volume;
         this.currentAudio = audio;
@@ -1232,6 +1194,7 @@ class SpeechEngine {
           // L'ambiance recule sous la voix et revient dans les silences de transition.
           sfx.duckAmbience(true);
           this.emitStatus();
+          this.majSessionMedia(segment);
           if (this.onSegmentStartCb) {
             this.onSegmentStartCb(index, segment);
           }
@@ -1321,22 +1284,45 @@ class SpeechEngine {
   }
 
   private updateMediaSession(title: string): void {
+    this.titreDossier = title;
     if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
+    this.majSessionMedia();
 
+    // Les commandes de l'écran de verrouillage et du casque : lecture, pause, réplique
+    // précédente ou suivante, arrêt. Un navigateur qui ne connaît pas une action la refuse
+    // en levant une exception — elle ne doit pas empêcher d'installer les autres.
+    const actions: [MediaSessionAction, () => void][] = [
+      ['play', () => this.play()],
+      ['pause', () => this.pause()],
+      ['previoustrack', () => this.previous()],
+      ['nexttrack', () => this.next()],
+      ['stop', () => this.stop()]
+    ];
+    for (const [action, gestionnaire] of actions) {
+      try {
+        navigator.mediaSession.setActionHandler(action, gestionnaire);
+      } catch {
+        /* action inconnue de ce navigateur */
+      }
+    }
+  }
+
+  /**
+   * Ce que montre l'écran de verrouillage : le dossier, qui parle, l'icône de l'application.
+   * Des images matricielles : Android et iOS ignorent une icône SVG, et la notification
+   * restait sans image.
+   */
+  private majSessionMedia(segment?: SpeechSegment): void {
+    if (typeof navigator === 'undefined' || !('mediaSession' in navigator) || typeof MediaMetadata === 'undefined') return;
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: title,
-      artist: 'Fondation SCP - Archive Audio Roleplay',
-      album: 'Dossiers Classifiés',
+      title: this.titreDossier,
+      artist: segment ? nomDuLocuteur(segment.speaker) : NOM_SITE,
+      album: NOM_SITE,
       artwork: [
-        { src: '/favicon.svg', sizes: '96x96', type: 'image/svg+xml' },
-        { src: '/favicon.svg', sizes: '256x256', type: 'image/svg+xml' }
+        { src: '/icones/icone-192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/icones/icone-512.png', sizes: '512x512', type: 'image/png' }
       ]
     });
-
-    navigator.mediaSession.setActionHandler('play', () => this.play());
-    navigator.mediaSession.setActionHandler('pause', () => this.pause());
-    navigator.mediaSession.setActionHandler('previoustrack', () => this.previous());
-    navigator.mediaSession.setActionHandler('nexttrack', () => this.next());
   }
 
   private emitStatus(options?: { throttle?: boolean }): void {
@@ -1351,12 +1337,17 @@ class SpeechEngine {
     }
 
     const currentSegment = this.segments[this.currentIndex];
+    // L'écran de verrouillage montre lecture ou pause selon ce que dit la page, pas selon
+    // l'élément : pendant un silence de transition, la lecture continue.
+    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = this.isPlaying ? 'playing' : this.isPaused ? 'paused' : 'none';
+    }
     this.onStatusChangeCb({
       isPlaying: this.isPlaying,
       isPaused: this.isPaused,
       currentSegmentIndex: this.currentIndex,
       totalSegments: this.segments.length,
-      currentSpeaker: currentSegment ? currentSegment.speaker : t('roles.narrateur'),
+      currentSpeaker: currentSegment ? nomDuLocuteur(currentSegment.speaker) : t('roles.narrateur'),
       currentRole: currentSegment ? currentSegment.role : 'narrator',
       globalSpeed: this.globalSpeed,
       currentTime: this.currentTime,

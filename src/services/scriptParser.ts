@@ -1,6 +1,7 @@
 import { CharacterRole, SpeechSegment } from '../types/audioRoleplay';
 import { characterVoiceService, CharacterGender, AssignedVoiceSignature, resolveInitialSignatories } from './characterVoiceService';
 import { extractWikiLinks, anchorLinksToTexts } from './linkExtractor';
+import { STAGE_DIRECTIONS } from './speechLexicon';
 
 /**
  * Motifs de rôle, essayés dans l'ordre : le premier qui correspond l'emporte.
@@ -305,6 +306,154 @@ export function extractStageDirections(text: string): { cleanedText: string; dir
   }).replace(/\s{2,}/g, ' ').trim();
 
   return { cleanedText, directions };
+}
+
+/** Une didascalie réduite à ses lettres et chiffres : la source et le texte rendu diffèrent par les apostrophes et les points de suspension. */
+const simplifierDidascalie = (texte: string) =>
+  texte.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\p{L}\p{N}]/gu, '');
+
+/**
+ * Les parenthèses en italique de la source — « (//L'interrompt, en colère//) »,
+ * « //(Pause)// » : la marque que les auteurs donnent aux didascalies, et que textContent
+ * perd. Gardées sous forme simplifiée (`simplifierDidascalie`).
+ */
+export function extraireDidascaliesItaliques(source: string): Set<string> {
+  const trouvees = new Set<string>();
+  for (const m of source.matchAll(/\(\/\/([^\n]{1,300}?)\/\/\)|\/\/\(([^\n()]{1,300})\)\/\//g)) {
+    const cle = simplifierDidascalie((m[1] ?? m[2]).replace(/\*\*|\/\/|__/g, ''));
+    if (cle) trouvees.add(cle);
+  }
+  return trouvees;
+}
+
+const motsEntiers = (formes: string[]) => new RegExp(`(?<!\\p{L})(?:${formes.join('|')})(?!\\p{L})`, 'iu');
+
+/**
+ * Comment la réplique est dite : ton, souffle, rire, silence, à qui ou d'où l'on parle.
+ * Complète `STAGE_DIRECTIONS` (qui en tire un silence, un volume, un débit).
+ */
+const DIDASCALIE_DE_MANIERE = motsEntiers([
+  'interromp\\w*', 'interrupt\\w*', 'le coupe', 'la coupe', 'col[èe]re', 'furieu\\w*', 'furious\\w*', 'angr\\w*', '[ée]nerv[ée]\\w*', 'agitated',
+  'glouss\\w*', 'rican\\w*', 'rires?', 'rigol\\w*', 'sanglot\\w*', 'sobs?', 'sobbing', 'en pleurs', 'pleur\\w*', 'cries', 'crying', 'weep\\w*',
+  'essouffl[ée]\\w*', 'haletant\\w*', 'hal[èe]te\\w*', 'à bout de souffle', 'out of breath', 'panting',
+  'respir\\w*', 'breath\\w*', 'inspir\\w*', 'expir\\w*', 'renifl\\w*', 'sniff\\w*', 'hic', 'ahem',
+  'b[ée]gai\\w*', 'stutter\\w*', 'marmonn\\w*', 'mumbl\\w*', 'mutter\\w*', 'grogn\\w*', 'growl\\w*', 'g[ée]mi\\w*', 'groan\\w*',
+  'nerveu\\w*', 'nervous\\w*', 'calme\\w*', 'calm\\w*', 'sarcasti\\w*', 'ironi\\w*', 'doucement', 'quietly', 'softly', 'loudly',
+  'enjou[ée]\\w*', 'g[êe]n[ée]\\w*', 'troubl[ée]\\w*', 'surpris\\w*', 'paniqu\\w*', 'panick\\w*', 'abasourdi\\w*', 'choqu[ée]\\w*', 'shocked',
+  'incr[ée]dul\\w*', 'effray[ée]\\w*', 'terrifi\\w*', 'scared', 'voix basse', 'voix rauque', 'inaudible',
+  'en fran[çc]ais', 'in french', 'en anglais', 'in english', 'à la radio', 'over the radio', 'au micro', 'en arrière-plan',
+  'in the background', 'de loin', 'from afar', 'hors[- ]champ', 'off-screen'
+]);
+
+/**
+ * Ce qui se passe pendant la réplique : un geste, un déplacement, un bruit. Filet des
+ * didascalies que la source n'a pas mises en italique. Les formes sont bornées : « sit »
+ * attraperait « Site-19 », « stand » « standard ».
+ */
+const DIDASCALIE_D_ACTION = motsEntiers([
+  'souri(?:t|ent|ant|re)', 'smil\\w*', 'grin\\w*', 'hoche\\w*', 'acquiesce\\w*', 'nods?', 'nodding', 'secoue\\w*', 'shakes',
+  'regarde\\w*', 'looks', 'looking', 'stare[sd]?', 'staring', 'se l[èe]v\\w*', 'stands?', 'standing', 'stood',
+  "s'assi\\w*", "s'asso\\w*", 'sits', 'sitting', 'se penche\\w*', 'leans?', 'leaning', 'hausse les [ée]paules', 'shrugs?',
+  'frissonn\\w*', 'shiver\\w*', 'trembl\\w*', 'd[ée]glut\\w*', 'swallow\\w*', 'se tourn\\w*', 'turns', 'turning', 'gestur\\w*', 'geste',
+  'bruits?', 'sounds?', 'noises?', 'gr[ée]sill\\w*', 'static', 'parasites', 'coups? de (?:feu|pied|poing)', 'tirs?', 'gunfire',
+  'gunshots?', 'shots? fired', 'explosions?', 'alarmes?', 'sir[èe]nes?', 'pas de r[ée]ponse', 'no (?:response|answer)', 'silence'
+]);
+
+/**
+ * Un nom scientifique (« (Cervus elaphus) », « (Canis lupus familiaris) ») : en italique
+ * comme une didascalie, mais c'est du contenu, qu'on lit.
+ */
+function nomLatin(x: string): boolean {
+  const mots = x.split(/\s+/);
+  return (
+    mots.length <= 3 &&
+    /^[A-Z][a-z]+$/.test(mots[0]) &&
+    mots.every(m => /^[A-Za-z]+$/.test(m) && /(?:us|a|um|is|ae|es|ides|oides|ina|idae|inae|eo|ica|aris|ensis|ii|ix|ex|on)$/i.test(m))
+  );
+}
+
+/**
+ * Nature d'une parenthèse de réplique : du contenu, qu'on dit ; une indication de jeu brève,
+ * qu'on ne dit pas ; ou une didascalie qui raconte, que dit l'Archiviste.
+ *
+ * @param avant le texte de la réplique avant la parenthèse, et `apres` celui qui la suit : une
+ *   didascalie ouvre la réplique, suit une ponctuation ou précède une phrase ; une parenthèse
+ *   en plein milieu d'une phrase (« une oie (Anser cygnoides) qui ») est une apposition.
+ */
+function classerParenthese(contenu: string, avant: string, apres: string, italiques?: Set<string>): 'contenu' | 'maniere' | 'raconte' {
+  const x = contenu.trim();
+  const mots = x.split(/\s+/).length;
+  // Du contenu : une référence ou un chiffre (« (1) », « (D-4581) »), une marque de genre
+  // (« (e) »), un sigle ou un champ de formulaire en capitales (« (ASIE) »), une énumération.
+  if (x.length <= 2) return 'contenu';
+  if (/\d/.test(x) && mots <= 2) return 'contenu';
+  if (x === x.toUpperCase() && /\p{Lu}{2}/u.test(x)) return 'contenu';
+  if (/(?<!\p{L})etc\.?(?!\p{L})/iu.test(x)) return 'contenu';
+
+  const debutDePhrase =
+    !avant.trim() || /[.!?…:;\-–—]$/.test(avant.trimEnd()) || !apres.trim() || /^[\p{Lu}.!?…,;:\-–—]/u.test(apres.trimStart());
+  // « à qui l'on parle » : « (Au personnel) », « (À la foule) », « (To the crowd) ».
+  const adresse = /^(?:à|au|aux|to)\s/iu.test(x) && mots <= 5;
+  const maniere = adresse || DIDASCALIE_DE_MANIERE.test(x) || STAGE_DIRECTIONS.some(({ motif }) => motif.test(x));
+  const action = debutDePhrase && DIDASCALIE_D_ACTION.test(x);
+  const italique = debutDePhrase && !!italiques?.has(simplifierDidascalie(x)) && !nomLatin(x);
+  // Une indication de jeu se glisse aussi après une virgule (« Oui, (rire nerveux) bien
+  // sûr ») ; le reste doit être à sa place de didascalie.
+  if (!(maniere && (debutDePhrase || /,$/.test(avant.trimEnd()))) && !action && !italique) return 'contenu';
+
+  const nommeUnSujet = /(?<!\p{L})(?:SCP|D|PdI|POI)-\d/iu.test(x);
+  if (maniere && !action && mots <= 4 && !nommeUnSujet) return 'maniere';
+  return 'raconte';
+}
+
+/** Un morceau de réplique : ce que dit le personnage, ou une didascalie que dit l'Archiviste. */
+export interface PartieReplique {
+  texte: string;
+  narration: boolean;
+}
+
+/**
+ * Sépare, dans une réplique, ce qui est dit de ce qui décrit la scène.
+ *
+ * « SCP-049 : (L'interrompt, en colère) Pas mort ! » — lue par la voix du personnage, la
+ * parenthèse faisait dire à SCP-049 « L'interrompt, en colère » (signalé à l'écoute,
+ * 27/09/2026). Une indication de jeu brève — le ton, le souffle, un rire, un silence, à qui
+ * l'on parle — quitte le texte prononcé : elle s'affiche en italique au-dessus de la réplique
+ * et se traduit en silence, en volume ou en débit (`stageEffectFor`). Une didascalie qui
+ * raconte — un geste, un bruit, un déplacement (« (Parcourt la pièce du regard) », « (Coups
+ * de feu) ») — est dite par l'Archiviste, à sa place, entre les morceaux de la réplique.
+ *
+ * Les parenthèses de contenu restent dans la réplique, comme avant : sans leurs parenthèses
+ * de 2 à 60 caractères, telles quelles au-delà et en deçà (« fichier(s) »).
+ */
+export function separerDidascalies(texte: string, italiques?: Set<string>): { parties: PartieReplique[]; directions: string[] } {
+  const parties: PartieReplique[] = [];
+  const directions: string[] = [];
+  let courant = '';
+  const pousserReplique = () => {
+    const propre = courant.replace(/\s{2,}/g, ' ').replace(/\s+([,.!?…])/g, '$1').trim();
+    if (/[\p{L}\p{N}]/u.test(propre)) parties.push({ texte: propre, narration: false });
+    courant = '';
+  };
+  let dernier = 0;
+  for (const m of texte.matchAll(/\(([^()]{1,300})\)/g)) {
+    const debut = m.index!;
+    courant += texte.slice(dernier, debut);
+    dernier = debut + m[0].length;
+    const nature = classerParenthese(m[1], texte.slice(0, debut), texte.slice(dernier), italiques);
+    if (nature === 'contenu') {
+      courant += m[1].length >= 2 && m[1].length <= 60 ? m[1] : m[0];
+    } else if (nature === 'maniere') {
+      directions.push(m[1].trim());
+    } else {
+      pousserReplique();
+      const contenu = m[1].trim();
+      parties.push({ texte: /[.!?…]$/.test(contenu) ? contenu : `${contenu}.`, narration: true });
+    }
+  }
+  courant += texte.slice(dernier);
+  pousserReplique();
+  return { parties, directions };
 }
 
 /**
@@ -1718,6 +1867,8 @@ interface StructureSource {
   tableaux?: TableauExtrait[];
   onglets?: EvenementOnglet[];
   sessions?: SessionTerminal[];
+  /** Les parenthèses en italique de la source (`extraireDidascaliesItaliques`). */
+  didascaliesItaliques?: Set<string>;
 }
 
 /**
@@ -1755,7 +1906,8 @@ export function parseScpDossier(
     ? {
         tableaux: extraireTableaux(source, lang),
         onglets: extraireOnglets(source, lang),
-        sessions: extraireSessionsTerminal(source, lang)
+        sessions: extraireSessionsTerminal(source, lang),
+        didascaliesItaliques: extraireDidascaliesItaliques(source)
       }
     : {};
   pagesLues.forEach((page, fragmentIndex) => {
@@ -2533,7 +2685,7 @@ export function parseScpScript(
 
       if (!isNotDialogue) {
         const role = detectRole(candidateSpeaker);
-        const { cleanedText, directions } = extractStageDirections(diagContent || candidateSpeaker);
+        const { parties, directions } = separerDidascalies(diagContent || candidateSpeaker, structure?.didascaliesItaliques);
 
         let gender: CharacterGender | undefined;
         let voiceSignature: AssignedVoiceSignature | undefined;
@@ -2543,26 +2695,49 @@ export function parseScpScript(
           gender = voiceSignature.gender;
         }
 
+        // Une réplique faite d'une seule indication de jeu (« SCP-049 : (Silence) ») : rien
+        // à faire dire au personnage, l'Archiviste la lit.
+        if (!parties.length && directions.length) {
+          parties.push({ texte: `${directions.join('. ')}.`, narration: true });
+          directions.length = 0;
+        }
+        // Rien de prononçable (« SCP-049 : … ») : la ligne reste affichée, comme avant.
+        if (!parties.length) parties.push({ texte: diagContent || candidateSpeaker, narration: false });
+
         // Une longue tirade est découpée comme un paragraphe narratif : même respiration,
         // même possibilité de s'y déplacer. Les didascalies restent sur le premier morceau,
-        // là où l'auteur les a écrites.
-        const morceaux = splitIntoBreathChunks(cleanedText || diagContent);
-        morceaux.forEach((morceau, i) => {
-          segments.push({
-            id: segmentId++,
-            speaker: candidateSpeaker,
-            role: role,
-            gender: gender,
-            voiceSignature: voiceSignature ? {
-              voiceId: voiceSignature.voiceId,
-              pitch: voiceSignature.pitch,
-              rate: voiceSignature.rate
-            } : undefined,
-            text: morceau,
-            rawText: i === 0 ? line : morceau,
-            stageDirections: i === 0 ? directions : undefined
-          });
-        });
+        // là où l'auteur les a écrites ; celles qui racontent sont dites par l'Archiviste,
+        // entre les morceaux (`separerDidascalies`).
+        let premier = true;
+        for (const partie of parties) {
+          if (partie.narration) {
+            segments.push({
+              id: segmentId++,
+              speaker: 'Archiviste',
+              role: 'narrator',
+              text: partie.texte,
+              rawText: partie.texte
+            });
+            continue;
+          }
+          for (const morceau of splitIntoBreathChunks(partie.texte)) {
+            segments.push({
+              id: segmentId++,
+              speaker: candidateSpeaker,
+              role: role,
+              gender: gender,
+              voiceSignature: voiceSignature ? {
+                voiceId: voiceSignature.voiceId,
+                pitch: voiceSignature.pitch,
+                rate: voiceSignature.rate
+              } : undefined,
+              text: morceau,
+              rawText: premier ? line : morceau,
+              stageDirections: premier ? directions : undefined
+            });
+            premier = false;
+          }
+        }
         lineCursor++;
         continue;
       }

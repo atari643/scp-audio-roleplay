@@ -12,8 +12,9 @@ import { chargerEntites, dossiersDeLEntite, entiteParId } from '../../services/e
 import { catalogueDe, chargerCatalogue } from '../../services/catalogueDefaut';
 import { parseScpDossier } from '../../services/scriptParser';
 import { WikiLink } from '../../services/linkExtractor';
-import { definirLangue } from '../../i18n';
-import { ecrireEtatPartage, lireEtatPartage } from '../../services/lienPartage';
+import { definirLangue, useT } from '../../i18n';
+import { ecrireEnTete, ecrireEtatPartage, lireEtatPartage } from '../../services/lienPartage';
+import { titreDossier } from '../../services/adresseSite';
 import { speechEngine } from '../../services/speechEngine';
 import { storageService } from '../../services/storageService';
 import {
@@ -36,6 +37,8 @@ import { useIntercomAnnouncements } from '../../components/IntercomAnnouncement'
 let liveInstances = 0;
 
 export function useScpApp() {
+  const t = useT();
+
   useEffect(() => {
     liveInstances++;
     if (import.meta.env.DEV && liveInstances > 1) {
@@ -277,6 +280,21 @@ export function useScpApp() {
   useEffect(() => {
     ecrireEtatPartage(activeSlug, currentLanguage);
   }, [activeSlug, currentLanguage]);
+
+  // Le titre de l'onglet et le lien canonique suivent le même état. Le titre de
+  // l'accueil est lu ici, dans le rendu, pour que l'effet se rejoue quand le
+  // dictionnaire de la branche arrive — il arrive après le changement de langue.
+  const titreAccueil = t('site.titre');
+  useEffect(() => {
+    const nom = activeScpDetail
+      ? titreDossier(
+          activeScpDetail.scpNumber || activeScpDetail.slug.toUpperCase(),
+          activeScpDetail.title,
+          activeScpDetail.alternateTitle
+        )
+      : null;
+    ecrireEnTete(nom, activeSlug, currentLanguage.code, titreAccueil);
+  }, [activeScpDetail, activeSlug, currentLanguage, titreAccueil]);
 
   // Le catalogue de démarrage suit la branche. Il ne suivait rien : une liste figée,
   // bâtie sur la branche française, servait d'accueil à tout le monde — un lecteur
