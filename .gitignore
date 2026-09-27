@@ -45,3 +45,7 @@ bascule/
 
 # Réglages locaux de l'agent (permissions propres à la machine)
 .claude/settings.local.json
+# Outillage local de l'assistant (graft) : chemins propres à une machine, rien d'utile au dépôt.
+.claude/helpers/
+.claude/skills/
+.claude/settings.json
