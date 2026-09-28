@@ -88,6 +88,14 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
 
 ### Corrigé
 
+- **SCP-5618 se lit comme il est écrit.** Ses annotations sont des notes « en ligne » (un
+  point survolable accolé à la phrase), aplaties par le wiki en « …terminated.. Seems harsh.
+  [SZ]|. Can't afford… [AF] » : l'Archiviste les lisait au milieu du paragraphe, initiales
+  comprises. Elles deviennent des notes, dites à leur place par leurs auteurs, Alice Forth et
+  Stephen Zorić. Sa seconde page lisait aussi l'avis « This is a fragment page » et le code
+  jQuery de la fenêtre de crédits de l'auteur : ils ne sont plus lus, sur aucun dossier.
+- **Les champs d'une fiche de personnel ne sont plus des personnages.** « Full Name »,
+  « Height », « Date de naissance »… recevaient chacun une voix et une annonce.
 - **Plus d'erreur JavaScript à chaque chargement sur Vercel.** Tant que la mesure
   d'audience n'est pas activée dans le tableau de bord, son script
   (`/_vercel/insights/script.js`) tombait sur la réécriture vers `index.html` : le

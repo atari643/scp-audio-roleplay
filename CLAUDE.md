@@ -348,6 +348,14 @@ règles existantes. Les cas couverts :
   le digicode (clé relue dans le script du bloc) et ignore boutons et scripts.
 - `[[include component:preview]]` est en `display: none` mais présent dans
   textContent : retiré (`retirerApercuCache`).
+- Notes « en ligne » (SCP-5618 : `[[span class="fnnum"]].[[/span]][[span class="fncon"]]
+  //note// [AF][[/span]]`, aplaties en « …phrase.. note [AF]|. note [SZ] ») : rangées parmi
+  les notes après le balayage des marqueurs (`extraireNotesEnLigne`), jamais avant — numérotées
+  à la suite, elles lui feraient chercher des chiffres nus.
+- Restes de composants dans textContent, surtout dans les fragments qui n'ont pas de source :
+  avis « This is a fragment page », séries d'au moins trois lignes de code, fenêtre de crédits
+  de « X » à « More by this author! » (`retirerRestesDeComposants`). Un « ; » final ne suffit
+  pas à faire du code : la typographie française termine les items de liste par « ; ».
 
 **Une didascalie n'est jamais dite par le personnage.** « SCP-049 : (L'interrompt, en
 colère) Pas mort ! » faisait dire « L'interrompt, en colère » à SCP-049. `separerDidascalies()`

@@ -171,6 +171,120 @@ function canoniserLocuteurs(segments: SpeechSegment[], lang: string, contenuComp
  */
 const SCRIPT_ONGLETS = /\/\/<!\[CDATA\[[\s\S]*?\/\/\]\]>/g;
 
+/**
+ * Une ligne de code : commentaire, bloc, instruction, appel jQuery, propriété CSS. Un « ; »
+ * final ne suffit pas : la typographie française termine les items de liste par « ; »
+ * (« - les conduits nasaux ; »), et les prendre pour du code effaçait des listes entières.
+ */
+const LIGNES_DE_CODE = [
+  /^\/\*!?|^\*(?:\/|\s|$)|^\/\//,
+  /[{}]\s*\)?;?\s*$/,
+  // Un appel (« go(-1); ») ou une affectation — pas une parenthèse de texte : « une Prison de
+  // la Réalité (FIM-I); », « (0) nullion: … ; » sont des items de liste.
+  /^(?=.*(?:[\w$\]]\(|\s=\s|[\w\]]=)).*\S;\s*$/,
+  // Une propriété CSS : clé en minuscules, valeur collée au « ; » (« Peau : … ; » est du texte).
+  /^[a-z-]+\s*:\s*[^;\s][^;]{0,80}\S;\s*$/,
+  /^(?:var|let|const)\s+[\w$]+\s*=|^function\b|^(?:if|for|while|catch)\s*\(|^else\b|^return\b.*;\s*$/,
+  /^\$\s*\(|^\$function|^\$'/
+];
+/** Une ligne de quinze mots ou plus est de la prose, même dans une chaîne JavaScript (SCP-299-FR). */
+const estLigneDeCode = (ligne: string) => ligne.split(/\s+/).length < 15 && LIGNES_DE_CODE.some(motif => motif.test(ligne));
+
+/**
+ * Ce que Crom laisse des composants d'une page qui ne sont pas du dossier — constaté sur le
+ * fragment paginé de SCP-5618, qui n'a pas de source pour les repérer autrement :
+ *
+ *  - l'avis « NOTICE: This is a fragment page. It is an internal page used by the SCP Wiki… »,
+ *    que le wiki affiche à qui ouvre le fragment seul ;
+ *  - le code de la fenêtre de crédits de l'auteur (jQuery, CSS) : au moins trois lignes de
+ *    code d'affilée, lignes vides comprises ;
+ *  - le contenu de cette fenêtre, de sa croix « X » (et du bouton « Info » juste avant) à
+ *    « More by this author! ».
+ *
+ * Les trois étaient lus à voix haute, jQuery compris.
+ */
+export function retirerRestesDeComposants(texte: string): string {
+  const lignes = texte
+    .replace(/(?:^|\n)NOTICE:?[ \t]*\n\s*This is a fragment page\.[^\n]*\n\s*It is an internal page used by the SCP Wiki[^\n]*/g, '\n')
+    .split('\n');
+  const garder = lignes.map(() => true);
+
+  // Les séries d'au moins trois lignes de code, en enjambant les lignes vides.
+  let debut = -1;
+  let nombre = 0;
+  const clore = (fin: number) => {
+    if (nombre >= 3) for (let k = debut; k < fin; k++) garder[k] = false;
+    debut = -1;
+    nombre = 0;
+  };
+  lignes.forEach((brute, i) => {
+    const l = brute.trim();
+    if (!l) return;
+    if (estLigneDeCode(l)) {
+      if (debut < 0) debut = i;
+      nombre++;
+    } else {
+      clore(i);
+    }
+  });
+  clore(lignes.length);
+
+  // La fenêtre de crédits : de « X » (et « Info » juste avant) à « More by this author! ».
+  const pleines = lignes.map((l, i) => ({ l: l.trim(), i })).filter(({ l, i }) => l && garder[i]);
+  pleines.forEach(({ l, i }, k) => {
+    if (!/^More by this author!?$/i.test(l)) return;
+    const croix = pleines.slice(Math.max(0, k - 5), k).findIndex(p => p.l === 'X');
+    if (croix < 0) return;
+    let premier = Math.max(0, k - 5) + croix;
+    if (premier > 0 && /^Info$/i.test(pleines[premier - 1].l)) premier--;
+    for (let j = pleines[premier].i; j <= i; j++) garder[j] = false;
+  });
+
+  return lignes.filter((_, i) => garder[i]).join('\n');
+}
+
+/**
+ * Les notes « en ligne » d'un dossier sans bloc de notes en fin de page (SCP-5618) : chaque
+ * note est un span survolable accolé à sa phrase — `[[span class="fnnum"]].[[/span]]
+ * [[span class="fncon"]] //note// [AF][[/span]]`, séparées par « | » —, que Crom aplatit en
+ * « …terminated.. Seems harsh. [SZ]|. Can't afford… [AF] ». Lues telles quelles, elles
+ * s'enchaînaient au paragraphe dans la voix du narrateur, initiales comprises, alors qu'elles
+ * sont un dialogue entre deux chercheurs.
+ *
+ * On les range parmi les notes de bas de page, avec un marqueur juste après leur phrase : le
+ * mécanisme des notes fait le reste (voix du signataire, annonce « Note : »). Le point du
+ * marqueur suit la ponctuation de la phrase (« terminated.. ») ou un espace (« Instructions
+ * . ») ; chaque note de la chaîne est signée. Le paragraphe peut reprendre après la dernière
+ * note (« …Goodbye, Stephen. [AF] To determine whether… ») : la suite redevient une ligne.
+ */
+export function extraireNotesEnLigne(texte: string, notes: Map<number, string>): string {
+  const note = String.raw`[^|[\]\n]+?\s\[[A-ZÀ-Þ]{2,3}\]`;
+  const chaine = new RegExp(String.raw`^(${note}(?:\|\s?\.\s${note})*)(?:\s+(\S.*))?$`, 'u');
+  let suivant = Math.max(0, ...notes.keys()) + 1;
+  return texte
+    .split('\n')
+    .map(ligne => {
+      if (!/\[[A-ZÀ-Þ]{2,3}\]/u.test(ligne)) return ligne;
+      for (const m of ligne.matchAll(/(?<=[.!?…])\.\s|\s\.\s/g)) {
+        const trouve = ligne.slice(m.index! + m[0].length).match(chaine);
+        if (!trouve) continue;
+        const corps = ligne.slice(0, m.index!).trimEnd();
+        const marqueurs = trouve[1]
+          .split(/\|\s?\.\s/)
+          .map(n => n.trim())
+          .filter(Boolean)
+          .map(texteNote => {
+            const n = suivant++;
+            notes.set(n, texteNote);
+            return `@@NOTE${n}@@`;
+          });
+        return [corps, ...marqueurs, trouve[2] ?? ''].filter(Boolean).join('\n');
+      }
+      return ligne;
+    })
+    .join('\n');
+}
+
 // Clean Wikidot markup from text and replace awkward censorship blocks
 export function cleanWikidotMarkup(raw: string, lang: string = 'fr'): string {
   let text = raw;
@@ -1949,7 +2063,10 @@ const BARE_OBJECT_CLASS =
  * This is the catch-all behind the structural fixes.
  */
 const HEADER_LABEL_NOT_SPEAKER =
-  /^(?:objet\s*n[o°\^]*|item\s*#?|classe(?:\s+(?:de\s+)?(?:confinement|secondaire|perturbation|risque))?|(?:object|containment|secondary|disruption|risk)\s*class|niveau(?:\s+de\s+(?:menace|confinement|conscience))?|threat\s*level|clearance(?:\s*level)?|accr[ée]ditation|classification|niveau\s*d.autorisation)$/i;
+  /^(?:objet\s*n[o°\^]*|item\s*#?|classe(?:\s+(?:de\s+)?(?:confinement|secondaire|perturbation|risque))?|(?:object|containment|secondary|disruption|risk)\s*class|niveau(?:\s+de\s+(?:menace|confinement|conscience))?|threat\s*level|clearance(?:\s*level)?|accr[ée]ditation|classification|niveau\s*d.autorisation|(?:full\s+name|known\s+aliases|direct\s+report|home\s+site|d\.?o\.?b\.?|date\s+of\s+birth|height|weight|education|personal\s+history|psychological\s+profile|nom\s+complet|alias(?:\s+connus)?|sup[ée]rieur\s+direct|site\s+d.affectation|date\s+de\s+naissance|taille|poids|formation|historique\s+personnel|profil\s+psychologique))$/i;
+// Les champs d'une fiche de personnel (hub RCT-Δt : « Full Name : Thaddeus Robspierre Xyank »,
+// « Height : 1.90 m ») ont la forme d'une réplique ; lus comme des personnages, chacun recevait
+// sa propre voix et une annonce « Full Name : ».
 
 /**
  * Build the solemn "Objet : X. Classe : Y." intro from an ACS header bar starting at `index`.
@@ -2271,11 +2388,13 @@ export function parseScpScript(
 ): SpeechSegment[] {
   // Le script des onglets part AVANT le repérage des notes : ses identifiants hexadécimaux
   // (« tabViewffded5f1ca63… ») offriraient des chiffres nus au balayage des marqueurs.
-  const contenu = rawContent.replace(SCRIPT_ONGLETS, '');
+  const contenu = retirerRestesDeComposants(rawContent.replace(SCRIPT_ONGLETS, ''));
   const { body: withoutNotes, notes: footnotes } = extractFootnotes(contenu);
   // Who signs the marginal notes? Resolved from the document's own wording.
   const signatories = knownSignatories ?? resolveInitialSignatories(rawContent);
-  const cleaned = cleanWikidotMarkup(markFootnotePositions(withoutNotes, footnotes), lang);
+  // Les notes en ligne APRÈS le balayage des marqueurs : numérotées à la suite, elles lui
+  // feraient chercher des chiffres nus qui n'existent pas (« Level 1-3 » aurait pris la note 1).
+  const cleaned = cleanWikidotMarkup(extraireNotesEnLigne(markFootnotePositions(withoutNotes, footnotes), footnotes), lang);
   const lignesNettoyees = recollerPonctuationOrpheline(
     cleaned
       .split('\n')

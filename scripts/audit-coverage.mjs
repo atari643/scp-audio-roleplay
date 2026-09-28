@@ -214,12 +214,15 @@ function titresOngletsGroupes(segments, source) {
   return groupes;
 }
 
-function auditDossier(slug, detail, segments, { retirerTexteBarre, retirerApercuCache, texteDesBlocsHtml }, lang) {
+function auditDossier(slug, detail, segments, { retirerTexteBarre, retirerApercuCache, texteDesBlocsHtml, retirerRestesDeComposants }, lang) {
   // La page telle que le lecteur la voit : sans l'aperçu caché (display: none) que CROM
   // laisse dans textContent, avec le texte des blocs [[html]] que CROM ne rend pas.
   const page0 = retirerApercuCache(detail.textContent, detail.source);
   const html = texteDesBlocsHtml(detail.source, page0);
-  const pages = [html ? `${page0}\n${html}` : page0, ...(detail.fragments || [])];
+  // Le parseur retire aussi ce que les composants laissent dans textContent (avis de
+  // fragment, code de la fenêtre de crédits) : ce n'est pas du dossier, et le compter ferait
+  // passer ce correctif pour une perte de contenu.
+  const pages = [html ? `${page0}\n${html}` : page0, ...(detail.fragments || [])].map(p => retirerRestesDeComposants(p));
   // Les gabarits ACS laissent parfois des emplacements non substitués ({$item-number},
   // {$container-class}…). Le parseur les retire à dessein — les compter comme du contenu
   // source ferait passer ce correctif pour une perte de couverture.
@@ -237,7 +240,10 @@ function auditDossier(slug, detail, segments, { retirerTexteBarre, retirerApercu
   const barres = new Set(motsBarres);
 
   const srcWords = words(sourceText).filter(w => !barres.has(w));
-  const outWords = words(segments.map(s => `${s.speaker} ${s.text}`).join(' '));
+  // Les indications de jeu retirées du texte prononcé restent affichées au-dessus de la
+  // réplique (`separerDidascalies`) : un choix de lecture, comme le texte barré, pas une perte.
+  const lu = s => `${s.speaker} ${s.text} ${(s.stageDirections ?? []).join(' ')}`;
+  const outWords = words(segments.map(lu).join(' '));
 
   // Couverture : chaque mot source doit se retrouver dans la sortie (multiset).
   const bag = new Map();
@@ -253,7 +259,7 @@ function auditDossier(slug, detail, segments, { retirerTexteBarre, retirerApercu
   const coverage = srcWords.length ? matched / srcWords.length : 1;
 
   // Lignes entières absentes, classées par nature.
-  const spokenBag = new Set(words(segments.map(s => `${s.speaker} ${s.text}`).join(' ')));
+  const spokenBag = new Set(words(segments.map(lu).join(' ')));
   const buckets = { chrome: 0, credits: 0, media: 0, contenu: 0 };
   const contentLosses = [];
   for (const line of sourceText.split('\n').map(l => l.trim()).filter(Boolean)) {
