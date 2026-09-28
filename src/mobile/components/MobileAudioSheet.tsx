@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Play, Pause, Square, SkipBack, SkipForward, RotateCcw, RotateCw,
-  Volume2, VolumeX, Radio, Sparkles, ChevronDown, ListMusic, User
+  Volume2, VolumeX, Radio, AudioLines, ChevronDown, ListMusic, User
 } from 'lucide-react';
 import { PlayerStatus, SpeechSegment } from '../../types/audioRoleplay';
 import { sfx } from '../../services/sfxService';
@@ -78,7 +78,7 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
           }}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-1 border border-bordure text-xs font-mono text-role-agent hover:text-texte"
         >
-          <Sparkles className="w-4 h-4 text-role-agent" />
+          <AudioLines className="w-4 h-4 text-role-agent" />
           <span>{t('lecteur.configurerStudio')}</span>
         </button>
       </div>
@@ -117,8 +117,8 @@ export const MobileAudioSheet: React.FC<MobileAudioSheetProps> = ({
             }}
             className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-3/80 border border-accent-texte text-xs font-mono text-accent-texte hover:text-texte active:scale-95 transition-all"
           >
-            <Sparkles className="w-3.5 h-3.5 text-role-agent" />
-            <span>{t('lecteur.voixIA')}</span>
+            <AudioLines className="w-3.5 h-3.5 text-role-agent" />
+            <span>{t('lecteur.voix')}</span>
           </button>
           <button
             onClick={() => setShowSegmentList(!showSegmentList)}

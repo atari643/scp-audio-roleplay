@@ -6,7 +6,7 @@ import {
   Star,
   ExternalLink,
   FileText,
-  Sparkles,
+  AudioLines,
   Radio,
   Crosshair,
   Share2,
@@ -295,7 +295,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
                 : 'text-texte-attenue hover:text-texte border border-transparent'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <AudioLines className="w-3.5 h-3.5" />
             <span>{t('compte.repliques', { n: String(segments.length) })}</span>
           </button>
 

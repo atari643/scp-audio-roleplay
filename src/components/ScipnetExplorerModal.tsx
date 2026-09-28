@@ -13,7 +13,6 @@ import {
   Shield, 
   Database, 
   ExternalLink,
-  Sparkles,
   Layers,
   ArrowRight,
   ShieldAlert
@@ -548,7 +547,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                           }}
                           className="win2k-btn px-3 py-1 text-xs text-classe-euclid hover:text-texte flex items-center gap-1.5"
                         >
-                          <Sparkles className="w-3.5 h-3.5 text-classe-euclid" />
+                          <Search className="w-3.5 h-3.5 text-classe-euclid" />
                           <span>{t('explorateur.rechercherLiees')}</span>
                         </button>
                       )}
@@ -646,7 +645,7 @@ export const ScipnetExplorerModal: React.FC<ScipnetExplorerModalProps> = ({
                           }}
                           className="win2k-btn px-3 py-1 text-xs font-bold text-classe-euclid hover:text-texte flex items-center gap-1.5"
                         >
-                          <Sparkles className="w-3.5 h-3.5 text-classe-euclid" />
+                          <Layers className="w-3.5 h-3.5 text-classe-euclid" />
                           <span>{t('explorateur.parcourirSerie')}</span>
                         </button>
                       )}

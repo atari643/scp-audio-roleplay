@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  X, ChevronRight, Sparkles, Star, Volume2, VolumeX, Tv, Terminal, 
+  X, ChevronRight, AudioLines, Star, Volume2, VolumeX, Tv, Terminal, 
   Radio, Globe, Monitor, Smartphone, ShieldAlert
 } from 'lucide-react';
 import { LanguageBranch, SUPPORTED_LANGUAGES } from '../../types/scp';
@@ -96,7 +96,7 @@ export const MobileTacticalDrawer: React.FC<MobileTacticalDrawerProps> = ({
               className="w-full flex items-center justify-between p-3 rounded-xl bg-surface-1/80 border border-bordure hover:border-role-agent text-left active:scale-[0.99] transition-all"
             >
               <div className="flex items-center gap-2.5">
-                <Sparkles className="w-4 h-4 text-role-agent" />
+                <AudioLines className="w-4 h-4 text-role-agent" />
                 <div>
                   <div className="text-xs font-mono font-bold text-texte">{t('menu.studioVocal')}</div>
                   <div className="text-xs font-mono text-texte-attenue">{t('menu.studioVocalInfo')}</div>

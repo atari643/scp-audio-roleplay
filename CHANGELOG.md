@@ -7,6 +7,11 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
 
 ### Ajouté
 
+- **Chaque dossier dit comment il est lu.** Sous les crédits : « Lu tel quel par synthèse
+  vocale (text-to-speech) : aucun mot n'est écrit, réécrit ni résumé par une IA générative,
+  et aucune voix n'est clonée. » La communauté SCP rejette l'IA générative, que le wiki
+  interdit, et une voix de synthèse y est vite prise pour elle. Les aperçus de lien et le
+  README le disent aussi, dans les dix langues.
 - **Un dossier s'écoute écran éteint, comme un podcast.** Sur téléphone, la lecture
   s'arrêtait au premier changement de réplique dès que l'écran se verrouillait : chaque
   segment créait son propre élément audio, que le navigateur refuse de lancer hors d'un
@@ -85,6 +90,13 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
   n'exécutent pas le JavaScript — ils indexaient un `<div>` vide.
 - **Mesure d'audience** (Vercel Web Analytics, sans cookie), dans la seule version
   construite par Vercel. À activer dans le tableau de bord.
+
+### Modifié
+
+- **Plus de « voix IA » dans l'interface.** Le bouton du studio s'appelle « Voix », le
+  moteur « Voix Edge », les messages de secours parlent du service de synthèse vocale d'Edge
+  et non plus d'un « moteur neural ». Les étincelles ✨, devenues le symbole de l'IA, laissent
+  place à une onde sonore.
 
 ### Corrigé
 

@@ -45,7 +45,7 @@ const ATTRIBUTS = /\b(title|placeholder|aria-label|alt)="([^"]{2,})"/g;
 const TOLERE = [
   /^[\s·•|/\\<>→←↑↓✓●○—–\-.,:;!?'"«»()[\]{}]*$/, // ponctuation et flèches seules
   /^[A-Z0-9][A-Z0-9\s._:/#-]*$/, // SIGLES, CODES, SCP-173, O5-COMM, CL-5
-  /^(SCP|SCiPNET|RAISA|CROM|CRT|CLI|BPM|HUD|TTS|MTF|FIM|GdI|GoI|O5|Site-19|Edge Neural TTS)/,
+  /^(SCP|SCiPNET|RAISA|CROM|CRT|CLI|BPM|HUD|TTS|MTF|FIM|GdI|GoI|O5|Site-19|Edge TTS)/,
   /^[a-z][a-z0-9-]*(\s+[a-z0-9:[\]/.%()-]+)*$/, // classes utilitaires Tailwind
   /^[a-z]+\.[a-zA-Z0-9.]+$/, // une clé de traduction déjà posée
   /var\(--/,

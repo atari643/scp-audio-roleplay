@@ -77,6 +77,11 @@ export const CreditsDossier: React.FC<CreditsDossierProps> = ({
         titre={titre}
         className="mt-2 pt-2 border-t border-bordure-faible"
       />
+
+      {/* Ce que fait la voix, et ce qu'elle ne fait pas : lire les mots des auteurs. */}
+      <p className="mt-1.5 text-xs text-texte-attenue leading-relaxed">
+        {t('credits.lecture')}
+      </p>
     </section>
   );
 };

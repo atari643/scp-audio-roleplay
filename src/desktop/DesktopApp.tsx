@@ -356,7 +356,7 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
                   </div>
                   <div className="flex items-center gap-2">
                     <dt className="text-texte-attenue uppercase tracking-technique">{t('etat.synthese')}</dt>
-                    <dd className="text-systeme">Edge Neural TTS</dd>
+                    <dd className="text-systeme">Edge TTS</dd>
                   </div>
                   <div className="flex items-center gap-2">
                     <dt className="text-texte-attenue uppercase tracking-technique">{t('etat.isolation')}</dt>

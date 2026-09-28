@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, RotateCcw, Sparkles, Check, Cpu, Radio, Award, Shield, Flame, Activity, Globe, Info, Database, Trash2 } from 'lucide-react';
+import { Play, RotateCcw, AudioLines, Check, Radio, Award, Shield, Flame, Activity, Globe, Info, Database, Trash2 } from 'lucide-react';
 import { CharacterRole, VoiceProfile } from '../types/audioRoleplay';
 import { speechEngine, TtsEngineMode } from '../services/speechEngine';
 import { DEFAULT_ROLE_PROFILES } from '../services/storageService';
@@ -209,7 +209,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
       onClose={onClose}
       titre={t('studio.titre')}
       classification={`${stats.totalVoices} voix · ${stats.langName}`}
-      icone={<Sparkles className="w-4 h-4" />}
+      icone={<AudioLines className="w-4 h-4" />}
       largeur="max-w-3xl"
     >
       <div className="flex flex-col">
@@ -229,8 +229,8 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
                     : 'text-texte-attenue hover:text-texte'
                 }`}
               >
-                <Cpu className="w-3.5 h-3.5" />
-                <span>{t('studio.packNeural')}</span>
+                <AudioLines className="w-3.5 h-3.5" />
+                <span>{t('studio.voixEdge')}</span>
               </button>
               <button
                 onClick={() => handleToggleEngine('system')}
@@ -311,7 +311,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
               </p>
             </div>
 
-            {/* Neural AI Voices Selection (when in Neural mode) */}
+            {/* Choix de la voix Edge (synthèse vocale), en mode Edge */}
             {engineMode === 'neural' ? (
               <div className="space-y-2">
                 {/* Region Filter Buttons */}

@@ -29,6 +29,11 @@ Classe-D crie, l'intercom du Site-19 coupe la parole à tout le monde.
 Elle ne stocke aucun dossier : elle interroge le wiki SCP en direct, dans dix
 branches linguistiques, et met le résultat en voix.
 
+**Du text-to-speech, pas de l'IA générative.** Les mots sont ceux des auteurs du
+wiki, crédités sur chaque dossier, et lus tels quels par la synthèse vocale de
+Microsoft Edge. Aucun mot n'est écrit, réécrit ni résumé par une IA générative,
+et aucune voix n'est clonée.
+
 ## Ce que ça donne à l'oreille
 
 Un extrait d'entretien, tel que l'application le découpe et le distribue — chaque
@@ -49,8 +54,8 @@ pour qu'on les distingue du paragraphe.
 
 ## Ce qu'elle fait
 
-- **Douze voix neurales françaises** attribuées par rôle — narrateur, chercheur,
-  anomalie, Classe-D, agent de terrain, intercom, terminal.
+- **Douze voix de synthèse vocale** (Microsoft Edge) attribuées par rôle — narrateur,
+  chercheur, anomalie, Classe-D, agent de terrain, intercom, terminal.
 - **Découpage automatique du dossier** : les onglets, les tableaux, les terminaux,
   les notes de bas de page et les blocs caviardés sont reconnus dans la source du
   wiki et lus à leur place, pas à la fin.

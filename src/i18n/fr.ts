@@ -42,14 +42,14 @@ export const FR = {
   'lecteur.ouvrirStudio': 'Ouvrir le studio des voix',
   'lecteur.voixSecours': 'VOIX DE SECOURS',
   'lecteur.voixSecoursInfo':
-    "Voix du navigateur : le moteur neural n'est pas joignable depuis cet hébergement. Ouvrez le studio des voix pour réessayer.",
+    "Voix du navigateur : le service de synthèse vocale d'Edge n'est pas joignable depuis cet hébergement. Ouvrez le studio des voix pour réessayer.",
   'lecteur.voixSecoursMobile': 'VOIX DE SECOURS — appuyez pour réessayer',
   'lecteur.voixSecoursCourt': 'SECOURS',
 
   'lecteur.reduire': 'Réduire',
   'lecteur.agrandir': 'Agrandir le lecteur',
   'lecteur.segmentSuivant': 'Segment suivant',
-  'lecteur.voixIA': 'Voix IA',
+  'lecteur.voix': 'Voix',
   'lecteur.listeSegments': 'Liste des segments',
   'lecteur.indexDialogues': 'INDEX DES DIALOGUES',
   'lecteur.diffusion': 'Diffusion audio SCiPNET…',
@@ -59,7 +59,7 @@ export const FR = {
     'Sélectionnez un dossier SCP dans les archives pour charger la transcription vocale multi-personnages.',
   'lecteur.configurerStudio': 'Configurer le studio des voix',
   'lecteur.voixSecoursCourtInfo':
-    "Voix du navigateur : le moteur neural n'est pas joignable. Ouvrez le lecteur pour réessayer.",
+    "Voix du navigateur : le service de synthèse vocale d'Edge n'est pas joignable. Ouvrez le lecteur pour réessayer.",
 
   // --- Répertoire d'entités -------------------------------------------------
   'entites.retour': 'Retour',
@@ -101,6 +101,11 @@ export const FR = {
   'credits.contribution': 'Contribution',
   'credits.maintenance': 'Maintenance',
   'credits.deLOriginal': "de l'original",
+  // Sous chaque pavé de crédits : la communauté SCP refuse l'IA générative (le wiki la
+  // bannit), et la voix de synthèse y est vite prise pour elle. Ne dire que le vrai : le
+  // texte du wiki, lu tel quel, sans voix clonée.
+  'credits.lecture':
+    "Lu tel quel par synthèse vocale (text-to-speech) : aucun mot n'est écrit, réécrit ni résumé par une IA générative, et aucune voix n'est clonée.",
 
   // --- États généraux -------------------------------------------------------
   'general.chargement': "Ouverture de l'archive…",
@@ -225,7 +230,7 @@ export const FR = {
   'feuille.sourdine': 'Sourdine',
 
   // --- Studio des voix ------------------------------------------------------
-  'studio.packNeural': 'Pack IA neural',
+  'studio.voixEdge': 'Voix Edge',
   'studio.navigateur': 'Navigateur',
   'studio.prereglages': 'Préréglages SCP :',
   'studio.packsIntegres': 'Packs Hugging Face et GitHub intégrés',
@@ -566,8 +571,8 @@ export const FR = {
   // de Discord, Reddit ou Google, qui n'exécutent pas le JavaScript.
   'site.titre': 'SCP Audio Roleplay — les dossiers de la Fondation SCP lus à voix haute',
   'site.description':
-    'Les dossiers de la Fondation SCP lus à voix haute, avec une voix par personnage : narrateur, chercheurs, anomalie, Classe-D. Dix branches du wiki, gratuit, sans compte.',
-  'site.dossierDescription': 'Lu à voix haute, avec une voix par personnage.',
+    'Les dossiers de la Fondation SCP lus tels quels par synthèse vocale, avec une voix par personnage : narrateur, chercheurs, anomalie, Classe-D. Dix branches du wiki, gratuit, sans compte.',
+  'site.dossierDescription': 'Lu tel quel par synthèse vocale, avec une voix par personnage.',
   'site.dossierTexte': 'Texte : {auteurs} — wiki SCP, CC BY-SA 3.0.',
 
   // --- Écran de confinement d'erreur ---------------------------------------
