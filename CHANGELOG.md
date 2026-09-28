@@ -95,8 +95,9 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
 
 - **Plus de « voix IA » dans l'interface.** Le bouton du studio s'appelle « Voix », le
   moteur « Voix Edge », les messages de secours parlent du service de synthèse vocale d'Edge
-  et non plus d'un « moteur neural ». Les étincelles ✨, devenues le symbole de l'IA, laissent
-  place à une onde sonore.
+  et non plus d'un « moteur neural ». Les étincelles, devenues le symbole de l'IA, laissent
+  place à une onde sonore. Le README et la description du paquet parlent eux aussi de voix
+  d'Edge et de synthèse vocale, sans emoji ni tiret long.
 
 ### Corrigé
 

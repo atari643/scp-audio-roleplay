@@ -4,9 +4,9 @@
 
 # SCP Audio Roleplay
 
-**Les dossiers de la Fondation SCP, lus à voix haute — avec une voix par personnage.**
+**Les dossiers de la Fondation SCP, lus à voix haute, avec une voix par personnage.**
 
-### ▶︎ [Ouvrir l'application](https://scp-audio-roleplay.vercel.app)
+### [Ouvrir l'application](https://scp-audio-roleplay.vercel.app)
 
 *Rien à installer, rien à créer : un dossier s'ouvre et se met à parler.*
 
@@ -36,7 +36,7 @@ et aucune voix n'est clonée.
 
 ## Ce que ça donne à l'oreille
 
-Un extrait d'entretien, tel que l'application le découpe et le distribue — chaque
+Un extrait d'entretien, tel que l'application le découpe et le distribue. Chaque
 ligne sort d'une voix différente, et le badge du locuteur suit à l'écran :
 
 | Voix | Ce qu'on entend |
@@ -54,7 +54,7 @@ pour qu'on les distingue du paragraphe.
 
 ## Ce qu'elle fait
 
-- **Douze voix de synthèse vocale** (Microsoft Edge) attribuées par rôle — narrateur,
+- **Douze voix de synthèse vocale** (Microsoft Edge) attribuées par rôle : narrateur,
   chercheur, anomalie, Classe-D, agent de terrain, intercom, terminal.
 - **Découpage automatique du dossier** : les onglets, les tableaux, les terminaux,
   les notes de bas de page et les blocs caviardés sont reconnus dans la source du
@@ -66,7 +66,7 @@ pour qu'on les distingue du paragraphe.
   factions, FIM, personnel) construit depuis le wiki, jamais saisi à la main.
 - **Deux interfaces distinctes**, une pour l'ordinateur et une pour le téléphone,
   qui partagent la même logique métier.
-- **Application Android** empaquetée avec Capacitor, voix neurales incluses.
+- **Application Android** empaquetée avec Capacitor, voix d'Edge incluses.
 
 ## Démarrer
 
@@ -84,7 +84,7 @@ synthèse, ni l'API Crom n'en demandent, et le dépôt ne contient aucun secret.
 
 | Commande | Ce qu'elle fait |
 |---|---|
-| `npm run dev` | Développement, avec `/api/tts` — voix neurales. |
+| `npm run dev` | Développement, avec `/api/tts` : les voix d'Edge. |
 | `npm run build` | `tsc -b` en mode strict puis `vite build`. **C'est le seul filet du projet.** |
 | `npm run serve` | Sert `dist/` **avec** `/api/tts` : la vraie version de production. |
 | `npm run preview` | Sert `dist/` **sans** `/api/tts` : voix du navigateur uniquement. |
@@ -103,7 +103,7 @@ C'est la contrainte qui commande toute l'architecture audio, et elle a été
 mesurée sur le vrai service : **la synthèse d'Edge ne filtre que l'User-Agent.**
 Un agent contenant `Edg/` obtient une connexion ; ceux de Chrome, de Firefox et
 de la WebView Android sont refusés. Une page web ne peut pas mentir sur son
-User-Agent dans un WebSocket — d'où trois chemins, tous dans
+User-Agent dans un WebSocket, d'où trois chemins, tous dans
 [`src/services/edgeTts.ts`](src/services/edgeTts.ts) :
 
 | Contexte | Chemin | Pourquoi |
@@ -115,19 +115,19 @@ User-Agent dans un WebSocket — d'où trois chemins, tous dans
 
 Quand aucun de ces chemins n'aboutit, l'application retombe sur les voix du
 navigateur, le signale dans le lecteur (« VOIX DE SECOURS ») et répartit malgré tout
-des voix **différentes** entre les rôles — au lieu de lire les sept personnages avec
+des voix **différentes** entre les rôles, au lieu de lire les sept personnages avec
 la même.
 
 Sur Android, c'est `overrideUserAgent` dans
-[`capacitor.config.ts`](capacitor.config.ts) qui rend les voix neurales
+[`capacitor.config.ts`](capacitor.config.ts) qui rend les voix d'Edge
 possibles. C'est une ligne, et sans elle le téléphone parle avec la voix système.
 
 ## Déploiement
 
-### Vercel — recommandé
+### Vercel (recommandé)
 
 La fonction [`api/tts.ts`](api/tts.ts) réexporte le même gestionnaire que le
-serveur local, donc **les voix neurales fonctionnent dans tous les navigateurs**.
+serveur local, donc **les voix d'Edge fonctionnent dans tous les navigateurs**.
 Rien à configurer : pas de variable d'environnement, pas de secret.
 
 ```bash
@@ -138,12 +138,12 @@ vercel --prod   # production
 
 La configuration vit dans [`vercel.json`](vercel.json).
 
-### GitHub Pages — miroir de démonstration
+### GitHub Pages (miroir de démonstration)
 
 Pages ne sait pas exécuter de fonction. Le site y est donc publié avec
 `VITE_TTS_ENDPOINT` pointant sur le déploiement Vercel, ce qui lui rend les voix
-neurales ; sans cette variable, Chrome et Firefox retombent sur les voix du
-navigateur (Edge, lui, garde le neural). Tout est dans
+d'Edge ; sans cette variable, Chrome et Firefox retombent sur les voix du
+navigateur (Edge, lui, garde les siennes). Tout est dans
 [`.github/workflows/pages.yml`](.github/workflows/pages.yml).
 
 ### Android
@@ -153,8 +153,8 @@ npm run cap:sync        # build web + synchronisation
 npm run android:debug   # APK de test
 ```
 
-La marche à suivre complète jusqu'au Play Store — keystore, AAB, fiche, politique
-de confidentialité — est dans **[PUBLICATION.md](PUBLICATION.md)**.
+La marche à suivre complète jusqu'au Play Store (keystore, AAB, fiche, politique
+de confidentialité) est dans **[PUBLICATION.md](PUBLICATION.md)**.
 
 ## Architecture en trois espaces
 
@@ -179,7 +179,7 @@ l'arborescence, [`CLAUDE.md`](CLAUDE.md) les pièges déjà rencontrés.
 Les retours sont la raison d'être de ce dépôt public. Trois gabarits d'issue sont
 prêts : **problème de lecture audio**, **problème d'affichage mobile**,
 **idée de fonctionnalité**. Un rapport utile mentionne le numéro du SCP, la
-langue, la voix et la plateforme — c'est presque toujours reproductible avec ça.
+langue, la voix et la plateforme : c'est presque toujours reproductible avec ça.
 
 Avant d'ouvrir une pull request, lisez [CONTRIBUTING.md](CONTRIBUTING.md) : le
 projet n'a ni tests ni ESLint, `npm run build` est le seul filet, et quelques
