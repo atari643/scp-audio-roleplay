@@ -97,6 +97,8 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
     removeFromQueue,
     clearQueue,
     openLink,
+    handleGoBack,
+    canGoBack,
     availableSeries,
     selectedSeries,
     setSelectedSeries,
@@ -422,6 +424,11 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
                     : -1
                 }
                 onBack={() => {
+                  // Arrivé par un lien : on revient au dossier d'où l'on vient.
+                  if (canGoBack) {
+                    handleGoBack();
+                    return;
+                  }
                   handleBackToCatalog();
                   setActiveTab('catalog');
                 }}
@@ -461,10 +468,10 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
                         {t('accueil.lireAnglais')}
                       </button>
                       <button
-                        onClick={() => setActiveTab('catalog')}
+                        onClick={() => (canGoBack ? handleGoBack() : setActiveTab('catalog'))}
                         className="px-4 py-2.5 rounded-xl bg-surface-1 border border-bordure text-xs font-mono text-texte-second"
                       >
-                        {t('accueil.retourArchives')}
+                        {t(canGoBack ? 'dossier.precedent' : 'accueil.retourArchives')}
                       </button>
                     </div>
                   </>
@@ -477,10 +484,10 @@ export const MobileApp: React.FC<MobileAppProps> = ({ app, toggleMode, setDevice
                         : t('general.aucunDossierOuvert')}
                     </p>
                     <button
-                      onClick={() => setActiveTab('catalog')}
+                      onClick={() => (canGoBack ? handleGoBack() : setActiveTab('catalog'))}
                       className="px-4 py-2 rounded-xl bg-surface-3 border border-accent-texte text-xs font-mono text-accent-texte"
                     >
-                      {t('accueil.ouvrirArchives')}
+                      {t(canGoBack ? 'dossier.precedent' : 'accueil.ouvrirArchives')}
                     </button>
                   </>
                 )}

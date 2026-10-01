@@ -101,6 +101,43 @@ projet adhère au [versionnage sémantique](https://semver.org/lang/fr/).
 
 ### Corrigé
 
+- **Les liens d'un dossier ouvrent le dossier lié.** Le clic mettait le lien de côté, dans
+  la file « À suivre » affichée en haut du dossier, hors de vue : on cliquait sur une
+  proposition de SCP-001 et rien ne se passait. Le clic ouvre désormais le dossier, sans
+  le scanner biométrique, et « Dossier précédent » (« Retour » sur téléphone) ramène à la
+  réplique qu'on écoutait. Alt+clic, clic droit ou appui long mettent toujours de côté ;
+  Ctrl+clic et clic molette ouvrent un nouvel onglet, les liens ayant maintenant une adresse.
+- **Les cibles de lien sont celles du wiki.** La source écrit « qntm's Proposal » ou « Dr.
+  Gears's Proposal », que Wikidot suit sous `qntm-s-proposal` et `dr-gears-s-proposal` :
+  l'app demandait des pages qui n'existent pas. Apostrophes, points, accents, `*`, `#ancre`
+  et `/offset/2` sont ramenés au nom de page, et « The Great Hippo (feat. PeppersGhost) »,
+  dont le parseur ôte les parenthèses, redevient un lien : SCP-001 en a 60 sur 60.
+- **Les pages que Crom rend sans texte s'ouvrent.** Ouroboros (quatre images cliquables, une
+  par partie), la proposition de notgull (tout dans un bloc `[[html]]`) et psul-001 (page 1
+  vide, dossier dans ses fragments) étaient déclarées introuvables, ou « pas encore
+  traduites » alors que la traduction existe. Les images cliquables d'une page sans texte
+  deviennent des liens lus, nommés par leur `alt` ou, à défaut, par le titre de la page
+  visée ; le bloc `[[html]]` est lu ; la page 1 vide cède la place au premier fragment.
+- **« Lire la version anglaise » ne tourne plus en rond.** Sur la branche anglaise, l'avis
+  « pas encore traduite » restait affiché depuis le cache et renvoyait à lui-même.
+- **Une page en partie programme le dit.** SCP-3340, SCP-2212, SCP-404-JP ou SCP-280-JP
+  écrivent leur texte par un script : les lecteurs l'annoncent, avec un lien vers le wiki,
+  au lieu de s'ouvrir sur un « Chargement en cours… » ou sur les seuls crédits.
+- **Le pavé de crédits n'est plus lu sur les pages sans en-tête d'objet.** Contes, hubs et
+  propositions 001 commençaient par « Crédits », puis « Titre original » dit comme un
+  personnage.
+- **L'entretien de SCP-682 ne fait plus dire ses didascalies aux personnages.** SCP-682
+  disait « Incomprehensible », le docteur « Motions to move microphone closer » et « Retreats
+  from the room ». La note du transcripteur (« incomprehensible », « unintelligible ») devient
+  une indication affichée ; les gestes, les déplacements et « no verbal communication » sont
+  dits par l'Archiviste. « (To Personnel D-085) », à qui l'on parle, reste affiché au-dessus de
+  la réplique au lieu de la couper en deux.
+- **Les didascalies entre crochets sont traitées comme celles entre parenthèses.** Le
+  capitaine de SCP-096 disait « Pauses » (« [Pauses] You know… ») : l'indication est désormais
+  affichée et devient un silence. Un bruit décrit au passif (« …the use of an [Papers are
+  heard moving] AT-4 HEDT launcher? ») est dit par l'Archiviste, plus par le docteur. Les
+  caviardages entre crochets (« [REDACTED] », « [DATA EXPUNGED] ») gardent leurs crochets et
+  restent des caviardages.
 - **SCP-5618 se lit comme il est écrit.** Ses annotations sont des notes « en ligne » (un
   point survolable accolé à la phrase), aplaties par le wiki en « …terminated.. Seems harsh.
   [SZ]|. Can't afford… [AF] » : l'Archiviste les lisait au milieu du paragraphe, initiales

@@ -71,6 +71,8 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
     removeFromQueue,
     clearQueue,
     openLink,
+    handleGoBack,
+    canGoBack,
     activeSegments,
     playerStatus,
     activeWord,
@@ -259,7 +261,8 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
                     ? activeWord.wordIndex
                     : -1
                 }
-                onBack={handleBackToCatalog}
+                onBack={canGoBack ? handleGoBack : handleBackToCatalog}
+                retourAuDossier={canGoBack}
                 isFavorite={storageServiceIsFav(activeScpDetail.slug, favorites)}
                 onToggleFavorite={() => handleToggleFavorite(activeScpDetail)}
                 onPlaySegment={(idx) => {
@@ -297,10 +300,10 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
                       {t('accueil.lireAnglais')}
                     </button>
                     <button
-                      onClick={handleBackToCatalog}
+                      onClick={canGoBack ? handleGoBack : handleBackToCatalog}
                       className="font-mono text-xs text-texte-attenue hover:text-texte underline underline-offset-4"
                     >
-                      {t('accueil.retourCatalogue')}
+                      {t(canGoBack ? 'dossier.precedent' : 'accueil.retourCatalogue')}
                     </button>
                   </div>
                 </>
@@ -311,10 +314,10 @@ export const DesktopApp: React.FC<DesktopAppProps> = ({ app }) => {
                     {t('general.dossierIntrouvable')}
                   </p>
                   <button
-                    onClick={handleBackToCatalog}
+                    onClick={canGoBack ? handleGoBack : handleBackToCatalog}
                     className="mt-4 font-mono text-xs text-texte-attenue hover:text-texte underline underline-offset-4"
                   >
-                    {t('accueil.retourCatalogue')}
+                    {t(canGoBack ? 'dossier.precedent' : 'accueil.retourCatalogue')}
                   </button>
                 </>
               )}

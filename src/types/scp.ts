@@ -149,6 +149,11 @@ export interface ScpItemDetail extends ScpItemSummary {
    */
   fragments?: string[];
   source?: string;
+  /**
+   * Titre des pages que visent les images cliquables sans `alt` d'une page sans texte
+   * (la traduction d'Ouroboros) : c'est le libellé de ces liens. Voir `extraireImagesLiees`.
+   */
+  titresLies?: Record<string, string>;
   translations?: Array<{ url: string; language?: string }>;
   authors?: string[];
   /**

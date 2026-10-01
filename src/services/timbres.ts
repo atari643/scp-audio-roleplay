@@ -246,7 +246,8 @@ const simplifierMot = (mot: string) =>
  *
  * @param annonce l'annonce telle qu'elle ouvre le texte prononcé (« Le docteur Sherman : »)
  * @returns `null` si les frontières ne concordent pas avec l'annonce — l'appelant garde alors
- *   la synthèse d'un seul tenant, qui reste juste.
+ *   la synthèse d'un seul tenant, qui reste juste. Sinon le signal monté, les frontières de la
+ *   réplique et celles de l'annonce, toutes aux instants du signal monté.
  */
 export function composerAnnonce(options: {
   voixOff: Float32Array;
@@ -255,8 +256,11 @@ export function composerAnnonce(options: {
   frontieresReplique: FrontiereMot[];
   annonce: string;
   frequence: number;
-}): { signal: Float32Array; frontieres: FrontiereMot[] } | null {
+  /** Le silence entre l'annonce et la réplique, en secondes : `SILENCE_APRES_ANNONCE` par défaut. */
+  silence?: number;
+}): { signal: Float32Array; frontieres: FrontiereMot[]; frontieresAnnonce: FrontiereMot[] } | null {
   const { voixOff, frontieresVoixOff, replique, frontieresReplique, annonce, frequence } = options;
+  const silence = options.silence ?? SILENCE_APRES_ANNONCE;
   const nOff = frontieresDeLAnnonce(frontieresVoixOff, annonce);
   const n = frontieresDeLAnnonce(frontieresReplique, annonce);
   if (nOff === null || n === null) return null;
@@ -270,16 +274,17 @@ export function composerAnnonce(options: {
   const debutReplique = Math.max(finMotPrecedent, frontieresReplique[n].offset - 0.04);
 
   const a = Math.round(finAnnonce * frequence);
-  const s = Math.round(SILENCE_APRES_ANNONCE * frequence);
+  const s = Math.round(silence * frequence);
   const b = Math.round(debutReplique * frequence);
   const suite = replique.subarray(Math.min(b, replique.length));
   const signal = new Float32Array(a + s + suite.length);
   signal.set(voixOff.subarray(0, Math.min(a, voixOff.length)), 0);
   signal.set(suite, a + s);
 
-  const decalage = finAnnonce + SILENCE_APRES_ANNONCE - debutReplique;
+  const decalage = finAnnonce + silence - debutReplique;
   const frontieres = frontieresReplique.slice(n).map(f => ({ ...f, offset: f.offset + decalage }));
-  return { signal, frontieres };
+  // Le signal commence par la voix off : ses mots d'annonce y sont aux mêmes instants.
+  return { signal, frontieres, frontieresAnnonce: frontieresVoixOff.slice(0, nOff) };
 }
 
 /**

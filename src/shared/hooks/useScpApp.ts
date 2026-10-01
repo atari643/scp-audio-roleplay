@@ -146,7 +146,10 @@ export function useScpApp() {
 
   // Navigation entre dossiers liés : pile pour revenir en arrière, file « À SUIVRE » pour
   // mettre un lien de côté sans interrompre l'écoute en cours.
-  const [navigationStack, setNavigationStack] = useState<string[]>([]);
+  // Chaque étape garde la réplique où l'on en était : un clic sur un lien ouvre le dossier
+  // lié, et le retour doit rendre sa place à qui écoutait.
+  const [navigationStack, setNavigationStack] = useState<Array<{ slug: string; segment: number }>>([]);
+  const repriseApresRetour = useRef<{ slug: string; segment: number } | null>(null);
 
   /**
    * Le filtre d'entité : « montre-moi les dossiers de la Main du Serpent ».
@@ -251,13 +254,20 @@ export function useScpApp() {
         [activeScpDetail.textContent, ...(activeScpDetail.fragments || [])],
         activeScpDetail.title,
         currentLanguage.code,
-        activeScpDetail.source
+        activeScpDetail.source,
+        activeScpDetail.titresLies
       );
       setActiveSegments(parsed);
       speechEngine.setScript(
-        parsed, 
+        parsed,
         `${activeScpDetail.scpNumber} - ${activeScpDetail.alternateTitle || activeScpDetail.title}`
       );
+      // Retour depuis un dossier lié : la lecture reprend à la réplique quittée, en pause.
+      const reprise = repriseApresRetour.current;
+      if (reprise && reprise.slug === activeScpDetail.slug) {
+        repriseApresRetour.current = null;
+        if (reprise.segment > 0) speechEngine.jumpToSegment(reprise.segment);
+      }
       storageService.addToRecent(activeScpDetail);
     }
   }, [activeScpDetail, currentLanguage.code]);
@@ -381,6 +391,7 @@ export function useScpApp() {
   // SCP selection through biometric scanner
   const handleSelectScp = useCallback((slugOrNumber: string) => {
     sfx.playTerminalBeep();
+    repriseApresRetour.current = null;
     setPendingSlug(slugOrNumber);
     setShowBiometric(true);
     setShowStamp(false);
@@ -459,18 +470,28 @@ export function useScpApp() {
       window.open(link.url || link.target, '_blank', 'noopener,noreferrer');
       return;
     }
-    setNavigationStack(prev => (activeSlug ? [...prev, activeSlug] : prev));
+    const segment = playerStatus.currentSegmentIndex;
+    setNavigationStack(prev => (activeSlug ? [...prev, { slug: activeSlug, segment }] : prev));
     removeFromQueue(link.target);
-    handleSelectScp(link.target);
-  }, [activeSlug, handleSelectScp, removeFromQueue]);
+    // Sans le scanner biométrique, comme un lien partagé : le clic EST le choix, et un lien
+    // qui fait patienter devant un capteur ne se comporte plus comme un lien.
+    sfx.playTerminalBeep();
+    speechEngine.stop();
+    repriseApresRetour.current = null;
+    setShowStamp(false);
+    setShowAlert(false);
+    setActiveSlug(link.target);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [activeSlug, removeFromQueue, playerStatus.currentSegmentIndex]);
 
-  /** Revenir au dossier depuis lequel on a suivi un lien. */
+  /** Revenir au dossier depuis lequel on a suivi un lien, à la réplique où on l'avait quitté. */
   const handleGoBack = useCallback(() => {
     setNavigationStack(prev => {
       if (prev.length === 0) return prev;
       const previous = prev[prev.length - 1];
       speechEngine.stop();
-      setActiveSlug(previous);
+      repriseApresRetour.current = previous;
+      setActiveSlug(previous.slug);
       return prev.slice(0, -1);
     });
   }, []);
@@ -548,8 +569,13 @@ export function useScpApp() {
     activeScpDetail,
     isDetailLoading,
     detailError,
-    /** Set when the dossier is absent locally but exists in English — "pas encore traduite". */
-    englishFallback: englishFallback ?? null,
+    /**
+     * Set when the dossier is absent locally but exists in English — "pas encore traduite".
+     * Jamais sur la branche anglaise : la requête y est désactivée, mais TanStack rend encore
+     * la réponse en cache. « Lire la version anglaise » menait alors à… la même invitation à
+     * lire la version anglaise, sans fin.
+     */
+    englishFallback: currentLanguage.code !== 'en' ? englishFallback ?? null : null,
     /** Jump to the English branch keeping the same dossier open. */
     readInEnglish: () => {
       const en = SUPPORTED_LANGUAGES.find(l => l.code === 'en');

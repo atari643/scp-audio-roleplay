@@ -91,6 +91,21 @@ export function ecrireEtatPartage(slug: string | null, langue: LanguageBranch): 
   }
 }
 
+/**
+ * L'adresse qui ouvre `slug` dans la branche affichée, ou `undefined` si ce n'est pas un
+ * slug qu'on accepterait à l'ouverture.
+ *
+ * Sert de `href` aux liens d'un dossier : Ctrl+clic, clic molette et « ouvrir dans un
+ * nouvel onglet » font alors ce qu'on attend d'un lien. La langue est reprise de l'adresse
+ * courante, que `ecrireEtatPartage` tient à jour.
+ */
+export function adresseDossier(slug: string): string | undefined {
+  if (typeof window === 'undefined' || !SLUG_VALIDE.test(slug)) return undefined;
+  const params = new URLSearchParams(window.location.search);
+  params.set('scp', slug);
+  return `${window.location.pathname}?${params.toString()}`;
+}
+
 /** Le titre d'onglet livré par `index.html` (ou par le middleware des aperçus). */
 let titreInitial: string | null = null;
 

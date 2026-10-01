@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { WikiLink } from '../services/linkExtractor';
+import { WikiLink, motifLibelle } from '../services/linkExtractor';
+import { adresseDossier } from '../services/lienPartage';
 import { splitDisplayWords } from '../services/wordAlignment';
 import { useT } from '../i18n';
 
@@ -59,9 +60,8 @@ function buildDecorations(text: string, links?: WikiLink[]): Decoration[] {
     // « Secure Facility Dossier: Site-120 » par le milieu.
     const ordered = [...links].sort((a, b) => b.label.length - a.label.length);
     for (const link of ordered) {
-      const motif = new RegExp(link.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-      for (const m of text.matchAll(motif)) {
-        if (m.index === undefined) continue;
+      for (const m of text.matchAll(motifLibelle(link.label))) {
+        if (m.index === undefined || m[0].length === 0) continue;
         const start = m.index;
         const end = start + m[0].length;
         // Un libellé déjà couvert par une décoration plus longue est ignoré.
@@ -133,30 +133,44 @@ export const SpokenLine: React.FC<SpokenLineProps> = ({
       );
     } else if (deco.link && onEnqueueLink && onOpenLink) {
       const link = deco.link;
+      const externe = link.kind === 'external';
+      // Un vrai lien, avec une adresse : Ctrl+clic et clic molette l'ouvrent dans un
+      // nouvel onglet, comme partout ailleurs. Sans adresse (cible qui n'est pas un slug
+      // accepté à l'ouverture), le clic reste le seul chemin.
+      const href = externe ? link.url || link.target : adresseDossier(link.target);
+      const Balise = href ? 'a' : 'button';
       noeuds.push(
-        <button
+        <Balise
           key={`l${i}`}
-          type="button"
+          {...(href
+            ? { href, ...(externe ? { target: '_blank', rel: 'noopener noreferrer' } : {}) }
+            : { type: 'button' as const })}
           className={`wiki-link wiki-link--${link.kind}${actif ? ' mot-lu' : ''}`}
           title={
-            link.kind === 'external'
+            externe
               ? `Lien externe : ${link.url || link.target}`
               : t('file.miseDeCote', { genre: KIND_LABEL[link.kind] || t('file.page'), cible: link.target })
           }
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
-            if (e.altKey || link.kind === 'external') onOpenLink(link);
-            else onEnqueueLink(link);
+            // Ctrl, Cmd ou Maj : le navigateur ouvre l'adresse lui-même.
+            if (href && (e.ctrlKey || e.metaKey || e.shiftKey)) return;
+            e.preventDefault();
+            // Le clic OUVRE le dossier. Il le mettait de côté, dans la file « À suivre »
+            // affichée en haut du dossier, hors de vue : on cliquait et rien ne se passait.
+            if (e.altKey && !externe) onEnqueueLink(link);
+            else onOpenLink(link);
           }}
-          onContextMenu={e => {
-            // Clic droit = ouvrir tout de suite, équivalent souris de l'appui long.
+          onContextMenu={(e: React.MouseEvent) => {
+            if (externe) return;
+            // Clic droit, ou appui long sur téléphone : mettre de côté sans couper l'écoute.
             e.preventDefault();
             e.stopPropagation();
-            onOpenLink(link);
+            onEnqueueLink(link);
           }}
         >
           {contenu}
-        </button>
+        </Balise>
       );
     } else {
       noeuds.push(

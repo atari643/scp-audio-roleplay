@@ -21,8 +21,8 @@ const KIND_LABEL: Record<WikiLink['kind'], string> = {
 /**
  * File « À SUIVRE » — partagée desktop et mobile.
  *
- * Elle existe pour une raison précise : dans une app audio, cliquer un lien en pleine
- * écoute fait perdre sa place. Le clic met donc de côté, et on enchaîne quand on veut.
+ * Le clic sur un lien ouvre le dossier lié (le retour rend sa place à l'écoute) ; Alt+clic,
+ * clic droit ou appui long le mettent ici, de côté, pour enchaîner quand on veut.
  */
 export const ReadingQueue: React.FC<ReadingQueueProps> = ({ queue, onOpen, onRemove, onClear }) => {
   const t = useT();

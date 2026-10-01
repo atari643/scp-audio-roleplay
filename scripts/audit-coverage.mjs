@@ -349,7 +349,9 @@ async function main() {
       if (detail) fs.writeFileSync(cacheFile, JSON.stringify(detail));
       await new Promise(r => setTimeout(r, 120)); // ne pas marteler une API communautaire
     }
-    if (!detail || !detail.textContent) continue;
+    // Un textContent vide n'est plus une page vide : bloc `[[html]]` seul, hub d'images
+    // (`cromApi.construireDetail`). L'application les lit, l'audit doit les voir.
+    if (!detail) continue;
 
     const segments = parseScpDossier(
       [detail.textContent, ...(detail.fragments || [])],
@@ -357,7 +359,8 @@ async function main() {
       args.lang,
       // La source Wikidot porte les cibles des liens (et, au cas 5, le texte barré) — sans
       // elle, l'audit ne voit pas ce que l'application voit.
-      detail.source
+      detail.source,
+      detail.titresLies
     );
     const rapport = auditDossier(slug, detail, segments, parseur, args.lang);
     rapport.prononciation = auditPrononciation(segments, normalizeForSpeech, args.lang);

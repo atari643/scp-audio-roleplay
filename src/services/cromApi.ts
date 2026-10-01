@@ -2,6 +2,8 @@ import { AttributionScp, LanguageBranch, ObjectClass, ScpItemDetail, ScpItemSumm
 import { getSeriesById } from '../data/seriesData';
 import { enrichissementDe } from './catalogueDefaut';
 import TAGS_CLASSE from '../data/tagsClasse.json';
+import { extraireImagesLiees, imagesLieesSansLibelle } from './linkExtractor';
+import { estPageInteractive, texteDesBlocsHtml } from './scriptParser';
 
 const CROM_ENDPOINT = 'https://api.crom.avn.sh/graphql';
 
@@ -49,6 +51,14 @@ function extractScpNumber(slugOrTitle: string): string {
     return match[0].toUpperCase();
   }
   return slugOrTitle.toUpperCase();
+}
+
+/**
+ * Un texte rendu qui contient au moins une lettre ou un chiffre. Crom rend « vide » une page
+ * faite d'un bloc `[[html]]` ou d'images, mais souvent avec des sauts de ligne.
+ */
+function aDuTexte(texte: string): boolean {
+  return /[\p{L}\p{N}]/u.test(texte);
 }
 
 /**
@@ -718,49 +728,96 @@ ${SELECTION_DETAIL}
 
     try {
       const data = await queryGraphQL<DetailResponse>(detailQuery, { url: canonicalUrl });
-      const page = data?.page;
-      const wiki = page?.wikidotInfo;
+      const detail = data?.page ? await this.construireDetail(data.page, slug, langCode) : null;
+      if (detail) return detail;
 
-      if (!page || !wiki || !wiki.textContent) {
-        // Fallback: Try searching for the slug if direct URL didn't match
-        const searchResults = await this.searchScp(slug, langCode);
-        if (searchResults.length > 0 && searchResults[0].url !== canonicalUrl) {
-          return this.fetchScpDetailByUrl(searchResults[0].url);
-        }
-        return null;
+      // Fallback: Try searching for the slug if direct URL didn't match
+      const searchResults = await this.searchScp(slug, langCode);
+      if (searchResults.length > 0 && searchResults[0].url !== canonicalUrl) {
+        return this.fetchScpDetailByUrl(searchResults[0].url, langCode);
       }
-
-      const title = wiki.title || slug.toUpperCase();
-      const tags = wiki.tags || [];
-
-      // Paginated dossiers (see fetchFragments) only return their first page here. Keep the
-      // extra pages SEPARATE rather than concatenating: each page carries its own
-      // "Notes de bas de page" block with its own 1..N numbering, so a naive join would put
-      // page 2 inside page 1's footnote section and lose it entirely.
-      const fragments = await this.fetchFragments(slug, wiki.source || '', langCode, wiki.textContent || '');
-
-      return {
-        fragments: fragments.length > 0 ? fragments : undefined,
-        url: page.url,
-        slug,
-        title,
-        scpNumber: extractScpNumber(slug),
-        alternateTitle: page.alternateTitles?.[0]?.title,
-        rating: wiki.rating,
-        tags,
-        objectClass: extractObjectClass(tags),
-        thumbnailUrl: wiki.thumbnailUrl,
-        textContent: wiki.textContent,
-        source: wiki.source,
-        createdAt: wiki.createdAt,
-        translations: page.translations?.map(t => ({ url: t.url })),
-        attributions: versAttributions(page)
-      };
+      return null;
     } catch (err) {
       console.error(`Erreur chargement SCP ${slug}:`, err);
       return null;
     }
   },
+
+  /**
+   * Le détail d'un dossier à partir de sa page Crom, ou `null` s'il n'y a rien à lire.
+   *
+   * « Rien à lire » ne veut pas dire « textContent vide ». Crom ne rend ni les blocs
+   * `[[html]]` (servis en iframe), ni les images, et un
+   * dossier paginé peut avoir une page 1 vide. Des pages bien réelles étaient ainsi déclarées
+   * introuvables — ou « pas encore traduites », puisque l'original anglais existe :
+   *  - Ouroboros, hub de quatre images cliquables (FR et EN) ;
+   *  - la proposition de notgull, SCP-280-JP : tout le dossier dans un bloc `[[html]]` ;
+   *  - psul-001 : la page 1 est vide, le dossier est dans ses fragments.
+   *
+   * Les iframes ne sont PAS suivis : celui de SCP-268-KO mène à une page dont Crom rend tout
+   * le gabarit Wikidot, scripts compris — 330 répliques de JavaScript.
+   */
+  async construireDetail(page: NoeudDetail, slug: string, langCode: string): Promise<ScpItemDetail | null> {
+    const wiki = page.wikidotInfo;
+    if (!wiki) return null;
+    const source = wiki.source || '';
+    let texte = wiki.textContent || '';
+
+    // Paginated dossiers (see fetchFragments) only return their first page here. Keep the
+    // extra pages SEPARATE rather than concatenating: each page carries its own
+    // "Notes de bas de page" block with its own 1..N numbering, so a naive join would put
+    // page 2 inside page 1's footnote section and lose it entirely.
+    const fragments = await this.fetchFragments(slug, source, langCode, texte);
+    if (!aDuTexte(texte) && fragments.length > 0) texte = fragments.shift() ?? '';
+
+    const imagesSansLibelle = aDuTexte(texte) ? [] : imagesLieesSansLibelle(source);
+    // Un programme (SCP-280-JP) n'a rien à lire, mais la page existe : le lecteur l'ouvre et
+    // dit pourquoi elle se tait, plutôt que de la déclarer introuvable.
+    const contenuDeSource =
+      extraireImagesLiees(source).length > 0 ||
+      imagesSansLibelle.length > 0 ||
+      aDuTexte(texteDesBlocsHtml(source, '')) ||
+      estPageInteractive(source);
+    if (!aDuTexte(texte) && !contenuDeSource) return null;
+
+    const title = wiki.title || slug.toUpperCase();
+    const tags = wiki.tags || [];
+
+    return {
+      fragments: fragments.length > 0 ? fragments : undefined,
+      url: page.url,
+      slug,
+      title,
+      scpNumber: extractScpNumber(slug),
+      alternateTitle: page.alternateTitles?.[0]?.title,
+      rating: wiki.rating,
+      tags,
+      objectClass: extractObjectClass(tags),
+      thumbnailUrl: wiki.thumbnailUrl,
+      textContent: texte,
+      source: wiki.source,
+      titresLies: imagesSansLibelle.length > 0 ? await this.titresDesPages(imagesSansLibelle, langCode) : undefined,
+      createdAt: wiki.createdAt,
+      translations: page.translations?.map(t => ({ url: t.url })),
+      attributions: versAttributions(page)
+    };
+  },
+
+  /**
+   * Le titre de pages du wiki, pour nommer une image cliquable qui n'a pas d'`alt` — la
+   * traduction française d'Ouroboros. Un dossier SCP garde son titre alternatif
+   * (« SCP-173 - La Statue »), plus parlant que son seul numéro.
+   */
+  async titresDesPages(slugs: string[], langCode: string): Promise<Record<string, string>> {
+    const resumes = await this.fetchBySlugs(slugs, langCode);
+    return Object.fromEntries(
+      resumes.map(r => [
+        r.slug.toLowerCase(),
+        r.alternateTitle && r.alternateTitle !== r.title ? `${r.title} - ${r.alternateTitle}` : r.title
+      ])
+    );
+  },
+
 
   /**
    * Fetch directly by full page URL
@@ -806,9 +863,10 @@ ${SELECTION_DETAIL}
       }
     }
 
-    // Route 2: probe the usual naming patterns, bounded so a miss costs little.
+    // Route 2: probe the usual naming patterns, bounded so a miss costs little. Douze et non
+    // huit : psul-001 compte neuf fragments, dont les deux premiers ne sont que des images.
     const num = slug.replace(/^scp-/i, '');
-    for (let i = 1; i <= 8; i++) {
+    for (let i = 1; i <= 12; i++) {
       for (const pattern of [`fragment:${slug}-offset-${i}`, `fragment:${slug}-${i}`, `fragment:${num}-${i}`]) {
         if (!seen.has(pattern)) {
           seen.add(pattern);
@@ -908,7 +966,7 @@ ${SELECTION_DETAIL}
     }
   },
 
-  async fetchScpDetailByUrl(pageUrl: string): Promise<ScpItemDetail | null> {
+  async fetchScpDetailByUrl(pageUrl: string, langCode: string = 'fr'): Promise<ScpItemDetail | null> {
     const canonicalUrl = pageUrl.replace(/^https:\/\//, 'http://');
     const slug = canonicalUrl.split('/').pop() || '';
 
@@ -926,30 +984,7 @@ ${SELECTION_DETAIL}
 
     try {
       const data = await queryGraphQL<DetailResponse>(detailQuery, { url: canonicalUrl });
-      const page = data?.page;
-      const wiki = page?.wikidotInfo;
-
-      if (!page || !wiki || !wiki.textContent) return null;
-
-      const title = wiki.title || slug.toUpperCase();
-      const tags = wiki.tags || [];
-
-      return {
-        url: page.url,
-        slug,
-        title,
-        scpNumber: extractScpNumber(slug),
-        alternateTitle: page.alternateTitles?.[0]?.title,
-        rating: wiki.rating,
-        tags,
-        objectClass: extractObjectClass(tags),
-        thumbnailUrl: wiki.thumbnailUrl,
-        textContent: wiki.textContent,
-        source: wiki.source,
-        createdAt: wiki.createdAt,
-        translations: page.translations?.map(t => ({ url: t.url })),
-        attributions: versAttributions(page)
-      };
+      return data?.page ? await this.construireDetail(data.page, slug, langCode) : null;
     } catch (err) {
       console.error(`Erreur fetchScpDetailByUrl:`, err);
       return null;

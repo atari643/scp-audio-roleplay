@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   Play,
@@ -16,6 +16,8 @@ import { ScpItemDetail } from '../types/scp';
 import { adresseDePartage, titreDossier } from '../services/adresseSite';
 import { usePartage } from '../shared/hooks/usePartage';
 import { CreditsDossier } from './CreditsDossier';
+import { AvisPageInteractive } from './AvisPageInteractive';
+import { estPageInteractive } from '../services/scriptParser';
 import { CharacterRole, SpeechSegment } from '../types/audioRoleplay';
 import { speechEngine } from '../services/speechEngine';
 import { sfx } from '../services/sfxService';
@@ -32,6 +34,8 @@ interface ScpReaderProps {
   currentSegmentIndex: number;
   isPlaying: boolean;
   onBack: () => void;
+  /** Vrai quand on est arrivé ici par un lien : le retour ramène au dossier d'où l'on vient. */
+  retourAuDossier?: boolean;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onPlaySegment: (index: number) => void;
@@ -83,6 +87,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
   currentSegmentIndex,
   isPlaying,
   onBack,
+  retourAuDossier = false,
   isFavorite,
   onToggleFavorite,
   onPlaySegment,
@@ -102,6 +107,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
   const segmentRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   const habillage = habillageClasse(scp.objectClass);
+  const pageInteractive = useMemo(() => estPageInteractive(scp.source), [scp.source]);
 
   // Recentrage sur la réplique active, pour suivre la voix à l'œil.
   const scrollToActiveSegment = (index: number, smooth: boolean = true) => {
@@ -144,7 +150,7 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
           className={`${BOUTON_OUTIL} group`}
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-          <span>{t('dossier.catalogue')}</span>
+          <span>{t(retourAuDossier ? 'dossier.precedent' : 'dossier.catalogue')}</span>
         </button>
 
         <div className="flex items-center gap-2">
@@ -351,6 +357,8 @@ export const ScpReader: React.FC<ScpReaderProps> = ({
           onClear={onClearQueue}
         />
       )}
+
+      {pageInteractive && <AvisPageInteractive url={scp.url} className="mb-4 max-w-lecture" />}
 
       {activeTab === 'roleplay' ? (
         <div className="space-y-1.5 scp-document">

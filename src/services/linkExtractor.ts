@@ -31,9 +31,43 @@ const GENERIC_LABELS = new Set([
   'more', 'plus', 'page', 'article', 'source', 'note'
 ]);
 
-/** Slugs techniques : thèmes et composants de mise en page, jamais du contenu. */
+/**
+ * Slugs techniques : thèmes, composants de mise en page et pages système du wiki
+ * (`system:page-tags`, `fragment:…`), jamais du contenu.
+ */
 function isTechnical(target: string): boolean {
-  return /^(?:theme|component|info|include|module|css):/i.test(target);
+  return /^(?:theme|component|info|include|module|css|system|fragment|admin|nav|forum|search):/i.test(target);
+}
+
+/**
+ * Le nom de page que Wikidot donne à une cible de lien.
+ *
+ * La source écrit la cible comme on l'a tapée — « qntm's Proposal », « Dr. Gears's
+ * Proposal », « Rapports d'expérience 005-FR-1 et 2 + Incident 005-FR-1 » — et le wiki la
+ * ramène à son nom de page avant de la suivre. Sans ce calcul, l'app demandait à Crom
+ * `qntm's-proposal`, une page qui n'existe pas : le lien de SCP-001 n'ouvrait rien.
+ *
+ * Vérifié sur Crom le 01/10/2026 : apostrophe, point, « + » et souligné deviennent un
+ * tiret (`qntm-s-proposal`, `dr-gears-s-proposal`, `b-bone-s-proposal`), les accents sont
+ * translittérés (`rapports-d-experience-…`), les tirets se replient. Le deux-points de
+ * catégorie reste.
+ */
+function nomDePage(cible: string): string {
+  return cible
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9:]+/g, '-')
+    .replace(/-*:-*/g, ':')
+    .replace(/^[-:]+|[-:]+$/g, '');
+}
+
+/**
+ * La page que vise une cible interne. Un `/` initial est de la syntaxe ; `#ancre` et
+ * `/offset/2` désignent un endroit DANS la page, et l'app ouvre toujours la page entière.
+ */
+function pageVisee(cible: string): string {
+  return nomDePage(cible.replace(/^\/+/, '').split(/[#/]/)[0]);
 }
 
 function classify(target: string): WikiLinkKind {
@@ -62,39 +96,114 @@ export function extractWikiLinks(source: string | undefined): WikiLink[] {
   const seen = new Set<string>();
   const links: WikiLink[] = [];
 
-  const push = (target: string, label: string, url?: string) => {
-    const cleanTarget = target.trim();
+  const push = (target: string, label: string) => {
+    // `*` en tête : « ouvrir dans un nouvel onglet ». C'est de la syntaxe, pas la cible —
+    // `[[[*https://commons…]]]` passait pour un conte que l'app tentait de charger.
+    const brute = target.trim().replace(/^\*/, '');
+    const externe = /^https?:\/\//i.test(brute);
+    const cleanTarget = externe ? brute : pageVisee(brute);
     const cleanLabel = label.trim();
     if (!cleanTarget || !cleanLabel) return;
     if (isTechnical(cleanTarget)) return;
     if (cleanLabel.length < 4) return;
+    // Sans lettre ni chiffre (« ██████ », « ( ) »), le motif du libellé n'ancre rien de sûr.
+    if (!/[\p{L}\p{N}]/u.test(cleanLabel)) return;
     if (GENERIC_LABELS.has(cleanLabel.toLowerCase())) return;
 
     const key = cleanTarget.toLowerCase();
     if (seen.has(key)) return;
     seen.add(key);
 
-    const kind = classify(cleanTarget);
     links.push({
-      target: kind === 'external' ? cleanTarget : cleanTarget.toLowerCase().replace(/\s+/g, '-'),
+      target: cleanTarget,
       label: cleanLabel,
-      kind,
-      ...(url ? { url } : {})
+      kind: classify(cleanTarget),
+      ...(externe ? { url: brute } : {})
     });
   };
 
-  // Liens internes : [[[cible|libellé]]] ou [[[cible]]]
-  for (const m of body.matchAll(/\[\[\[([^\]|]+?)(?:\|([^\]]*))?\]\]\]/g)) {
+  // Liens internes : [[[cible|libellé]]] ou [[[cible]]]. Le `(?!\[)` ancre la capture sur
+  // les trois DERNIERS crochets : SCP-106 encadre un lien de crochets, « [[[[until-death|DATA
+  // EXPUNGED]]]] », et la cible devenait « [until-death ».
+  for (const m of body.matchAll(/\[\[\[(?!\[)([^\]|]+?)(?:\|([^\]]*))?\]\]\]/g)) {
     const target = m[1];
     push(target, m[2] || target);
   }
 
   // Liens externes : [https://… libellé]. On exclut [[*user …]], géré par le markup.
   for (const m of body.matchAll(/\[(https?:\/\/[^\s\]]+)\s+([^\]]+)\]/g)) {
-    push(m[1], m[2], m[1]);
+    push(m[1], m[2]);
   }
 
   return links;
+}
+
+/** Une image cliquable de la source, et l'endroit où elle finit. */
+export interface ImageLiee {
+  fin: number;
+  lien: WikiLink;
+}
+
+/**
+ * Les images qui mènent à une autre page du wiki : `[[image LesEnfants.png link="…"]]`.
+ *
+ * C'est toute la page de certains hubs. Ouroboros (proposition 001 de djkaktus) n'est que
+ * quatre images, une par partie : Crom n'en rend aucun texte, et l'app déclarait la page
+ * introuvable. Le libellé est l'`alt` de l'image (« Part One - The Children ») ; la
+ * traduction française n'en a pas, d'où `titres`, le titre de la page visée que l'appelant
+ * a demandé à Crom (`cromApi.titresDesImagesLiees`). Sans l'un ni l'autre, l'image est
+ * ignorée : un nom de fichier n'est pas un libellé.
+ *
+ * Écartés : `link=#` (une image qu'on agrandit), les fichiers (`local--files`, `.png`…)
+ * et les pages techniques.
+ */
+export function extraireImagesLiees(
+  source: string | undefined,
+  titres: Record<string, string> = {}
+): ImageLiee[] {
+  return imagesCliquables(source).flatMap(({ fin, page, alt }) => {
+    const label = alt ?? titres[page];
+    return label ? [{ fin, lien: { target: page, label, kind: classify(page) } }] : [];
+  });
+}
+
+/** Les pages visées par des images cliquables sans `alt` : celles dont il faut le titre. */
+export function imagesLieesSansLibelle(source: string | undefined): string[] {
+  return imagesCliquables(source).filter(i => !i.alt).map(i => i.page);
+}
+
+function imagesCliquables(source: string | undefined): Array<{ fin: number; page: string; alt?: string }> {
+  if (!source) return [];
+  const images: Array<{ fin: number; page: string; alt?: string }> = [];
+  const vues = new Set<string>();
+  for (const m of source.matchAll(/\[\[[<>=f]*image\s([^\]]*)\]\]/gi)) {
+    const brut = m[1].match(/\blink\s*=\s*"([^"]*)"|\blink\s*=\s*([^\s\]]+)/i);
+    const cible = (brut?.[1] ?? brut?.[2] ?? '').trim().replace(/^\*/, '');
+    if (!cible || /^https?:\/\//i.test(cible) || /local--files|\.(?:png|jpe?g|gif|webp|svg)$/i.test(cible)) continue;
+    const page = pageVisee(cible);
+    if (!page || isTechnical(page) || vues.has(page)) continue;
+    vues.add(page);
+    const alt = m[1].match(/\balt\s*=\s*"([^"]*)"/i)?.[1]?.trim();
+    images.push({ fin: (m.index ?? 0) + m[0].length, page, ...(alt && /[\p{L}\p{N}]/u.test(alt) ? { alt } : {}) });
+  }
+  return images;
+}
+
+/**
+ * Le motif qui retrouve un libellé dans le texte d'une réplique.
+ *
+ * Les parenthèses y sont facultatives : le libellé vient de la source, mais le parseur
+ * déballe une parenthèse de contenu — « The Great Hippo (feat. PeppersGhost) » devient
+ * « The Great Hippo feat. PeppersGhost », et c'était le seul lien de SCP-001 à ne pas
+ * s'afficher. Partagé par l'ancrage et par l'affichage (`SpokenLine`) : un lien ancré
+ * doit être un lien qu'on voit.
+ */
+export function motifLibelle(label: string): RegExp {
+  const echappe = label
+    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    .replace(/\\([()])/g, '\\$1?')
+    .replace(/\s+/g, '\\s*');
+  return new RegExp(echappe, 'gi');
 }
 
 /**
@@ -108,16 +217,17 @@ export function anchorLinksToTexts(texts: string[], links: WikiLink[]): Array<Wi
   const result: Array<WikiLink[] | undefined> = new Array(texts.length).fill(undefined);
   if (links.length === 0) return result;
 
-  const pending = [...links];
+  const pending = links.map(link => ({ link, motif: motifLibelle(link.label) }));
 
   for (let i = 0; i < texts.length; i++) {
     const text = texts[i];
     if (!text) continue;
-    const lower = text.toLowerCase();
 
     for (let j = pending.length - 1; j >= 0; j--) {
-      if (lower.includes(pending[j].label.toLowerCase())) {
-        (result[i] ||= []).push(pending[j]);
+      const { link, motif } = pending[j];
+      motif.lastIndex = 0;
+      if (motif.test(text)) {
+        (result[i] ||= []).push(link);
         pending.splice(j, 1);
       }
     }

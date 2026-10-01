@@ -150,6 +150,8 @@ export const FR = {
 
   // --- Lecteur de dossier ---------------------------------------------------
   'dossier.catalogue': 'Catalogue',
+  'dossier.precedent': 'Dossier précédent',
+  'dossier.pageInteractive': "Une partie de cette page est un programme interactif : la lecture audio ne le restitue pas.",
   'dossier.source': 'Source',
   'dossier.sourceInfo': "Consulter l'archive originale sur le wiki",
   'dossier.partager': 'Partager',
@@ -355,7 +357,7 @@ export const FR = {
   'favoris.classe': 'Classé',
   'favoris.titre': 'Dossiers classés',
   'file.retirer': 'Retirer {libelle} de la file',
-  'file.miseDeCote': '{genre} · {cible} — clic : mettre de côté, Alt+clic : ouvrir',
+  'file.miseDeCote': '{genre} · {cible} — clic : ouvrir, Alt+clic ou clic droit : mettre de côté',
 
   // --- Filtres rapides ------------------------------------------------------
   'filtre.departements': 'Départements',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ArrowLeft, Star, Play, ZoomIn, ZoomOut, ExternalLink, Share2, Check } from 'lucide-react';
 import { ScpItemDetail } from '../../types/scp';
 import { adresseDePartage, titreDossier } from '../../services/adresseSite';
@@ -9,6 +9,8 @@ import { SpokenLine } from '../../components/SpokenLine';
 import { ReadingQueue } from '../../components/ReadingQueue';
 import { BandeauEntites } from '../../components/BandeauEntites';
 import { CreditsDossier } from '../../components/CreditsDossier';
+import { AvisPageInteractive } from '../../components/AvisPageInteractive';
+import { estPageInteractive } from '../../services/scriptParser';
 import {
   cleLibelleClasse,
   habillageClasse,
@@ -81,6 +83,7 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
   const { etat: etatPartage, partager } = usePartage();
   const [fontSize, setFontSize] = useState<keyof typeof TAILLES>('sm');
   const habillage = habillageClasse(scp.objectClass);
+  const pageInteractive = useMemo(() => estPageInteractive(scp.source), [scp.source]);
 
   return (
     <div className="flex-1 flex flex-col pb-28">
@@ -231,6 +234,8 @@ export const MobileScpReader: React.FC<MobileScpReaderProps> = ({
           />
         </div>
       )}
+
+      {pageInteractive && <AvisPageInteractive url={scp.url} className="mt-3" />}
 
       <div className="mt-4 space-y-1.5">
         {segments.map((segment, index) => {

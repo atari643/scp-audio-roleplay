@@ -1,6 +1,6 @@
 import { CharacterRole, SpeechSegment } from '../types/audioRoleplay';
 import { characterVoiceService, CharacterGender, AssignedVoiceSignature, resolveInitialSignatories } from './characterVoiceService';
-import { extractWikiLinks, anchorLinksToTexts } from './linkExtractor';
+import { extractWikiLinks, anchorLinksToTexts, extraireImagesLiees } from './linkExtractor';
 import { STAGE_DIRECTIONS } from './speechLexicon';
 
 /**
@@ -240,8 +240,30 @@ export function retirerRestesDeComposants(texte: string): string {
     for (let j = pleines[premier].i; j <= i; j++) garder[j] = false;
   });
 
+  // Le pavé de crédits des traductions (`credit:start`) : « Crédits », ses champs d'un seul
+  // tenant (« Titre original : … », « Auteur : … »), puis le « Retour » qui le referme. Le
+  // préambule l'écarte devant un en-tête d'objet ; un conte, un hub, une proposition 001 ou
+  // une page interactive n'en ont pas, et l'Archiviste lisait « Crédits », puis « Titre
+  // original » comme un personnage (Proposition de Dr Gears, SCP-3340).
+  const blanc = (k: number) => k < lignes.length && !lignes[k].trim();
+  lignes.forEach((brute, i) => {
+    if (!garder[i] || !/^cr[ée]dits?$/i.test(brute.trim())) return;
+    let j = i + 1;
+    while (blanc(j)) j++;
+    if (j >= lignes.length || !CHAMP_DE_CREDITS.test(lignes[j].trim())) return;
+    while (j < lignes.length && lignes[j].trim()) j++;
+    let fin = j;
+    while (blanc(fin)) fin++;
+    if (fin < lignes.length && /^(?:retour|back)$/i.test(lignes[fin].trim())) j = fin + 1;
+    for (let k = i; k < j; k++) garder[k] = false;
+  });
+
   return lignes.filter((_, i) => garder[i]).join('\n');
 }
+
+/** Premier champ du pavé de crédits : c'est lui qui distingue ce pavé d'un titre « Crédits ». */
+const CHAMP_DE_CREDITS =
+  /^(?:titre|auteur|autrice|auteurs|traducteur|traductrice|traduction|date|images?|illustrations?|source)[^:]{0,30}:/i;
 
 /**
  * Les notes « en ligne » d'un dossier sans bloc de notes en fin de page (SCP-5618) : chaque
@@ -455,6 +477,8 @@ const DIDASCALIE_DE_MANIERE = motsEntiers([
   'nerveu\\w*', 'nervous\\w*', 'calme\\w*', 'calm\\w*', 'sarcasti\\w*', 'ironi\\w*', 'doucement', 'quietly', 'softly', 'loudly',
   'enjou[ée]\\w*', 'g[êe]n[ée]\\w*', 'troubl[ée]\\w*', 'surpris\\w*', 'paniqu\\w*', 'panick\\w*', 'abasourdi\\w*', 'choqu[ée]\\w*', 'shocked',
   'incr[ée]dul\\w*', 'effray[ée]\\w*', 'terrifi\\w*', 'scared', 'voix basse', 'voix rauque', 'inaudible',
+  // La note du transcripteur : « SCP-682 : (Incomprehensible) » faisait dire le mot à SCP-682.
+  'incompr[ée]hensible\\w*', 'unintelligible', 'indistinct\\w*', 'garbled',
   'en fran[çc]ais', 'in french', 'en anglais', 'in english', 'à la radio', 'over the radio', 'au micro', 'en arrière-plan',
   'in the background', 'de loin', 'from afar', 'hors[- ]champ', 'off-screen'
 ]);
@@ -470,7 +494,17 @@ const DIDASCALIE_D_ACTION = motsEntiers([
   "s'assi\\w*", "s'asso\\w*", 'sits', 'sitting', 'se penche\\w*', 'leans?', 'leaning', 'hausse les [ée]paules', 'shrugs?',
   'frissonn\\w*', 'shiver\\w*', 'trembl\\w*', 'd[ée]glut\\w*', 'swallow\\w*', 'se tourn\\w*', 'turns', 'turning', 'gestur\\w*', 'geste',
   'bruits?', 'sounds?', 'noises?', 'gr[ée]sill\\w*', 'static', 'parasites', 'coups? de (?:feu|pied|poing)', 'tirs?', 'gunfire',
-  'gunshots?', 'shots? fired', 'explosions?', 'alarmes?', 'sir[èe]nes?', 'pas de r[ée]ponse', 'no (?:response|answer)', 'silence'
+  'gunshots?', 'shots? fired', 'explosions?', 'alarmes?', 'sir[èe]nes?', 'pas de r[ée]ponse', 'no (?:response|answer)', 'silence',
+  // L'entretien de SCP-682 : « (Motions to move microphone closer) », « (Appearing to assault
+  // D-085's body) », « (Retreats from the room) », « (No verbal communication) » étaient dits
+  // par le personnage.
+  'motions?', 'motioning', 'fait signe', 'appears? to', 'appearing to', 'assault\\w*', 'attack(?:s|ing)',
+  'attaque(?:nt)?', 'lunges?', 'retreat\\w*', 'recule\\w*', 'flees', 'fleeing', "s'enfui\\w*", 'leaves the',
+  'exits', 'enters', 'quitte la (?:pi[èe]ce|salle)', 'entre dans', 'walks', 'walking',
+  'no verbal communication', '(?:pas|aucune) de communication verbale', 'aucune communication verbale',
+  // « …the use of an [Papers are heard moving] AT-4 HEDT launcher? » : le bruit décrit au
+  // passif était dit par le docteur (SCP-096).
+  '(?:is|are|was|were|can be|could be) heard', 'on entend', 'se fai(?:t|saient|sait) entendre'
 ]);
 
 /**
@@ -516,7 +550,9 @@ function classerParenthese(contenu: string, avant: string, apres: string, italiq
   if (!(maniere && (debutDePhrase || /,$/.test(avant.trimEnd()))) && !action && !italique) return 'contenu';
 
   const nommeUnSujet = /(?<!\p{L})(?:SCP|D|PdI|POI)-\d/iu.test(x);
-  if (maniere && !action && mots <= 4 && !nommeUnSujet) return 'maniere';
+  // « (To Personnel D-085) » : à qui l'on parle reste affiché au-dessus de la réplique ; dit par
+  // l'Archiviste, il coupait « Speak up. Move the mic up closer. » en deux (SCP-682).
+  if (maniere && !action && mots <= 4 && (adresse || !nommeUnSujet)) return 'maniere';
   return 'raconte';
 }
 
@@ -550,18 +586,23 @@ export function separerDidascalies(texte: string, italiques?: Set<string>): { pa
     courant = '';
   };
   let dernier = 0;
-  for (const m of texte.matchAll(/\(([^()]{1,300})\)/g)) {
+  // Les crochets aussi : « Capt. ██ : [Pauses] You know… » faisait dire « Pauses » au capitaine
+  // (SCP-096). Un crochet de contenu — « [REDACTED] », « [DATA EXPUNGED] », « [redacted] » —
+  // garde ses crochets : c'est à eux qu'on reconnaît le caviardage.
+  for (const m of texte.matchAll(/\(([^()]{1,300})\)|\[([^[\]]{1,300})\]/g)) {
     const debut = m.index!;
     courant += texte.slice(dernier, debut);
     dernier = debut + m[0].length;
-    const nature = classerParenthese(m[1], texte.slice(0, debut), texte.slice(dernier), italiques);
+    const crochet = m[2] !== undefined;
+    const interieur = crochet ? m[2] : m[1];
+    const nature = classerParenthese(interieur, texte.slice(0, debut), texte.slice(dernier), italiques);
     if (nature === 'contenu') {
-      courant += m[1].length >= 2 && m[1].length <= 60 ? m[1] : m[0];
+      courant += !crochet && interieur.length >= 2 && interieur.length <= 60 ? interieur : m[0];
     } else if (nature === 'maniere') {
-      directions.push(m[1].trim());
+      directions.push(interieur.trim());
     } else {
       pousserReplique();
-      const contenu = m[1].trim();
+      const contenu = interieur.trim();
       parties.push({ texte: /[.!?…]$/.test(contenu) ? contenu : `${contenu}.`, narration: true });
     }
   }
@@ -1894,7 +1935,7 @@ function extraireBlocsHtml(source: string | undefined, rendu: string): BlocHtml[
   for (const m of source.matchAll(/\[\[html[^\]]*\]\]([\s\S]*?)\[\[\/html\]\]/gi)) {
     const lignes = lignesDuHtml(m[1]);
     const mots = lignes.filter(l => !estMarqueur(l)).flatMap(l => motsDe(l));
-    if (mots.length < SEUIL_MOTS_HTML) continue;
+    if (mots.length < SEUIL_MOTS_HTML || estProgramme(m[1], mots.length)) continue;
     const reste = new Map(sac);
     let deja = 0;
     for (const mot of mots) {
@@ -1908,6 +1949,26 @@ function extraireBlocsHtml(source: string | undefined, rendu: string): BlocHtml[
     blocs.push({ fin: (m.index ?? 0) + m[0].length, lignes });
   }
   return blocs;
+}
+
+/**
+ * Un bloc `[[html]]` qui est un PROGRAMME : son texte, c'est un script qui l'écrit au
+ * chargement (SCP-3340, SCP-2212, SCP-404-JP, SCP-280-JP…). Hors du navigateur, il n'en
+ * reste qu'un « Chargement en cours… », qu'il ne faut pas lire comme du contenu.
+ */
+function estProgramme(bloc: string, mots: number = motsDe(lignesDuHtml(bloc).filter(l => !estMarqueur(l)).join(' ')).length): boolean {
+  const script = [...bloc.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].reduce((n, m) => n + m[1].length, 0);
+  return script >= 1500 && mots < 40;
+}
+
+/**
+ * La page contient-elle un programme (`estProgramme`) que la lecture ne restitue pas ?
+ * Les lecteurs le disent, avec un lien vers le wiki : sans cela, SCP-3340 s'ouvrait sur ses
+ * seuls crédits, et rien n'expliquait pourquoi.
+ */
+export function estPageInteractive(source: string | undefined): boolean {
+  if (!source || !/\[\[html/i.test(source)) return false;
+  return [...source.matchAll(/\[\[html[^\]]*\]\]([\s\S]*?)\[\[\/html\]\]/gi)].some(m => estProgramme(m[1]));
 }
 
 const echapperRegex = (texte: string): string => texte.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -1998,7 +2059,9 @@ export function parseScpDossier(
   scpTitle: string = 'Dossier SCP',
   lang: string = 'fr',
   /** Source Wikidot du dossier — seule à porter les cibles des liens. */
-  source?: string
+  source?: string,
+  /** Titre des pages que visent des images cliquables sans `alt` (`ScpItemDetail.titresLies`). */
+  titresLies?: Record<string, string>
 ): SpeechSegment[] {
   const all: SpeechSegment[] = [];
   // Resolve note signatories against the WHOLE dossier: a later page can sign "[SZ]" while
@@ -2007,11 +2070,21 @@ export function parseScpDossier(
   // Les passages barrés ne sont pas lus (décision produit) — uniquement la page 0, les
   // fragments paginés n'ayant pas de source distincte pour localiser leurs barrés.
   const pagesLues = [...retirerTexteBarre(pages, source).pages];
+  // Une page dont Crom ne rend aucun texte (`[[html]]` seul, hub fait d'images) n'a que sa
+  // source. Ses images cliquables deviennent alors des lignes : c'est tout son contenu
+  // (Ouroboros). Sur une page qui a son texte, une image liée est une illustration, et son
+  // libellé lu au milieu du dossier serait du bruit.
+  const pageVide = !/[\p{L}\p{N}]/u.test(pagesLues[0] ?? '');
+  const imagesLiees = pageVide ? extraireImagesLiees(source, titresLies) : [];
   // Page 0 seulement, comme le reste de la structure : l'aperçu caché part, le texte des
   // blocs [[html]] (absent de textContent) entre à sa place.
-  if (source && pagesLues[0]) {
-    const sansApercu = retirerApercuCache(pagesLues[0], source);
-    pagesLues[0] = insererBlocsHtml(sansApercu, source, extraireBlocsHtml(source, sansApercu), lang);
+  if (source && (pagesLues[0] || pageVide)) {
+    const sansApercu = retirerApercuCache(pagesLues[0] ?? '', source);
+    const blocs = [
+      ...extraireBlocsHtml(source, sansApercu),
+      ...imagesLiees.map(image => ({ fin: image.fin, lignes: [image.lien.label] }))
+    ].sort((a, b) => a.fin - b.fin);
+    pagesLues[0] = insererBlocsHtml(sansApercu, source, blocs, lang);
   }
   // Les tableaux, les onglets et les sessions de terminal ne vivent que dans la source
   // wikidot — CROM a aplati textContent. Extraits une fois, consommés par la page 0 (les
@@ -2037,7 +2110,11 @@ export function parseScpDossier(
   canoniserLocuteurs(all, lang, pages.join('\n'));
 
   // Ancrage des liens une fois les segments construits : purement additif, `text` intact.
-  const links = extractWikiLinks(source);
+  const liensTexte = extractWikiLinks(source);
+  const links = [
+    ...liensTexte,
+    ...imagesLiees.map(image => image.lien).filter(lien => !liensTexte.some(l => l.target === lien.target))
+  ];
   if (links.length > 0) {
     const anchored = anchorLinksToTexts(all.map(s => s.text), links);
     anchored.forEach((found, i) => {
